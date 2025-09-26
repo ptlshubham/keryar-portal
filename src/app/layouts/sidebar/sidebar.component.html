@@ -12,8 +12,9 @@
           }@else if (!item.isTitle && !item.isLayout) {
           <li>
             @if(hasItems(item)){
-            <a href="javascript:void(0);" class="is-parent" [ngClass]="{'has-arrow': !item.badge, 'has-dropdown': item.badge}">
-              <i-feather name="{{ item.icon }}"></i-feather>
+            <a href="javascript:void(0);" class="is-parent"
+              [ngClass]="{'has-arrow': !item.badge, 'has-dropdown': item.badge}">
+              <i class="{{ item.icon }}" aria-hidden="true"></i>
               <span> {{ item.label | translate }}</span>
               @if(item.badge){
               <span class="badge rounded-pill float-end badge-soft-{{item.badge.variant}} text-danger">{{item.badge.text
@@ -23,7 +24,8 @@
 
             <a [routerLink]="item.link" class="side-nav-link-ref" routerLinkActive="active">
               @if(item.icon){
-              <i-feather name="{{ item.icon }}"></i-feather>}
+              <i class="{{ item.icon }}" aria-hidden="true"></i>
+              }
               <span> {{ item.label | translate }}</span>
               @if(item.badge){
               <span class="badge rounded-pill badge-soft-{{item.badge.variant}} float-end">{{item.badge.text
@@ -35,19 +37,22 @@
               <li>
 
                 @if(hasItems(subitem)){
-                <a class="side-nav-link-a-ref has-arrow" href="javascript:void(0);" [attr.data-parent]="subitem.parentId">
+                <a class="side-nav-link-a-ref has-arrow" href="javascript:void(0);"
+                  [attr.data-parent]="subitem.parentId">
                   {{ subitem.label | translate}}
                 </a>
                 <ul class="sub-menu mm-collapse" aria-expanded="false">
                   @for (subSubitem of subitem.subItems; track $index) {
                   <li>
-                    <a [attr.data-parent]="subSubitem.parentId" [routerLink]="subSubitem.link" routerLinkActive="active" class="side-nav-link-ref">
+                    <a [attr.data-parent]="subSubitem.parentId" [routerLink]="subSubitem.link" routerLinkActive="active"
+                      class="side-nav-link-ref">
                       {{ subSubitem.label | translate }}
                     </a>
                   </li>}
                 </ul>}
                 @else {
-                <a [routerLink]="subitem.link" class="side-nav-link-ref" [attr.data-parent]="subitem.parentId" routerLinkActive="active">
+                <a [routerLink]="subitem.link" class="side-nav-link-ref" [attr.data-parent]="subitem.parentId"
+                  routerLinkActive="active">
                   {{ subitem.label | translate}}
                   @if(subitem.badge){
                   <span class="badge rounded-pill badge-soft-{{subitem.badge.variant}} float-end">{{subitem.badge.text
@@ -61,19 +66,15 @@
         </ng-container>
         }
       </ul>
-
-      <div class="card sidebar-alert border-0 text-center mx-4 mb-0 mt-5">
-        <div class="card-body">
-          <img src="assets/images/giftbox.png" alt="">
-          <div class="mt-4">
-            <h5 class="alertcard-title font-size-16">Unlimited Access</h5>
-            <p class="font-size-13">Upgrade your plan from a Free trial, to select ‘Business Plan’.</p>
-            <a href="javascript:void(0);" class="btn btn-primary mt-2">Upgrade Now</a>
-          </div>
-        </div>
-      </div>
     </div>
     <!-- Sidebar -->
+    <!-- Sticky section -->
+    <!-- <div class="sticky-section">
+      <div class="d-flex justify-content-center">
+        <a routerLink="/account-sharing" class="btn btn-primary" ngbTooltip="Account Sharing" placement="top">
+          <i class="mdi mdi-account-group"></i> Account Sharing</a>
+      </div>
+    </div> -->
   </ngx-simplebar>
 </div>
 <!-- Left Sidebar End -->

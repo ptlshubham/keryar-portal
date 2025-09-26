@@ -8,9 +8,9 @@ const routes: Routes = [
     path: '',
     component: DashboardComponent
   },
-  // {
-  //   path: 'apps', loadChildren: () => import('./apps/apps.module').then(m => m.AppsModule)
-  // },
+  {
+    path: 'workfolio', loadChildren: () => import('./workfolio/workfolio.module').then(m => m.WorkfolioModule)
+  },
   // {
   //   path: 'pages', loadChildren: () => import('./extraspages/extraspages.module').then(m => m.ExtraspagesModule)
   // },

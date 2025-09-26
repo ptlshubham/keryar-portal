@@ -1,0 +1,62 @@
+<div class="row">
+    <div class="col-lg-12">
+        <div class="card">
+            <div class="card-header">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h5 class="card-title">Client Portfolio</h5>
+                        <p class="card-title-desc"><b>Enter Client Portfolio Details</b> </p>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <form [formGroup]="validationForm">
+                        <div class="row">
+                            <div class="col-lg-4 mb-2">
+                                <div class="form-group mb-3">
+                                    <label>Client Name</label>
+                                    <input type="text" class="form-control" placeholder="Enter Name"
+                                        formControlName="name"
+                                        [ngClass]="{'is-invalid': f.name.touched && f.name.errors}">
+                                    <div *ngIf="f.name.touched && f.name.errors" class="invalid-feedback">
+                                        <span *ngIf="f.name.errors.required">This Field is
+                                            required.</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-2 mb-2">
+                                <div class="form-group mb-3">
+                                    <label for="name">Upload Client Logo</label>
+                                    <div class="custom-avatar-uploader">
+                                        <div class="d-flex justify-content-center">
+                                            <label class="custom-upload-box" *ngIf="!imageUrl" tooltip="Upload Image"
+                                                tooltipPosition="above">
+                                                <input type="file" accept="image/*" (change)="uploadImageFile($event)"
+                                                    hidden />
+                                                <a><i class="mdi mdi-plus-circle"></i></a>
+                                            </label>
+                                            <div class="custom-preview-box" *ngIf="imageUrl">
+                                                <img [src]="serverPath+tokenImage" alt="Avatar" />
+                                                <a class="custom-remove-btn" tooltip="Remove Uploaded Image"
+                                                    tooltipPosition="above" (click)="removeUploadedImage(tokenImage)">
+                                                    <i class="mdi mdi-close-circle"></i></a>
+                                            </div>
+                                        </div>
+                                        <ngb-progressbar [value]="uploadProgress" [type]="progressType"
+                                            *ngIf="uploading"></ngb-progressbar>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                    <div class="d-flex justify-content-end gap-2">
+                        <button type="button" class="btn btn-danger waves-effect">Cancel</button>
+                        <button type="button" class="btn btn-primary waves-effect waves-light"
+                            [disabled]="validationForm.invalid">Submit</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
