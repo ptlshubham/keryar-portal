@@ -1,0 +1,96 @@
+<!-- start page title -->
+<app-pagetitle title="Blog Grid" [breadcrumbItems]="breadCrumbItems"></app-pagetitle>
+<!-- end page title -->
+
+<div class="row align-items-center">
+    <div class="col-md-6">
+        <div class="mb-3">
+            <h5 class="card-title">Blog List <span class="text-muted fw-normal ms-2">(535)</span></h5>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="d-flex flex-wrap align-items-center justify-content-end gap-2 mb-3">
+            <div>
+                <ul class="nav nav-pills">
+                    <li class="nav-item">
+                        <a class="nav-link" routerLink="/apps/blog-list" data-bs-toggle="tooltip" data-bs-placement="top" title="List"><i class="bx bx-list-ul"></i></a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" routerLink="/apps/blog-grid" data-bs-toggle="tooltip" data-bs-placement="top" title="Grid"><i class="bx bx-grid-alt"></i></a>
+                    </li>
+                </ul>
+            </div>
+            <div>
+                <a href="javascript:void(0);" class="btn btn-light"><i class="bx bx-plus me-1"></i> Add New</a>
+            </div>
+
+            <div class="dropdown" ngbDropdown>
+                <a class="btn btn-link text-muted py-1 font-size-16 shadow-none dropdown-toggle" href="javascript:void(0);" role="button" data-bs-toggle="dropdown" aria-expanded="false" ngbDropdownToggle>
+                    <i class="bx bx-dots-horizontal-rounded"></i>
+                </a>
+
+                <ul class="dropdown-menu dropdown-menu-end" ngbDropdownMenu>
+                    <li><a class="dropdown-item" href="javascript:void(0);">Action</a></li>
+                    <li><a class="dropdown-item" href="javascript:void(0);">Another action</a></li>
+                    <li><a class="dropdown-item" href="javascript:void(0);">Something else here</a></li>
+                </ul>
+            </div>
+        </div>
+
+    </div>
+</div>
+<!-- end row -->
+
+<div class="row">
+    @for (data of blogGridData; track $index) {
+    <div class="col-xl-4 col-sm-6">
+        <div class="card">
+            <div class="">
+                <img src="{{data.image}}" alt="" class="img-fluid">
+            </div>
+            <div class="card-body">
+                <p class="text-muted mb-2">{{data.date}}</p>
+                <h5 class=""><a href="javascript:void(0);" class="text-body">{{data.name}}</a></h5>
+                <p class="mb-0 font-size-15">{{data.content}}</p>
+                <div class="mt-3">
+                    <a href="javascript:void(0);" class="align-middle font-size-15">Read more <i class="mdi mdi-chevron-right"></i></a>
+                </div>
+            </div>
+        </div>
+        <!-- end card -->
+    </div>}
+    <!-- end col -->
+</div>
+<!-- end row -->
+
+<div class="row justify-content-center mb-4">
+    <div class="col-md-3">
+        <div class="">
+            <ul class="pagination mb-sm-0">
+                <li class="page-item disabled">
+                    <a href="javascript:void(0);" class="page-link"><i class="mdi mdi-chevron-left"></i></a>
+                </li>
+                <li class="page-item">
+                    <a href="javascript:void(0);" class="page-link">1</a>
+                </li>
+                <li class="page-item active">
+                    <a href="javascript:void(0);" class="page-link">2</a>
+                </li>
+                <li class="page-item">
+                    <a href="javascript:void(0);" class="page-link">3</a>
+                </li>
+                <li class="page-item">
+                    <a href="javascript:void(0);" class="page-link">4</a>
+                </li>
+                <li class="page-item">
+                    <a href="javascript:void(0);" class="page-link">5</a>
+                </li>
+                <li class="page-item">
+                    <a href="javascript:void(0);" class="page-link"><i class="mdi mdi-chevron-right"></i></a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+<!-- end row -->

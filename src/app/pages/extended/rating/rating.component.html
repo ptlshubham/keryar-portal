@@ -1,0 +1,90 @@
+<!-- start page title -->
+<app-pagetitle title="Rating" [breadcrumbItems]="breadCrumbItems"></app-pagetitle>
+<!-- end page title -->
+
+<div class="row">
+    <div class="col-lg-12">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="card-title">Ngb Rating</h4>
+                <p class="card-title-desc">Different example of rating.</p>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div class="p-lg-5 p-4 text-center" dir="ltr">
+                            <h5 class="font-size-15 mb-4">Basic Rating</h5>
+                            <ngb-rating [(rate)]="defaultSelect" (hover)="hovered=$event" (leave)="hovered=0"
+                                [readonly]="readonly" class="stars"></ngb-rating>
+                        </div>
+                    </div>
+                    <!-- end col -->
+                    <div class="col-sm-6">
+                        <div class="p-lg-5 p-4 text-center" dir="ltr">
+                            <h5 class="font-size-15 mb-4">Custom decimal rating</h5>
+                            <!-- <ngb-rating [rate]="5" class="stars"></ngb-rating> -->
+                            <ng-template #t let-fill="fill">
+                                <span class="star" [class.full]="fill === 100">
+                                  <span class="half" [style.width.%]="fill">★</span>☆
+                                </span>
+                              </ng-template>
+                              <ngb-rating [(rate)]="currentRate" [starTemplate]="t" [readonly]="true" [max]="5"></ngb-rating>
+                              <br/>
+                              <button class="btn btn-sm btn-outline-primary ms-2 mt-3" (click)="currentRate = 1.5">1.5</button>
+                              <button class="btn btn-sm btn-outline-primary ms-2 mt-3" (click)="currentRate = 4.5">4.5</button>
+                        </div>
+                    </div>
+                    <!-- end col -->
+                    <div class="col-sm-6">
+                        <div class="p-lg-5 p-4 text-center" dir="ltr">
+                            <h5 class="font-size-15 mb-4">Custom Star</h5>
+                            <ngb-rating [(rate)]="customColor">
+                                <ng-template let-fill="fill" let-index="index">
+                                    <span class="stars" [class.filled]="fill === 100"
+                                        [class.bad]="index < 3">&#9733;</span>
+                                </ng-template>
+                            </ngb-rating>
+                            <pre>Rate: <b>{{customColor}}</b></pre>
+
+                        </div>
+                    </div>
+                    <!-- end col -->
+                    <div class="col-sm-6">
+                        <div class="p-lg-5 p-4 text-center" dir="ltr">
+                            <h5 class="font-size-15 mb-4">Global configuration of ratings</h5>
+                            <ngb-rating [rate]="3" [readonly]="true" [max]="10" class="stars"></ngb-rating>
+                        </div>
+                    </div>
+                    <!-- end col -->
+                    <div class="col-sm-6">
+                        <div class="p-lg-5 p-4 text-center" dir="ltr">
+                            <h5 class="font-size-15 mb-4">On Hover Star</h5>
+                            <ngb-rating [(rate)]="defaultSelect" (hover)="hovered=$event" (leave)="hovered=0"
+                                [readonly]="readonly" class="stars"></ngb-rating>
+                            <br />
+                            Selected: <b>{{defaultSelect}}</b> <br />
+                            Hovered: <b>{{hovered}}</b>
+                        </div>
+                    </div>
+                    <!-- end col -->
+                    <div class="col-sm-6">
+                        <div class="p-lg-5 p-4 text-center" dir="ltr">
+                            <h5 class="font-size-15 mb-4">Events and readonly ratings</h5>
+                            <ngb-rating [rate]="3" [readonly]="readonly" class="stars"></ngb-rating>
+                            <button
+                                class="btn btn-outline-primary btn-sm ms-2 btn-outline-{{readonly ? 'danger' : 'success'}}"
+                                (click)="readonly = !readonly">
+                                {{ readonly ? "readonly" : "editable"}}
+                            </button>
+                        </div>
+                    </div>
+                    <!-- end col -->
+                </div>
+                <!-- end row -->
+
+            </div>
+        </div>
+    </div>
+    <!-- end col -->
+</div>
+<!-- end row -->

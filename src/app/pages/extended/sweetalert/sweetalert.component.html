@@ -1,0 +1,148 @@
+<!-- start page title -->
+<app-pagetitle title="SweetAlert 2" [breadcrumbItems]="breadCrumbItems"></app-pagetitle>
+<!-- end page title -->
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="card-title">Examples</h4>
+                <p class="card-title-desc">A beautiful, responsive, customizable
+                    and accessible (WAI-ARIA) replacement for JavaScript's popup boxes. Zero
+                    dependencies.</p>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-nowrap align-middle justify-content-center mb-0">
+                        <thead>
+                            <tr>
+                                <th scope="col" style="width: 50%;">
+                                    Sweet Alert Type
+                                </th>
+                                <th scope="col" class="text-center">
+                                    Sweet Alert Examples
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+
+                            <tr>
+                                <th scope="row">
+                                    A Basic Message
+                                </th>
+                                <td class="text-center">
+                                    <button type="button" class="btn btn-primary btn-sm waves-effect waves-light"
+                                        id="sa-basic" (click)="basicMessage()">Click me</button>
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <th scope="row">
+                                    A Title with a Text Under
+                                </th>
+                                <td class="text-center">
+                                    <button type="button" class="btn btn-primary btn-sm waves-effect waves-light"
+                                        id="sa-title" (click)="titleText()">Click me</button>
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <th scope="row">
+                                    A success message!
+                                </th>
+                                <td class="text-center">
+                                    <button type="button" class="btn btn-primary btn-sm waves-effect waves-light"
+                                        id="sa-success" (click)="successmsg()">Click me</button>
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <th scope="row">
+                                    A warning message, with a function attached to the "Confirm"-button...
+                                </th>
+                                <td class="text-center">
+                                    <button type="button" class="btn btn-primary btn-sm waves-effect waves-light"
+                                        id="sa-warning" (click)="confirm()">Click me</button>
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <th scope="row">
+                                    By passing a parameter, you can execute something else for "Cancel".
+                                </th>
+                                <td class="text-center">
+                                    <button type="button" class="btn btn-primary btn-sm waves-effect waves-light"
+                                        id="sa-params" (click)="cancel()">Click me</button>
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <th scope="row">
+                                    A message with custom Image Header
+                                </th>
+                                <td class="text-center">
+                                    <button type="button" class="btn btn-primary btn-sm waves-effect waves-light"
+                                        id="sa-image" (click)="imageHeader()">Click me</button>
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <th scope="row">
+                                    A message with auto close timer
+                                </th>
+                                <td class="text-center">
+                                    <button type="button" class="btn btn-primary btn-sm waves-effect waves-light"
+                                        id="sa-close" (click)="timer()">Click me</button>
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <th scope="row">
+                                    Custom HTML description and buttons
+                                </th>
+                                <td class="text-center">
+                                    <button type="button" class="btn btn-primary btn-sm waves-effect waves-light"
+                                        id="custom-html-alert" (click)="custom()">Click me</button>
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <th scope="row">
+                                    A custom positioned dialog
+                                </th>
+                                <td class="text-center">
+                                    <button type="button" class="btn btn-primary btn-sm waves-effect waves-light"
+                                        id="sa-position" (click)="position()">Click me</button>
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <th scope="row">
+                                    A message with custom width, padding and background
+                                </th>
+                                <td class="text-center">
+                                    <button type="button" class="btn btn-primary btn-sm waves-effect waves-light"
+                                        id="custom-padding-width-alert" (click)="customBackground()">Click me</button>
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <th scope="row">
+                                    Ajax request example
+                                </th>
+                                <td class="text-center">
+                                    <button type="button" class="btn btn-primary btn-sm waves-effect waves-light"
+                                        id="ajax-alert" (click)="ajax()">Click me</button>
+                                </td>
+                            </tr>
+
+                        </tbody>
+                    </table>
+                    <!-- end table -->
+                </div>
+                <!-- end table responsive -->
+
+            </div>
+        </div>
+    </div> <!-- end col -->
+</div> <!-- end row -->

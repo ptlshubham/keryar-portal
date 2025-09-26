@@ -1,0 +1,113 @@
+<!-- start page title -->
+<app-pagetitle title="E - chart" [breadcrumbItems]="breadCrumbItems"></app-pagetitle>
+<!-- end page title -->
+
+<div class="row">
+    <div class="col-xl-6">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="card-title mb-0">Line Chart</h4>
+            </div>
+            <div echarts [options]="lineChart" class="demo-chart"></div>
+        </div>
+        <!-- end card -->
+    </div>
+    <!-- end col -->
+    <div class="col-xl-6">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="card-title mb-0">Mix Line-Bar</h4>
+            </div>
+            <div class="card-body">
+                <div echarts [options]="lineBarChart" class="demo-chart"></div>
+            </div>
+        </div>
+        <!-- end card -->
+    </div>
+    <!-- end col -->
+</div>
+<!-- end row -->
+
+<div class="row">
+    <div class="col-xl-6">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="card-title mb-0">Doughnut Chart</h4>
+            </div>
+            <div class="card-body">
+                <div echarts [options]="donughnutChart" class="demo-chart"></div>
+            </div>
+        </div>
+        <!-- end card -->
+    </div>
+    <!-- end col -->
+    <div class="col-xl-6">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="card-title mb-0">Pie Chart</h4>
+            </div>
+            <div class="card-body">
+                <div echarts [options]="pieChart" class="demo-chart"></div>
+            </div>
+        </div>
+        <!-- end card -->
+    </div>
+    <!-- end col -->
+</div>
+<!-- end row -->
+
+<div class="row">
+    <div class="col-xl-6">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="card-title mb-0">Scatter Chart</h4>
+            </div>
+            <div class="card-body">
+                <div echarts [options]="scatterChart" class="demo-chart"></div>
+            </div>
+        </div>
+        <!-- end card -->
+    </div>
+    <!-- end col -->
+    <div class="col-xl-6">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="card-title mb-0">Bubble Chart</h4>
+            </div>
+            <div class="card-body">
+                <div echarts [options]="bubbleChart" class="demo-chart"></div>
+            </div>
+        </div>
+        <!-- end card -->
+    </div>
+    <!-- end col -->
+</div>
+<!-- end row -->
+
+<div class="row">
+    <div class="col-xl-6">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="card-title mb-0">Customize Pie chart</h4>
+            </div>
+            <div class="card-body">
+                <div echarts [options]="customizepieChart" class="demo-chart"></div>
+            </div>
+        </div>
+        <!-- end card -->
+    </div>
+    <!-- end col -->
+    <div class="col-xl-6">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="card-title mb-0">Gauge Chart</h4>
+            </div>
+            <div class="card-body">
+                <div echarts [options]="gaugeChart" class="demo-chart"></div>
+            </div>
+        </div>
+        <!-- end card -->
+    </div>
+    <!-- end col -->
+</div>
+<!-- end row -->

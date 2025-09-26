@@ -1,0 +1,121 @@
+<!-- start page title -->
+<app-pagetitle title="Carousel" [breadcrumbItems]="breadCrumbItems"></app-pagetitle>
+<!-- end page title -->
+
+<div class="row">
+    <div class="col-xl-6">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="card-title">Slides only</h4>
+                <p class="card-title-desc">Here’s a carousel with slides only.
+                </p>
+            </div><!-- end card header -->
+
+            <div class="card-body">
+                <ngb-carousel [showNavigationArrows]="showNavigationArrows"
+                    [showNavigationIndicators]="showNavigationIndicators">
+                    <ng-template ngbSlide>
+                        <img src="assets/images/small/img-1.jpg" alt="Random first slide">
+                    </ng-template>
+                    <ng-template ngbSlide>
+                        <img src="assets/images/small/img-2.jpg" alt="Random second slide">
+                    </ng-template>
+                    <ng-template ngbSlide>
+                        <img src="assets/images/small/img-3.jpg" alt="Random third slide">
+                    </ng-template>
+                </ngb-carousel>
+            </div><!-- end card-body -->
+        </div><!-- end card -->
+    </div><!-- end col -->
+
+    <div class="col-xl-6">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="card-title">With Controls</h4>
+                <p class="card-title-desc">Here's example with previous and next controls.</p>
+            </div><!-- end card header -->
+
+            <div class="card-body">
+                <!-- Controls carousel -->
+                <ngb-carousel [showNavigationIndicators]="showNavigationIndicators">
+                    <ng-template ngbSlide>
+                        <img src="assets/images/small/img-4.jpg" alt="first slide" class="d-block img-fluid">
+                    </ng-template>
+                    <ng-template ngbSlide>
+                        <img src="assets/images/small/img-5.jpg" alt="second slide" class="d-block img-fluid">
+                    </ng-template>
+                    <ng-template ngbSlide>
+                        <img src="assets/images/small/img-6.jpg" alt="third slide" class="d-block img-fluid">
+                    </ng-template>
+                </ngb-carousel>
+                <!-- End controls carousel -->
+            </div><!-- end card-body -->
+        </div><!-- end card -->
+    </div><!-- end col -->
+</div> <!-- end row -->
+
+<div class="row">
+    <div class="col-xl-6">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="card-title">With indicators</h4>
+                <p class="card-title-desc">You can also add the indicators to the
+                    carousel, alongside the controls, too.</p>
+            </div><!-- end card header -->
+
+            <div class="card-body">
+                <!-- Indicator carousel -->
+                <ngb-carousel [showNavigationIndicators]="!showNavigationIndicators">
+                    <ng-template ngbSlide>
+                        <img src="assets/images/small/img-3.jpg" alt="first slide" class="d-block img-fluid">
+                    </ng-template>
+                    <ng-template ngbSlide>
+                        <img src="assets/images/small/img-2.jpg" alt="second slide" class="d-block img-fluid">
+                    </ng-template>
+                    <ng-template ngbSlide>
+                        <img src="assets/images/small/img-1.jpg" alt="third slide" class="d-block img-fluid">
+                    </ng-template>
+                </ngb-carousel>
+                <!-- End indicator carousel -->
+            </div><!-- end card-body -->
+        </div><!-- end card -->
+    </div> <!-- end col -->
+
+    <div class="col-xl-6">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="card-title">With captions</h4>
+                <p class="card-title-desc">Add captions to your slides easily with the <code>.carousel-caption</code>
+                    element within <code>ngb-carousel</code>.</p>
+            </div><!-- end card header -->
+
+            <div class="card-body">
+                <!-- Carousel with caption -->
+                <ngb-carousel [showNavigationIndicators]="showNavigationIndicators">
+                    <ng-template ngbSlide>
+                        <img src="assets/images/small/img-7.jpg" alt="first slide" class="d-block img-fluid">
+                        <div class="carousel-caption d-none d-md-block">
+                            <h5 class="text-white">First slide label</h5>
+                            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+                        </div>
+                    </ng-template>
+                    <ng-template ngbSlide>
+                        <img src="assets/images/small/img-4.jpg" alt="second slide" class="d-block img-fluid">
+                        <div class="carousel-caption d-none d-md-block">
+                            <h5 class="text-white">Second slide label</h5>
+                            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+                        </div>
+                    </ng-template>
+                    <ng-template ngbSlide>
+                        <img src="assets/images/small/img-5.jpg" alt="third slide" class="d-block img-fluid">
+                        <div class="carousel-caption d-none d-md-block">
+                            <h5 class="text-white">Third slide label</h5>
+                            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+                        </div>
+                    </ng-template>
+                </ngb-carousel>
+                <!-- End carousel -->
+            </div><!-- end card-body -->
+        </div><!-- end card -->
+    </div> <!-- end col -->
+</div> <!-- end row -->

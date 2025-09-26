@@ -1,0 +1,198 @@
+<!-- start page title -->
+<app-pagetitle title="User List" [breadcrumbItems]="breadCrumbItems"></app-pagetitle>
+<!-- end page title -->
+
+<div class="row align-items-center">
+    <div class="col-md-6">
+        <div class="mb-3">
+            <h5 class="card-title">Contact List <span class="text-muted fw-normal ms-2">(123)</span></h5>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="d-flex flex-wrap align-items-center justify-content-end gap-2 mb-3">
+            <div>
+                <ul class="nav nav-pills">
+                    <li class="nav-item">
+                        <a class="nav-link active" routerLink="/apps/user-list" data-bs-toggle="tooltip" data-bs-placement="top" title="List"><i class="bx bx-list-ul"></i></a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" routerLink="/apps/user-grid" data-bs-toggle="tooltip" data-bs-placement="top" title="Grid"><i class="bx bx-grid-alt"></i></a>
+                    </li>
+                </ul>
+            </div>
+            <div>
+                <a href="javascript:void(0);" class="btn btn-light" (click)="openModal(content)"><i class="bx bx-plus me-1"></i> Add New</a>
+            </div>
+            <ng-template #content role="document" let-modal>
+                <div class="modal-header">
+                    <h5 class="modal-title mt-0">Add Contact</h5>
+                    <button type="button" class="btn-close" aria-hidden="true" (click)="modal.dismiss('Cross click')"></button>
+                </div>
+                <div class="modal-body">
+                    <form (ngSubmit)="saveUser()" [formGroup]="userForm">
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="mb-3">
+                                    <label class="control-label">Name</label>
+                                    <input class="form-control" placeholder="Enter Username" type="text" name="name" formControlName="name" [ngClass]="{'is-invalid': submitted && form.name.errors}" />
+                                    @if(submitted && form.name.errors){
+                                    <div class="invalid-feedback">
+                                        @if(form.name.errors.required){
+                                        <span>Name is required.</span>}
+                                    </div>}
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="control-label">Position</label>
+                                    <input class="form-control" placeholder="Enter position" type="text" name="position" formControlName="position" [ngClass]="{'is-invalid': submitted && form.position.errors}" />
+                                    @if(submitted && form.position.errors){
+                                    <div class="invalid-feedback">
+                                        @if(form.position.errors.required){
+                                        <span>Position is required.</span>}
+                                    </div>}
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="control-label">Email</label>
+                                    <input class="form-control" placeholder="Enter email" type="text" name="email" formControlName="email" [ngClass]="{'is-invalid': submitted && form.email.errors}" />
+                                    @if(submitted && form.email.errors){
+                                    <div class="invalid-feedback">
+                                        @if(form.email.errors.required){
+                                        <span>Email is required.</span>}
+                                    </div>}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="text-end">
+                            <button type="submit" class="btn btn-success" id="btn-save-event">
+                                Save
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </ng-template>
+
+
+            <div class="dropdown" ngbDropdown>
+                <a class="btn btn-link text-muted py-1 font-size-16 shadow-none dropdown-toggle" href="javascript:void(0);" role="button" data-bs-toggle="dropdown" aria-expanded="false" ngbDropdownToggle>
+                    <i class="bx bx-dots-horizontal-rounded"></i>
+                </a>
+
+                <ul class="dropdown-menu dropdown-menu-end" ngbDropdownMenu>
+                    <li><a class="dropdown-item" href="javascript:void(0);">Action</a></li>
+                    <li><a class="dropdown-item" href="javascript:void(0);">Another action</a></li>
+                    <li><a class="dropdown-item" href="javascript:void(0);">Something else here</a></li>
+                </ul>
+            </div>
+        </div>
+
+    </div>
+</div>
+<!-- end row -->
+
+<div class="row">
+    <div class="col-sm-12">
+        <div class="row mb-md-2">
+            <div class="col-sm-12 col-md-6">
+                <div class="dataTables_length" id="tickets-table_length"><label class="d-inline-flex align-items-center">Show
+                        <select name="tickets-table_length" aria-controls="tickets-table" name="pageSize" [(ngModel)]="service.pageSize" class="form-control form-control-sm mx-2">
+                            <option [ngValue]="10">10</option>
+                            <option [ngValue]="25">25</option>
+                            <option [ngValue]="50">50</option>
+                            <option [ngValue]="100">100</option>
+                        </select> entries</label></div>
+            </div>
+            <!-- Search -->
+            <div class="col-sm-12 col-md-6">
+                <div id="tickets-table_filter" class="dataTables_filter text-md-end"><label class="d-inline-flex align-items-center">Search:
+                        <input type="text" name="searchTerm" class="form-control form-control-sm ms-2" aria-controls="tickets-table" [(ngModel)]="service.searchTerm"></label></div>
+            </div>
+            <!-- End search -->
+        </div>
+        <!-- Table -->
+        <div class="table-responsive">
+            <table class="table align-middle datatable dt-responsive table-check nowrap datatables" style="border-collapse: collapse; border-spacing: 0 8px; width: 100%;">
+                <thead>
+                    <tr class="bg-transparent">
+                        <th style="width: 30px;">
+                            <div class="form-check font-size-16">
+                                <input type="checkbox" name="check" class="form-check-input" id="checkAll">
+                                <label class="form-check-label" for="checkAll"></label>
+                            </div>
+                        </th>
+                        <th userSorTable="name" (sort)="onSort($event)">Name</th>
+                        <th userSorTable="position" (sort)="onSort($event)">Position</th>
+                        <th userSorTable="email" (sort)="onSort($event)">Email</th>
+                        <th userSorTable="tags" (sort)="onSort($event)">Tags</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @for (table of tables$ | async; track $index) {
+                    <tr>
+                        <td>
+                            <div class="form-check font-size-16">
+                                <input type="checkbox" class="form-check-input">
+                                <label class="form-check-labe12"></label>
+                            </div>
+                        </td>
+
+                        <td>
+                            <img src="{{table.image}}" alt="" class="avatar-sm rounded-circle me-2">
+                            <ngb-highlight [result]="table.name" [term]="service.searchTerm"></ngb-highlight>
+                        </td>
+                        <td>
+                            <ngb-highlight [result]="table.position" [term]="service.searchTerm">
+                            </ngb-highlight>
+                        </td>
+                        <td>
+                            <ngb-highlight [result]="table.email" [term]="service.searchTerm"></ngb-highlight>
+                        </td>
+                        <td>
+                            <div class="d-flex gap-2">
+                                @for (item of table.tags; track $index) {
+                                <span>
+                                    <a href=" javascript:void(0);" class="badge bg-primary-subtle text-primary">{{item}}</a>
+                                </span>
+                                }
+                            </div>
+                        </td>
+                        <td>
+                            <div class="dropdown" ngbDropdown>
+                                <button class="btn btn-link font-size-16 shadow-none py-0 text-muted dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" ngbDropdownToggle>
+                                    <i class="bx bx-dots-horizontal-rounded"></i>
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-end" ngbDropdownMenu>
+                                    <li><a class="dropdown-item" href="javascript:void(0);">Edit</a></li>
+                                    <li><a class="dropdown-item" href="javascript:void(0);">Print</a></li>
+                                    <li><a class="dropdown-item" href="javascript:void(0);">Delete</a></li>
+                                </ul>
+                            </div>
+                        </td>
+                    </tr>}
+                </tbody>
+            </table>
+        </div>
+        <!-- End table -->
+        <div class="row justify-content-md-between align-items-md-center mt-2">
+            <div class="col-sm-12 col-md-5">
+                <div class="dataTables_info mb-2" id="tickets-table_info" role="status" aria-live="polite">
+                    Showing
+                    {{service.startIndex}} to
+                    {{service.endIndex}} of {{service.totalRecords}}
+                    entries
+                </div>
+            </div>
+            <!-- Pagination -->
+            <div class="col-sm-12 col-md-5">
+                <div class="text-md-right float-md-end pagination-rounded">
+                    <ngb-pagination [collectionSize]="(total$ | async)!" [(page)]="service.page" [pageSize]="service.pageSize">
+                    </ngb-pagination>
+                </div>
+            </div>
+            <!-- End Pagination -->
+        </div>
+    </div>
+</div>

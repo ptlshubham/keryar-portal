@@ -1,0 +1,76 @@
+<!-- start page title -->
+<app-pagetitle title="Lightbox" [breadcrumbItems]="breadCrumbItems"></app-pagetitle>
+<!-- end page title -->
+
+<div class="row">
+    <div class="col-lg-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title">Single Image Lightbox</h5>
+                <p class="card-title-desc">Single image lightbox example.</p>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    @for (image of images; track $index) {
+                    <div class="col-lg-3 col-sm-6">
+                        <div class="image-popup">
+                            <img [src]="image.thumb" (click)="openImage($index)" class="img-fluid" />
+                        </div>
+                    </div>}
+                </div>
+            </div>
+            <!-- end card body -->
+        </div>
+        <!-- end card -->
+    </div>
+    <!-- end col -->
+</div>
+<!-- end row -->
+
+<div class="row">
+    <div class="col-lg-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title">Images with Description</h5>
+                <p class="card-title-desc">Lightbox Images with Description Example</p>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    @for (image of gallery; track $index) {
+                    <div class="col-lg-3 col-sm-6">
+                        <img [src]="image.thumb" (click)="openZoomGallery($index)" class="img-fluid" />
+                    </div>}
+                </div>
+            </div>
+            <!-- end card body -->
+        </div>
+        <!-- end card -->
+    </div>
+    <!-- end col -->
+
+    <div class="col-lg-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title">Popup with Video or Map</h5>
+                <p class="card-title-desc">Glightbox Popup with Video or Map Example</p>
+            </div>
+            <div class="card-body">
+                <div class="d-flex align-items-start gap-3 flex">
+                    <button type="button" class="btn btn-light image-popup-video-map" (click)="openYoutubeModal(youtube)">Open YouTube Video</button>
+                    <ng-template #youtube role="document" let-modal>
+                        <div class="modal-header">
+                            <button type="button" class="btn-close text-white" aria-hidden="true" (click)="modal.dismiss('Cross click')"></button>
+                        </div>
+                        <div class="modal-body vimeo_video">
+                            <youtube-player videoId="JlvxDa7Sges" [height]="450" [width]="780"></youtube-player>
+                        </div>
+                    </ng-template>
+                </div>
+            </div>
+            <!-- end card body -->
+        </div>
+        <!-- end card -->
+    </div>
+    <!-- end col -->
+</div>
+<!-- end row -->

@@ -1,0 +1,142 @@
+<!-- start page title -->
+<app-pagetitle title="Invoice List" [breadcrumbItems]="breadCrumbItems"></app-pagetitle>
+<!-- end page title -->
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-sm">
+                        <div class="mb-4">
+                            <button type="button" class="btn btn-light waves-effect waves-light"><i class="bx bx-plus me-1"></i> Add Invoice</button>
+                        </div>
+                    </div>
+                    <div class="col-sm-auto">
+                        <div class="d-flex align-items-center gap-1 mb-4">
+                            <div class="input-group datepicker-range">
+                                <input class="form-control" type="date" value="" id="example-date-input">
+                            </div>
+                            <div class="dropdown" ngbDropdown>
+                                <a class="btn btn-link text-muted py-1 font-size-16 shadow-none dropdown-toggle" href="javascript:void(0);" role="button" data-bs-toggle="dropdown" aria-expanded="false" ngbDropdownToggle>
+                                    <i class="bx bx-dots-horizontal-rounded"></i>
+                                </a>
+                                <ul class="dropdown-menu dropdown-menu-end" ngbDropdownMenu>
+                                    <li><a class="dropdown-item" href="javascript:void(0);">Action</a></li>
+                                    <li><a class="dropdown-item" href="javascript:void(0);">Another action</a></li>
+                                    <li><a class="dropdown-item" href="javascript:void(0);">Something else here</a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row mb-md-2">
+                    <div class="col-sm-12 col-md-6">
+                        <div class="dataTables_length" id="tickets-table_length"><label class="d-inline-flex align-items-center">Show
+                                <select name="tickets-table_length" aria-controls="tickets-table" name="pageSize" [(ngModel)]="service.pageSize" class="form-control form-control-sm mx-2">
+                                    <option [ngValue]="10">10</option>
+                                    <option [ngValue]="25">25</option>
+                                    <option [ngValue]="50">50</option>
+                                    <option [ngValue]="100">100</option>
+                                </select> entries</label></div>
+                    </div>
+                    <!-- Search -->
+                    <div class="col-sm-12 col-md-6">
+                        <div id="tickets-table_filter" class="dataTables_filter text-md-end"><label class="d-inline-flex align-items-center">Search:
+                                <input type="text" name="searchTerm" class="form-control form-control-sm ms-2" aria-controls="tickets-table" [(ngModel)]="service.searchTerm"></label></div>
+                    </div>
+                    <!-- End search -->
+                </div>
+                <!-- Table -->
+                <div class="table-responsive">
+                    <table class="table align-middle datatable dt-responsive table-check nowrap datatables" style="border-collapse: collapse; border-spacing: 0 8px; width: 100%;">
+                        <thead>
+                            <tr class="bg-transparent">
+                                <th style="width: 30px;">
+                                    <div class="form-check font-size-16">
+                                        <input type="checkbox" name="check" class="form-check-input" id="checkAll">
+                                        <label class="form-check-label" for="checkAll"></label>
+                                    </div>
+                                </th>
+                                <th sortable="invoice_id" (sort)="onSort($event)">Invoice id</th>
+                                <th sortable="date" (sort)="onSort($event)">Date</th>
+                                <th sortable="billing_name" (sort)="onSort($event)">Billing Name</th>
+                                <th sortable="amount" (sort)="onSort($event)">Amount</th>
+                                <th sortable="status" (sort)="onSort($event)">Status</th>
+                                <th sortable="pdf" (sort)="onSort($event)">Download Pdf</th>
+                                <th sortable="action" (sort)="onSort($event)">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @for (table of tables$ | async; track $index) {
+                            <tr>
+                                <td>
+                                    <div class="form-check font-size-16">
+                                        <input type="checkbox" class="form-check-input">
+                                        <label class="form-check-labe12"></label>
+                                    </div>
+                                </td>
+                                <td class="text-body">
+                                    <ngb-highlight [result]="table.invoice_id" [term]="service.searchTerm">
+                                    </ngb-highlight>
+                                </td>
+                                <td>
+                                    <ngb-highlight [result]="table.date" [term]="service.searchTerm"></ngb-highlight>
+                                </td>
+                                <td>
+                                    <ngb-highlight [result]="table.billing_name" [term]="service.searchTerm">
+                                    </ngb-highlight>
+                                </td>
+                                <td>
+                                    <ngb-highlight [result]="table.amount" [term]="service.searchTerm"></ngb-highlight>
+                                </td>
+                                <td>
+                                    <ngb-highlight [result]="table.status" [term]="service.searchTerm" class="badge badge-soft-success font-size-12" [ngClass]=" { 'badge-soft-warning': table.status === 'Pending' }">
+                                    </ngb-highlight>
+                                </td>
+                                <td>
+                                    <div>
+                                        <button type="button" class="btn btn-soft-light btn-sm w-xs waves-effect btn-label waves-light"><i class="bx bx-download label-icon"></i> Pdf</button>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="dropdown" ngbDropdown>
+                                        <button class="btn btn-link font-size-16 shadow-none py-0 text-muted dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" ngbDropdownToggle>
+                                            <i class="bx bx-dots-horizontal-rounded"></i>
+                                        </button>
+                                        <ul class="dropdown-menu dropdown-menu-end" ngbDropdownMenu>
+                                            <li><a class="dropdown-item" href="javascript:void(0);">Edit</a></li>
+                                            <li><a class="dropdown-item" href="javascript:void(0);">Print</a></li>
+                                            <li><a class="dropdown-item" href="javascript:void(0);">Delete</a></li>
+                                        </ul>
+                                    </div>
+                                </td>
+                            </tr>}
+                        </tbody>
+                    </table>
+                </div>
+                <!-- End table -->
+                <div class="row justify-content-md-between align-items-md-center mt-2">
+                    <div class="col-sm-12 col-md-5">
+                        <div class="dataTables_info mb-2" id="tickets-table_info" role="status" aria-live="polite">
+                            Showing
+                            {{service.startIndex}} to
+                            {{service.endIndex}} of {{service.totalRecords}}
+                            entries
+                        </div>
+                    </div>
+                    <!-- Pagination -->
+                    <div class="col-sm-12 col-md-5">
+                        <div class="text-md-right float-md-end pagination-rounded">
+                            <ngb-pagination [collectionSize]="(total$ | async)!" [(page)]="service.page" [pageSize]="service.pageSize">
+                            </ngb-pagination>
+                        </div>
+                    </div>
+                    <!-- End Pagination -->
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,188 @@
+<!-- start page title -->
+<app-pagetitle title="Notifications" [breadcrumbItems]="breadCrumbItems"></app-pagetitle>
+<!-- end page title -->
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="card-title">Toast Notifications</h4>
+                <p class="card-title-desc">Toasts are lightweight notifications designed to mimic the push notifications
+                </p>
+            </div>
+            <div class="card-body">
+
+                <div class="row">
+                    <div class="col-lg-6">
+                        <div class="p-2">
+                            <h5 class="font-size-14">Basic</h5>
+                            <p class="card-title-desc mb-3">
+                                Toasts are as flexible as you need and have very little required markup.
+                                At a minimum, we require a single element to contain your
+                                “toasted” content and strongly encourage a dismiss button.
+                            </p>
+                            @if(show){
+                            <ngb-toast [autohide]="false" (hidden)="show=false">
+                                <ng-template ngbToastHeader>
+                                    <img src="assets/images/logo-sm.svg" alt="" class="me-2" height="18">
+                                    <strong class="me-auto">Minia</strong>
+                                    <small class="text-muted">11 mins ago</small>
+                                </ng-template>
+                                Hello, world! This is a toast message.
+                            </ngb-toast>}
+                            <!--end toast-->
+                        </div>
+                        <!--end card-->
+                    </div>
+                    <!--end col-->
+
+                    <div class="col-lg-6">
+                        <div class="p-2">
+                            <h5 class="font-size-14">Translucent</h5>
+                            <p class="card-title-desc mb-3">
+                                Toasts are slightly translucent, too, so they blend over
+                                whatever they might appear over. For browsers that
+                                support the <code>backdrop-filter</code> CSS property,
+                                we’ll also attempt to blur the elements under a toast.
+                            </p>
+                            <div class="bg-light-subtle p-3">
+                                @if(translucent){
+                                <ngb-toast [autohide]="false" (hidden)="translucent=false">
+                                    <ng-template ngbToastHeader>
+                                        <img src="assets/images/logo-sm.svg" alt="" class="me-2" height="18">
+                                        <strong class="me-auto">Minia</strong>
+                                        <small class="text-muted">11 mins ago</small>
+                                    </ng-template>
+                                    Hello, world! This is a toast message.
+                                </ngb-toast>
+                                }
+                                <!--end toast-->
+                            </div>
+                            <!--end /div-->
+                        </div>
+                        <!--end card-->
+                    </div>
+                    <!--end col-->
+                </div>
+                <!--end row-->
+
+                <div class="row">
+                    <div class="col-lg-6">
+                        <div class="p-2 mt-4">
+                            <h5 class="font-size-14">Stacking</h5>
+                            <p class="card-title-desc mb-3">
+                                For systems that generate more notifications, consider using a wrapping element
+                                so they can easily stack.
+                            </p>
+                            <div class="bg-light-subtle">
+                                <div aria-live="polite" aria-atomic="true" class="position-relative" style="min-height: 230px;">
+                                    <div class="toast-container position-absolute top-0 end-0 p-2 p-lg-3">
+                                        @if(stacking){
+                                        <ngb-toast [autohide]="false" (hidden)="stacking=false">
+                                            <ng-template ngbToastHeader>
+                                                <img src="assets/images/logo-sm.svg" alt="" class="me-2" height="18">
+                                                <strong class="me-auto">Minia</strong>
+                                                <small class="text-muted">11 mins ago</small>
+                                            </ng-template>
+                                            See? Just like this.
+                                        </ngb-toast>}
+                                        @if(stackingsecond){
+                                        <ngb-toast [autohide]="false" (hidden)="stackingsecond=false">
+                                            <ng-template ngbToastHeader>
+                                                <img src="assets/images/logo-sm.svg" alt="" class="me-2" height="18">
+                                                <strong class="me-auto">Minia</strong>
+                                                <small class="text-muted">11 mins ago</small>
+                                            </ng-template>
+                                            Heads up, toasts will stack automatically
+                                        </ngb-toast>}
+
+                                    </div>
+                                </div>
+                            </div>
+                            <!--end /div-->
+                        </div>
+                        <!--end card-->
+                    </div>
+                    <!--end col-->
+
+                    <div class="col-lg-6">
+                        <div class="p-2 mt-4">
+                            <h5 class="font-size-14">Placement</h5>
+                            <p class="card-title-desc mb-3">
+                                You can also get fancy with flexbox utilities to align toasts horizontally
+                                and/or vertically.
+                            </p>
+                            <div class="bg-light-subtle p-2 p-lg-3">
+                                <!-- Flexbox container for aligning the toasts -->
+                                <div aria-live="polite" aria-atomic="true" class="d-flex justify-content-center align-items-center w-100" style="min-height: 200px;">
+                                    @if(placement){
+                                    <ngb-toast [autohide]="false" (hidden)="placement=false">
+                                        <ng-template ngbToastHeader>
+                                            <img src="assets/images/logo-sm.svg" alt="" class="me-2" height="18">
+                                            <strong class="me-auto">Minia</strong>
+                                            <small class="text-muted">11 mins ago</small>
+                                        </ng-template>
+                                        Hello, world! This is a toast message.
+                                    </ngb-toast>
+                                    }
+
+                                </div>
+                            </div>
+                            <!--end div-->
+                        </div>
+                        <!--end card-->
+                    </div>
+                    <!--end col-->
+                </div>
+                <!--end row-->
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h4 class="card-title">Toast</h4>
+                <p class="card-title-desc">Notifications examples of using Toast.</p>
+            </div>
+            <div class="card-body">
+
+                <h4 class="card-title mt-2 mb-3">Default Notifications</h4>
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <tbody>
+                            <tr>
+                                <td>Default alert</td>
+                                <td><a href="javascript: void(0);" id="alert-message" class="btn btn-primary btn-sm waves-effect waves-light" (click)="showStandard()">Click me</a></td>
+                            </tr>
+                            <tr>
+                                <td>Success alert</td>
+                                <td><a href="javascript: void(0);" id="alert-success" class="btn btn-primary btn-sm waves-effect waves-light" (click)="showSuccess()">Click me</a></td>
+                            </tr>
+                            <tr>
+                                <td>Error alert</td>
+                                <td><a href="javascript: void(0);" id="alert-error" class="btn btn-primary btn-sm waves-effect waves-light" (click)="showDanger()">Click me</a></td>
+                            </tr>
+                            <tr>
+                                <td>Warning alert</td>
+                                <td><a href="javascript: void(0);" id="alert-warning" class="btn btn-primary btn-sm waves-effect waves-light" (click)="showWarning()">Click me</a></td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <ng-template #dangerTpl>
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="#fff" width="24" height="24" viewBox="0 0 24 24">
+                            <path d="M10.872 6.831l1.695 3.904 3.654-1.561-1.79 3.426 3.333.954-3.417 1.338 2.231 4.196-4.773-2.582-2.869 2.287.413-3.004-3.792-.726 2.93-1.74-1.885-2.512 3.427.646.843-4.626zm-.786-6.831l-1.665 9.119-6.512-1.228 3.639 4.851-5.548 3.294 7.108 1.361-.834 6.076 5.742-4.577 9.438 5.104-4.288-8.064 6.834-2.677-6.661-1.907 3.25-6.22-6.98 2.982-3.523-8.114z" />
+                        </svg>
+                        Danger Danger !
+                    </ng-template>
+
+                    <app-toasts aria-live="polite" aria-atomic="true"></app-toasts>
+
+                </div>
+            </div>
+            <!-- end card body -->
+        </div>
+        <!-- end card -->
+    </div>
+    <!-- end col -->
+</div>
+<!-- end row -->
