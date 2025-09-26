@@ -14,7 +14,6 @@ import { LayoutComponent } from './layout.component';
 import { SidebarComponent } from './sidebar/sidebar.component';
 import { FooterComponent } from './footer/footer.component';
 import { RightsidebarComponent } from './rightsidebar/rightsidebar.component';
-import { HorizontalComponent } from './horizontal/horizontal.component';
 import { HorizontaltopbarComponent } from './horizontaltopbar/horizontaltopbar.component';
 
 @NgModule({
@@ -25,7 +24,6 @@ import { HorizontaltopbarComponent } from './horizontaltopbar/horizontaltopbar.c
     SidebarComponent,
     FooterComponent,
     RightsidebarComponent,
-    HorizontalComponent,
     HorizontaltopbarComponent
   ],
   imports: [
