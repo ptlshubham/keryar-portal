@@ -87,6 +87,7 @@
     "@angular/localize": "^18.2.7",
     "@types/chart.js": "^2.9.41",
     "@types/file-saver": "^2.0.7",
+    "@types/lodash": "^4.17.20",
     "karma-chrome-launcher": "^3.2.0"
   }
 }
