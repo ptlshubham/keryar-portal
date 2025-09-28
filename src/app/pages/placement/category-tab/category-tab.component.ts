@@ -25,11 +25,12 @@ export class CategoryTabComponent implements OnInit {
   }
 
   setActiveTab(url: string) {
-    if (url.includes('category') && !url.includes('sub-category')) {
+    // Use exact match for each tab
+    if (url.endsWith('/category')) {
       this.activeTab = 1;
-    } else if (url.includes('sub-category')) {
+    } else if (url.endsWith('/sub-category')) {
       this.activeTab = 2;
-    } else if (url.includes('sub-to-subcategory')) {
+    } else if (url.endsWith('/sub-to-subcategory')) {
       this.activeTab = 3;
     }
   }

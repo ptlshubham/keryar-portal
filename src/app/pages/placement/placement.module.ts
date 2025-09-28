@@ -15,13 +15,15 @@ import { CoreModule } from 'src/app/core/core.module';
 import { SharedModule } from 'src/app/shared/shared.module';
 import { WorkfolioRoutingModule } from '../workfolio/workfolio-routing.module';
 import { CategoryTabComponent } from './category-tab/category-tab.component';
+import { SubToSubCategoryComponent } from './sub-to-sub-category/sub-to-sub-category.component';
 
 
 @NgModule({
   declarations: [
     CategoryComponent,
     SubCategoryComponent,
-    CategoryTabComponent
+    CategoryTabComponent,
+    SubToSubCategoryComponent
   ],
   imports: [
     CommonModule,

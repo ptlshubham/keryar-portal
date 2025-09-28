@@ -3,6 +3,7 @@ import { RouterModule, Routes } from '@angular/router';
 import { CategoryComponent } from './category/category.component';
 import { SubCategoryComponent } from './sub-category/sub-category.component';
 import { CategoryTabComponent } from './category-tab/category-tab.component';
+import { SubToSubCategoryComponent } from './sub-to-sub-category/sub-to-sub-category.component';
 
 const routes: Routes = [
   {
@@ -12,6 +13,10 @@ const routes: Routes = [
   {
     path: 'sub-category',
     component: SubCategoryComponent
+  },
+  {
+    path: 'sub-to-subcategory',
+    component: SubToSubCategoryComponent
   },
   {
     path: 'categorytab',
