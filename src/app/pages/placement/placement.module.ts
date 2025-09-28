@@ -14,12 +14,14 @@ import { LightboxModule } from 'ngx-lightbox';
 import { CoreModule } from 'src/app/core/core.module';
 import { SharedModule } from 'src/app/shared/shared.module';
 import { WorkfolioRoutingModule } from '../workfolio/workfolio-routing.module';
+import { CategoryTabComponent } from './category-tab/category-tab.component';
 
 
 @NgModule({
   declarations: [
     CategoryComponent,
-    SubCategoryComponent
+    SubCategoryComponent,
+    CategoryTabComponent
   ],
   imports: [
     CommonModule,

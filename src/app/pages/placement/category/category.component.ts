@@ -12,11 +12,6 @@ export class CategoryComponent {
 
   submitted = false;
   validationForm!: FormGroup;
-  imageUrl: any | null = null;
-  cardImageBase64: any;
-  tokenImage: any;
-  progressValue: number = 0;
-
   serverPath: string = 'https://api.cesociety.in';
 
   page = 1;
@@ -35,7 +30,7 @@ export class CategoryComponent {
   ngOnInit(): void {
     this.breadCrumbItems = [
       { label: 'Home' },
-      { label: 'Generate Tokens', active: true }
+      { label: 'Category', active: true }
     ];
     this.validationForm = this.formBuilder.group({
       category: ['', [Validators.required]],
