@@ -13,21 +13,49 @@
                 <div class="row">
                     <form [formGroup]="validationForm">
                         <div class="row">
+                            <!-- Title -->
                             <div class="col-lg-4 mb-2">
                                 <div class="form-group mb-3">
-                                    <label>Client Name</label>
-                                    <input type="text" class="form-control" placeholder="Enter Name"
-                                        formControlName="name"
-                                        [ngClass]="{'is-invalid': f.name.touched && f.name.errors}">
-                                    <div *ngIf="f.name.touched && f.name.errors" class="invalid-feedback">
-                                        <span *ngIf="f.name.errors.required">This Field is
-                                            required.</span>
+                                    <label>Title</label>
+                                    <input type="text" class="form-control" placeholder="Enter Title"
+                                        formControlName="title"
+                                        [ngClass]="{'is-invalid': f.title.touched && f.title.errors}">
+                                    <div *ngIf="f.title.touched && f.title.errors" class="invalid-feedback">
+                                        <span *ngIf="f.title.errors.required">This Field is required.</span>
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-lg-2 mb-2">
+                            <!-- Client Name Dropdown -->
+                            <div class="col-lg-4 mb-2">
                                 <div class="form-group mb-3">
-                                    <label for="name">Upload Client Logo</label>
+                                    <label>Client Name</label>
+                                    <select class="form-control" formControlName="clientName">
+                                        <option value="" disabled selected>Select Client</option>
+                                        <option *ngFor="let client of clients" [value]="client">{{client}}</option>
+                                    </select>
+                                    <div *ngIf="f.clientName.touched && f.clientName.errors" class="invalid-feedback">
+                                        <span *ngIf="f.clientName.errors.required">This Field is required.</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Category Dropdown -->
+                            <div class="col-lg-4 mb-2">
+                                <div class="form-group mb-3">
+                                    <label>Category</label>
+                                    <select class="form-control" formControlName="category">
+                                        <option value="" disabled selected>Select Category</option>
+                                        <option *ngFor="let cat of categories" [value]="cat">{{cat}}</option>
+                                    </select>
+                                    <div *ngIf="f.category.touched && f.category.errors" class="invalid-feedback">
+                                        <span *ngIf="f.category.errors.required">This Field is required.</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Outer Image Uploader -->
+                            <div class="col-lg-4 mb-2">
+                                <div class="form-group mb-3">
+                                    <label>Upload Outer Image <span class="text-muted">(Required size: 800x600px)</span>
+                                    </label>
                                     <div class="custom-avatar-uploader">
                                         <div class="d-flex justify-content-center">
                                             <label class="custom-upload-box" *ngIf="!imageUrl" tooltip="Upload Image"
@@ -45,6 +73,81 @@
                                         </div>
                                         <ngb-progressbar [value]="uploadProgress" [type]="progressType"
                                             *ngIf="uploading"></ngb-progressbar>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Inner Image Uploader -->
+                            <div class="col-lg-4 mb-2">
+                                <div class="form-group mb-3">
+                                    <label>Upload Inner Image <span class="text-muted">(Required size: 800x600px)</span>
+                                    </label>
+                                    <div class="custom-avatar-uploader">
+                                        <div class="d-flex justify-content-center">
+                                            <label class="custom-upload-box" *ngIf="!innerImageUrl"
+                                                tooltip="Upload Image" tooltipPosition="above">
+                                                <input type="file" accept="image/*"
+                                                    (change)="uploadInnerImageFile($event)" hidden />
+                                                <a><i class="mdi mdi-plus-circle"></i></a>
+                                            </label>
+                                            <div class="custom-preview-box" *ngIf="innerImageUrl">
+                                                <img [src]="innerImageUrl" alt="Inner Avatar" />
+                                                <a class="custom-remove-btn" tooltip="Remove Uploaded Image"
+                                                    tooltipPosition="above" (click)="removeUploadedInnerImage()">
+                                                    <i class="mdi mdi-close-circle"></i></a>
+                                            </div>
+                                        </div>
+                                        <div class="custom-progress" *ngIf="innerUploading">
+                                            Uploading... {{innerUploadProgress}}%
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Published Date -->
+                            <div class="col-lg-4 mb-2">
+                                <div class="form-group mb-3">
+                                    <label>Published Date</label>
+                                    <input type="date" class="form-control" formControlName="publishedDate">
+                                    <div *ngIf="f.publishedDate.touched && f.publishedDate.errors"
+                                        class="invalid-feedback">
+                                        <span *ngIf="f.publishedDate.errors.required">This Field is required.</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Description CKEditor -->
+                            <div class="col-lg-12 mb-2">
+                                <div class="form-group mb-3">
+                                    <label>Description</label>
+                                    <ckeditor [editor]="Editor" formControlName="description"></ckeditor>
+                                    <div *ngIf="f.description.touched && f.description.errors" class="invalid-feedback">
+                                        <span *ngIf="f.description.errors.required">This Field is required.</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Portfolio Gallery Uploader -->
+                            <div class="col-lg-12 mb-2">
+                                <div class="form-group mb-3">
+                                    <label>Portfolio Gallery <span class="text-muted">(You can add multiple
+                                            images)</span>
+                                    </label>
+                                    <div class="custom-avatar-uploader d-flex flex-wrap gap-2">
+                                        <ng-container *ngFor="let img of galleryImages; let i = index">
+                                            <div class="custom-preview-box">
+                                                <img [src]="img" alt="Gallery Image" />
+                                                <a class="custom-remove-btn" tooltip="Remove Image"
+                                                    tooltipPosition="above" (click)="removeGalleryImage(i)">
+                                                    <i class="mdi mdi-close-circle"></i>
+                                                </a>
+                                            </div>
+                                        </ng-container>
+                                        <!-- Add Image Button -->
+                                        <label class="custom-upload-box" tooltip="Add Image" tooltipPosition="above">
+                                            <input type="file" accept="image/*" (change)="addGalleryImage($event)"
+                                                hidden multiple />
+                                            <a><i class="mdi mdi-plus-circle"></i></a>
+                                        </label>
+                                    </div>
+                                    <div class="custom-progress" *ngIf="galleryUploading">
+                                        Uploading... {{galleryUploadProgress}}%
                                     </div>
                                 </div>
                             </div>
