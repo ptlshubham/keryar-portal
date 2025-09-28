@@ -10,7 +10,7 @@ export const MENU: MenuItem[] = [
         id: 2,
         label: 'MENUITEMS.DASHBOARDS.TEXT',
         icon: 'mdi mdi-desktop-mac-dashboard',
-            link: '/',
+        link: '/',
     },
     {
         id: 3,
@@ -33,6 +33,12 @@ export const MENU: MenuItem[] = [
                 id: 6,
                 label: 'Portfolio',
                 link: '/workfolio/portfolio',
+                parentId: 3
+            },
+            {
+                id: 7,
+                label: 'Case-Studies',
+                link: '/workfolio/casestudy',
                 parentId: 3
             },
         ]

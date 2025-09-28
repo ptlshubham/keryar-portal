@@ -13,6 +13,7 @@ import { PortfolioComponent } from './portfolio/portfolio.component';
 import { TestimonialsComponent } from './testimonials/testimonials.component';
 import { WorkfolioRoutingModule } from './workfolio-routing.module';
 import { ClientsComponent } from './clients/clients.component';
+import { CaseStudiesComponent } from './case-studies/case-studies.component';
 
 
 
@@ -20,7 +21,8 @@ import { ClientsComponent } from './clients/clients.component';
   declarations: [
     ClientsComponent,
     TestimonialsComponent,
-    PortfolioComponent
+    PortfolioComponent,
+    CaseStudiesComponent
   ],
   imports: [
     CommonModule,
@@ -45,7 +47,7 @@ import { ClientsComponent } from './clients/clients.component';
     NgSelectModule,
     NgbTypeaheadModule,
     CountUpModule,
-    LightboxModule
+    LightboxModule,
   ]
 })
 export class WorkfolioModule { }
