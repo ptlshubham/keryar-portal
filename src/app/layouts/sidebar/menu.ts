@@ -43,5 +43,19 @@ export const MENU: MenuItem[] = [
             },
         ]
     },
+    {
+        id: 3,
+        label: 'placement',
+        icon: 'mdi mdi-briefcase-outline',
+        subItems: [
+            {
+                id: 4,
+                label: 'category',
+                link: '/placement/category',
+                parentId: 3
+            },
+
+        ]
+    },
 ];
 

@@ -11,6 +11,9 @@ const routes: Routes = [
   {
     path: 'workfolio', loadChildren: () => import('./workfolio/workfolio.module').then(m => m.WorkfolioModule)
   },
+  {
+    path: 'placement', loadChildren: () => import('./placement/placement.module').then(m => m.PlacementModule)
+  },
   // {
   //   path: 'pages', loadChildren: () => import('./extraspages/extraspages.module').then(m => m.ExtraspagesModule)
   // },
