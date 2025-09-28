@@ -205,4 +205,7 @@ export class CaseStudiesComponent {
     this.innerUploadProgress = 0;
     this.innerUploading = false;
   }
+  caseStudyList() {
+    this.isOpen = true;
+  }
 }
