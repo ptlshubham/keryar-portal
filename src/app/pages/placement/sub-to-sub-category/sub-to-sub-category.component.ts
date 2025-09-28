@@ -18,22 +18,13 @@ export class SubToSubCategoryComponent {
   collectionSize = 0;
   paginateData: any = [];
 
-  categories: string[] = ['Developer', 'Designer', 'Q/A', 'Graphic Designer', 'Video Editor'];
-  categoriesWithSub: any[] = [
-    { category: 'Developer', name: 'Full Stack Developer' },
-    { category: 'Developer', name: 'MERN Stack Developer' },
-    { category: 'Developer', name: 'MEAN Stack Developer' },
-    { category: 'Developer', name: 'Node JS Developer' },
-    { category: 'Developer', name: 'React JS Developer' },
-    { category: 'Developer', name: 'Angular Developer' },
-    { category: 'Designer', name: 'UI Designer' },
-    { category: 'Designer', name: 'UX Designer' },
-    { category: 'Q/A', name: 'Manual Tester' },
-    { category: 'Q/A', name: 'Automation Tester' },
-    { category: 'Graphic Designer', name: 'Logo Designer' },
-    { category: 'Video Editor', name: 'YouTube Editor' }
-  ];
-
+  categories: string[] = ['Developer', 'Designer', 'Video Editor'];
+  subCategoryOptions: { [key: string]: string[] } = {
+    'Developer': ['Full Stack', 'Frontend', 'Backend'],
+    'Designer': ['Figma', 'UI/UX'],
+    'Video Editor': ['YouTube', 'Shorts']
+  };
+  filteredSubCategories: string[] = [];
 
   constructor(
     public router: Router,
@@ -47,8 +38,8 @@ export class SubToSubCategoryComponent {
       { label: 'Sub To Sub Category', active: true }
     ];
     this.validationForm = this.formBuilder.group({
-      selectedCategories: [[], [Validators.required]],
-      selectsubcategory: [[], [Validators.required]],
+      selectedCategory: ['', Validators.required],
+      selectedSubCategory: ['', Validators.required],
       subToSubCategories: this.formBuilder.array([this.formBuilder.control('', Validators.required)])
     });
   }
@@ -56,6 +47,11 @@ export class SubToSubCategoryComponent {
   get f() { return this.validationForm.controls; }
   get subToSubCategories(): FormArray {
     return this.validationForm.get('subToSubCategories') as FormArray;
+  }
+
+  onCategoryChange(category: string) {
+    this.filteredSubCategories = this.subCategoryOptions[category] || [];
+    this.validationForm.patchValue({ selectedSubCategory: '' });
   }
 
   addSubToSubCategory() {

@@ -18,7 +18,8 @@ export class SubCategoryComponent {
   collectionSize = 0;
   paginateData: any = [];
 
-  categories: string[] = ['Category A', 'Category B', 'Category C', 'Category D'];
+  categories: string[] = ['Developer', 'Designer', 'Video Editor'];
+  subCategoryMap: { [key: string]: string[] } = {}; // { category: [subCategories] }
 
   constructor(
     // public toastr: ToastrService,
@@ -35,7 +36,7 @@ export class SubCategoryComponent {
     ];
     this.validationForm = this.formBuilder.group({
       selectedCategories: [[], [Validators.required]],
-      subCategories: this.formBuilder.array([this.formBuilder.control('', Validators.required)])
+      subCategories: this.formBuilder.array([])
     });
   }
 
@@ -44,19 +45,37 @@ export class SubCategoryComponent {
     return this.validationForm.get('subCategories') as FormArray;
   }
 
-  addSubCategory() {
-    this.subCategories.push(this.formBuilder.control('', Validators.required));
+  onCategoryChange(selected: string[]) {
+    // Reset subCategories array
+    while (this.subCategories.length) {
+      this.subCategories.removeAt(0);
+    }
+    // Add a FormArray for each selected category
+    selected.forEach(cat => {
+      this.subCategories.push(this.formBuilder.group({
+        category: [cat],
+        subCategoryNames: this.formBuilder.array([this.formBuilder.control('', Validators.required)])
+      }));
+    });
   }
 
-  removeSubCategory(index: number) {
-    if (this.subCategories.length > 1) {
-      this.subCategories.removeAt(index);
-    }
+  addSubCategoryField(catIndex: number) {
+    const subCatGroup = this.subCategories.at(catIndex).get('subCategoryNames') as FormArray;
+    subCatGroup.push(this.formBuilder.control('', Validators.required));
+  }
+
+  removeSubCategoryField(catIndex: number, subIndex: number) {
+    const subCatGroup = this.subCategories.at(catIndex).get('subCategoryNames') as FormArray;
+    if (subCatGroup.length > 1) subCatGroup.removeAt(subIndex);
   }
 
   getPagintaion() {
     // this.paginateData = this.imagesData
     //   .slice((this.page - 1) * this.pageSize, (this.page - 1) * this.pageSize + this.pageSize);
+  }
+
+  getSubCategoryNames(group: any) {
+    return group.get('subCategoryNames') as FormArray;
   }
 
 }

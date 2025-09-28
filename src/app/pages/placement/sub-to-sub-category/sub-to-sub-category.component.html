@@ -14,33 +14,21 @@
             <div class="card-body">
                 <form [formGroup]="validationForm">
                     <div class="row">
-                        <!-- Select Category Dropdown (multiple) -->
+                        <!-- Select Category Dropdown -->
                         <div class="col-lg-6 mb-3">
-                            <label class="form-label">Select Category</label>
-                            <ng-select [items]="categories" [multiple]="true"
-                                formControlName="selectedCategories"></ng-select>
-                            <div *ngIf="f.selectedCategories.touched && f.selectedCategories.errors"
-                                class="invalid-feedback">
-                                <span *ngIf="f.selectedCategories.errors.required">This Field is required.</span>
-                            </div>
+                            <label>Select Category</label>
+                            <ng-select [items]="categories" formControlName="selectedCategory"
+                                (change)="onCategoryChange(f.selectedCategory.value)"></ng-select>
                         </div>
-                        <!-- Select Sub Category Dropdown (multiple, grouped) -->
+                        <!-- Select Sub Category Dropdown (filtered) -->
                         <div class="col-lg-6 mb-3">
-                            <label class="form-label">Select Sub Category</label>
-                            <ng-select [items]="categoriesWithSub" [multiple]="true" bindLabel="name" bindValue="name"
-                                groupBy="category" formControlName="selectsubcategory">
-                                <ng-template ng-optgroup-tmp let-item="item">
-                                    {{ item.category }}
-                                </ng-template>
-                            </ng-select>
-                            <div *ngIf="f.selectsubcategory.touched && f.selectsubcategory.errors"
-                                class="invalid-feedback">
-                                <span *ngIf="f.selectsubcategory.errors.required">This Field is required.</span>
-                            </div>
+                            <label>Select Sub Category</label>
+                            <ng-select [items]="filteredSubCategories"
+                                formControlName="selectedSubCategory"></ng-select>
                         </div>
                         <!-- Dynamic Sub To Sub Category Fields -->
                         <div class="col-lg-12 mb-2">
-                            <label class="form-label">Sub To Sub Categories</label>
+                            <label>Sub To Sub Categories</label>
                             <div *ngFor="let subCat of subToSubCategories.controls; let i = index"
                                 class="d-flex align-items-center mb-2">
                                 <input type="text" class="form-control" formControlName="subCat"

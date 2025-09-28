@@ -17,37 +17,30 @@
                     <form [formGroup]="validationForm">
                         <div class="row">
                             <!-- Select Category Dropdown (multiple) -->
-
-                            <div class="col-lg-8 col-md-6">
-                                <div class="mb-3">
-                                    <label for="choices-multiple-remove-button"
-                                        class="form-label font-size-13 text-muted">Select Category</label>
-                                    <ng-select [items]="categories" [multiple]="true"
-                                        formControlName="selectedCategories"></ng-select>
-                                    <div *ngIf="f.selectedCategories.touched && f.selectedCategories.errors"
-                                        class="invalid-feedback">
-                                        <span *ngIf="f.selectedCategories.errors.required">This Field is
-                                            required.</span>
-                                    </div>
-                                </div>
+                            <div class="col-lg-6 mb-2">
+                                <label>Select Category</label>
+                                <ng-select [items]="categories" [multiple]="true" formControlName="selectedCategories"
+                                    (change)="onCategoryChange(f.selectedCategories.value)">
+                                </ng-select>
                             </div>
 
-                            <!-- Dynamic Sub-Category Fields -->
-                            <div class="col-lg-6 mb-2">
-                                <div class="form-group mb-3">
-                                    <label>Sub Categories</label>
-                                    <div *ngFor="let subCat of subCategories.controls; let i = index"
-                                        class="d-flex align-items-center mb-2">
-                                        <input type="text" class="form-control" formControlName="subCat"
-                                            placeholder="Enter Sub Category">
-                                        <button type="button" class="btn btn-success ms-2" (click)="addSubCategory()">
-                                            <i class="bx bx-plus"></i>
-                                        </button>
-                                        <button type="button" class="btn btn-danger ms-2" (click)="removeSubCategory(i)"
-                                            [disabled]="subCategories.length === 1">
-                                            <i class="bx bx-minus"></i>
-                                        </button>
-                                    </div>
+                            <!-- Dynamic Sub-Category Fields for each selected category -->
+                            <div class="col-lg-6 mb-2"
+                                *ngFor="let group of subCategories.controls; let catIndex = index">
+                                <label>Sub Categories for {{ group.value.category }}</label>
+                                <div *ngFor="let subCatCtrl of getSubCategoryNames(group).controls; let subIndex = index"
+                                    class="d-flex align-items-center mb-2">
+                                    <input type="text" class="form-control" formControlName="subCatCtrl"
+                                        placeholder="Enter Sub Category">
+                                    <button type="button" class="btn btn-success ms-2"
+                                        (click)="addSubCategoryField(catIndex)">
+                                        <i class="bx bx-plus"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-danger ms-2"
+                                        (click)="removeSubCategoryField(catIndex, subIndex)"
+                                        [disabled]="getSubCategoryNames(group).length === 1">
+                                        <i class="bx bx-minus"></i>
+                                    </button>
                                 </div>
                             </div>
                         </div>
