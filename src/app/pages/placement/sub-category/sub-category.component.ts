@@ -1,81 +1,93 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormGroup, UntypedFormBuilder, Validators, FormArray } from '@angular/forms';
 import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-sub-category',
   templateUrl: './sub-category.component.html',
-  styleUrl: './sub-category.component.scss'
+  styleUrls: ['./sub-category.component.scss']
 })
-export class SubCategoryComponent {
-  breadCrumbItems!: Array<{}>;
+export class SubCategoryComponent implements OnInit {
+  breadCrumbItems!: Array<{ label: string; active?: boolean }>;
 
-  submitted = false;
   validationForm!: FormGroup;
-  serverPath: string = 'https://api.cesociety.in';
+  submitted = false;
+
+  // table pagination/demo data (replace with your API)
   page = 1;
   pageSize = 10;
   collectionSize = 0;
-  paginateData: any = [];
+  paginateData: any[] = [];
 
+  // single-select categories
   categories: string[] = ['Developer', 'Designer', 'Video Editor'];
-  subCategoryMap: { [key: string]: string[] } = {}; // { category: [subCategories] }
 
   constructor(
-    // public toastr: ToastrService,
-    // public homeService: HomeService,
     public router: Router,
-    public formBuilder: UntypedFormBuilder,
+    private fb: UntypedFormBuilder
+  ) { }
 
-  ) {
-  }
   ngOnInit(): void {
     this.breadCrumbItems = [
       { label: 'Home' },
       { label: 'Sub-Category', active: true }
     ];
-    this.validationForm = this.formBuilder.group({
-      selectedCategories: [[], [Validators.required]],
-      subCategories: this.formBuilder.array([])
+
+    this.validationForm = this.fb.group({
+      selectedCategory: [null, Validators.required],
+      subCategories: this.fb.array([]) // array of strings
     });
+
+    // demo list data
+    this.collectionSize = 3;
+    this.paginateData = [];
   }
 
+  // convenience getters
   get f() { return this.validationForm.controls; }
   get subCategories(): FormArray {
     return this.validationForm.get('subCategories') as FormArray;
   }
 
-  onCategoryChange(selected: string[]) {
-    // Reset subCategories array
+  // on single-select change
+  onCategoryChange(selected: string) {
+    // whenever category changes, reset sub-categories
     while (this.subCategories.length) {
       this.subCategories.removeAt(0);
     }
-    // Add a FormArray for each selected category
-    selected.forEach(cat => {
-      this.subCategories.push(this.formBuilder.group({
-        category: [cat],
-        subCategoryNames: this.formBuilder.array([this.formBuilder.control('', Validators.required)])
-      }));
-    });
+
+    if (selected) {
+      // start with one input
+      this.subCategories.push(this.fb.control('', Validators.required));
+    }
   }
 
-  addSubCategoryField(catIndex: number) {
-    const subCatGroup = this.subCategories.at(catIndex).get('subCategoryNames') as FormArray;
-    subCatGroup.push(this.formBuilder.control('', Validators.required));
+  addSubCategoryField() {
+    this.subCategories.push(this.fb.control('', Validators.required));
   }
 
-  removeSubCategoryField(catIndex: number, subIndex: number) {
-    const subCatGroup = this.subCategories.at(catIndex).get('subCategoryNames') as FormArray;
-    if (subCatGroup.length > 1) subCatGroup.removeAt(subIndex);
+  removeSubCategoryField(index: number) {
+    if (this.subCategories.length > 1) {
+      this.subCategories.removeAt(index);
+    }
+  }
+
+  submit() {
+    this.submitted = true;
+    if (this.validationForm.invalid) return;
+
+    const payload = this.validationForm.value;
+    // payload example:
+    // {
+    //   selectedCategory: 'Developer',
+    //   subCategories: ['Frontend', 'Backend']
+    // }
+    console.log('Submit payload:', payload);
+
+    // TODO: call your API here and then refresh list/table if needed
   }
 
   getPagintaion() {
-    // this.paginateData = this.imagesData
-    //   .slice((this.page - 1) * this.pageSize, (this.page - 1) * this.pageSize + this.pageSize);
+    // hook your pagination logic here
   }
-
-  getSubCategoryNames(group: any) {
-    return group.get('subCategoryNames') as FormArray;
-  }
-
 }

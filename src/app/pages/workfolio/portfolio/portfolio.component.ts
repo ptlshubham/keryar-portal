@@ -62,7 +62,7 @@ export class PortfolioComponent {
       title: ['', [Validators.required]],
       clientname: ['', [Validators.required]],
       category: ['', [Validators.required]],
-      authername: ['', [Validators.required]],
+      authorname: ['', [Validators.required]],
       description: ['', [Validators.required]],
       publishedDate: ['', [Validators.required]],
     });
