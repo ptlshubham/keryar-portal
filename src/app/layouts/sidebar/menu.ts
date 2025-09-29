@@ -69,5 +69,20 @@ export const MENU: MenuItem[] = [
 
         ]
     },
+    {
+        id: 3,
+        label: 'blog',
+        icon: 'mdi mdi-briefcase-outline',
+        subItems: [
+            {
+                id: 4,
+                label: 'Add blog',
+                link: '/blog/add-blog',
+                parentId: 3
+            },
+
+
+        ]
+    },
 ];
 
