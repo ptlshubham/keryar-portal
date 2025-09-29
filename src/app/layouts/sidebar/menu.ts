@@ -54,18 +54,7 @@ export const MENU: MenuItem[] = [
                 link: '/placement/category',
                 parentId: 3
             },
-            {
-                id: 4,
-                label: 'sub-category',
-                link: '/placement/sub-category',
-                parentId: 3
-            },
-            {
-                id: 4,
-                label: 'sub-to-subcategory',
-                link: '/placement/sub-to-subcategory',
-                parentId: 3
-            },
+
 
         ]
     },

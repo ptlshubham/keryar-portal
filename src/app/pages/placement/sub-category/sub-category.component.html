@@ -19,7 +19,7 @@
                             <!-- Select Category Dropdown (multiple) -->
                             <div class="col-lg-6 mb-2">
                                 <label>Select Category</label>
-                                <ng-select [items]="categories" [multiple]="true" formControlName="selectedCategories"
+                                <ng-select [items]="categories" formControlName="selectedCategories"
                                     (change)="onCategoryChange(f.selectedCategories.value)">
                                 </ng-select>
                             </div>
