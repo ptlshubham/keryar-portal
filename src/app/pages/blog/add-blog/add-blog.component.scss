@@ -1,0 +1,182 @@
+.custom-avatar-uploader {
+    .custom-upload-box {
+        width: 100px;
+        height: 100px;
+        border: 2px dashed #ccc;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 32px;
+        cursor: pointer;
+    }
+
+    .custom-remove-btn {
+        position: absolute;
+        top: 6%;
+        right: 24%;
+        font-size: 22px;
+        transform: translate(50%, -50%);
+        background: #fff;
+        height: 30px;
+        width: 30px;
+        border: 1px solid #ccc;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+    }
+
+    .custom-preview-box {
+        position: relative;
+        width: 100px;
+        height: 100px;
+
+        img {
+            width: 100%;
+            height: 100%;
+            border-radius: 8px;
+            object-fit: cover;
+        }
+
+        .custom-remove-btn {
+            position: absolute;
+            top: 10%;
+            font-size: 22px;
+            right: 8%;
+            transform: translate(50%, -50%);
+            background: #fff;
+            height: 30px;
+            width: 30px;
+            border: 1px solid #ccc;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+    }
+
+    .custom-progress {
+        font-size: 12px;
+    }
+}
+
+.custom-form-group {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+.custom-form-group .custom-margin-top {
+    margin-top: 24px;
+}
+
+/* Media queries for all screen sizes */
+@media only screen and (max-width: 767px) {
+    .custom-avatar-uploader {
+        .custom-remove-btn {
+            position: absolute;
+            top: 6%;
+            right: 36%;
+            font-size: 20px;
+            background: #fff;
+            height: 28px;
+            width: 28px;
+            border: 1px solid #ccc;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+    }
+    .custom-form-group .custom-margin-top {
+        margin-top: 0px;
+    }
+}
+
+@media only screen and (min-width: 768px) and (max-width: 1024px) {
+    .custom-avatar-uploader {
+        .custom-remove-btn {
+            position: absolute;
+            top: 5%;
+            right: 43%;
+            font-size: 22px;
+            background: #fff;
+            height: 30px;
+            width: 30px;
+            border: 1px solid #ccc;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+    }
+    .custom-form-group .custom-margin-top {
+        margin-top: 0px;
+    }
+}
+
+@media only screen and (min-width: 1025px) and (max-width: 1199px) {
+    .custom-avatar-uploader {
+        .custom-remove-btn {
+            position: absolute;
+            top: 6%;
+            right: 25%; /* Adjusted for better alignment on larger screens */
+            font-size: 22px;
+            background: #fff;
+            height: 30px;
+            width: 30px;
+            border: 1px solid #ccc;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+    }
+}
+
+/* Min width 1200px to Max width 1399px */
+@media only screen and (min-width: 1200px) and (max-width: 1399px) {
+    .custom-avatar-uploader {
+        .custom-remove-btn {
+            position: absolute;
+            top: 6%;
+            right: 25%; /* Adjusted for better alignment on larger screens */
+            font-size: 22px;
+            background: #fff;
+            height: 30px;
+            width: 30px;
+            border: 1px solid #ccc;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+    }
+}
+
+/* Min width 1600px */
+@media only screen and (min-width: 1600px) {
+    .custom-avatar-uploader {
+        .custom-remove-btn {
+            position: absolute;
+            top: 6%;
+            right: 32%; /* Adjusted for better alignment on larger screens */
+            font-size: 22px;
+            background: #fff;
+            height: 30px;
+            width: 30px;
+            border: 1px solid #ccc;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+    }
+}

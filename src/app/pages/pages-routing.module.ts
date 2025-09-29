@@ -14,6 +14,9 @@ const routes: Routes = [
   {
     path: 'placement', loadChildren: () => import('./placement/placement.module').then(m => m.PlacementModule)
   },
+  {
+    path: 'blog', loadChildren: () => import('./blog/blog.module').then(m => m.BlogModule)
+  },
   // {
   //   path: 'pages', loadChildren: () => import('./extraspages/extraspages.module').then(m => m.ExtraspagesModule)
   // },

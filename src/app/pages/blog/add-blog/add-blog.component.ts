@@ -4,11 +4,11 @@ import { Router } from '@angular/router';
 import * as ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 
 @Component({
-  selector: 'app-portfolio',
-  templateUrl: './portfolio.component.html',
-  styleUrl: './portfolio.component.scss'
+  selector: 'app-add-blog',
+  templateUrl: './add-blog.component.html',
+  styleUrl: './add-blog.component.scss'
 })
-export class PortfolioComponent {
+export class AddBlogComponent {
   breadCrumbItems!: Array<{}>;
   public Editor = ClassicEditor;
 
@@ -34,20 +34,16 @@ export class PortfolioComponent {
 
   serverPath: string = 'https://api.cesociety.in';
 
-
-
-  keyIndicator = [];
-  selectedKeyNo: any;
-
   isOpen: boolean = true;
 
 
-  // pagination
   page = 1;
   pageSize = 10;
   collectionSize = 0;
   paginateData: any = [];
 
+  keyIndicator = [];
+  selectedKeyNo: any;
   constructor(
     public router: Router,
     public formBuilder: UntypedFormBuilder,
@@ -60,7 +56,7 @@ export class PortfolioComponent {
     ];
     this.validationForm = this.formBuilder.group({
       title: ['', [Validators.required]],
-      clientname: ['', [Validators.required]],
+      clientName: ['', [Validators.required]],
       category: ['', [Validators.required]],
       authername: ['', [Validators.required]],
       description: ['', [Validators.required]],
@@ -69,8 +65,6 @@ export class PortfolioComponent {
   }
 
   get f() { return this.validationForm.controls; }
-
-
 
   uploadInnerImageFile(event: any) {
     const file = event.target.files[0];
@@ -100,18 +94,8 @@ export class PortfolioComponent {
     this.innerUploading = false;
   }
 
-
-
-  onKeyIndicatorChange(event: any) {
-    this.selectedKeyNo = event.keyno
-  }
-  addNewIndicator(term: string): any {
-    return { keyno: term };
-  }
-
-  // gallery images
-  removeGalleryUploader(uploaderIndex: number) {
-    this.galleryUploaders.splice(uploaderIndex, 1);
+  addGalleryUploader() {
+    this.galleryUploaders.push({ images: [] });
   }
 
   addGalleryImage(event: any, uploaderIndex: number) {
@@ -146,16 +130,15 @@ export class PortfolioComponent {
   removeGalleryImage(uploaderIndex: number, imageIndex: number) {
     this.galleryUploaders[uploaderIndex].images.splice(imageIndex, 1);
   }
-  addGalleryUploader() {
-    this.galleryUploaders.push({ images: [] });
+  removeGalleryUploader(uploaderIndex: number) {
+    this.galleryUploaders.splice(uploaderIndex, 1);
   }
-  addPortfolio() {
-    this.isOpen = false;
-  }
-  portfolioList() {
+  BlogList() {
     this.isOpen = true;
   }
-  // pagination
+  AddBlog() {
+    this.isOpen = false;
+  }
   getPagintaion() {
     // this.paginateData = this.imagesData
     //   .slice((this.page - 1) * this.pageSize, (this.page - 1) * this.pageSize + this.pageSize);
@@ -177,5 +160,11 @@ export class PortfolioComponent {
     //     timeOut: 3000,
     //   });
     // })
+  }
+  onKeyIndicatorChange(event: any) {
+    this.selectedKeyNo = event.keyno
+  }
+  addNewIndicator(term: string): any {
+    return { keyno: term };
   }
 }

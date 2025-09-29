@@ -1,13 +1,14 @@
-<div class="row" *ngIf="!isOpen">
+<div class="row" *ngIf="isOpen==false">
     <div class="col-lg-12">
         <div class="card">
             <div class="card-header">
+
                 <div class="d-flex justify-content-between">
                     <div>
-                        <h5 class="card-title">Case study</h5>
-                        <p class="card-title-desc"><b>Enter Case study Details</b> </p>
+                        <h5 class="card-title">Add Blog</h5>
+                        <p class="card-title-desc"><b>Enter Blog Details</b> </p>
                     </div>
-                    <button type="button" class="btn btn-danger waves-effect waves-light" (click)="caseStudyList()">
+                    <button type="button" class="btn btn-danger waves-effect waves-light" (click)="BlogList()">
                         <i class="bx bx-arrow-back  "></i>
                         Back</button>
                 </div>
@@ -16,36 +17,34 @@
                 <div class="row">
                     <form [formGroup]="validationForm">
                         <div class="row">
-                            <!-- Title Name -->
+                            <!-- Title -->
                             <div class="col-lg-4 mb-2">
                                 <div class="form-group mb-3">
-                                    <label>Title Name</label>
-                                    <input type="text" class="form-control" placeholder="Enter Name"
-                                        formControlName="name"
-                                        [ngClass]="{'is-invalid': f.name.touched && f.name.errors}">
-                                    <div *ngIf="f.name.touched && f.name.errors" class="invalid-feedback">
-                                        <span *ngIf="f.name.errors.required">This Field is
-                                            required.</span>
+                                    <label>Title</label>
+                                    <input type="text" class="form-control" placeholder="Enter Title"
+                                        formControlName="title"
+                                        [ngClass]="{'is-invalid': f.title.touched && f.title.errors}">
+                                    <div *ngIf="f.title.touched && f.title.errors" class="invalid-feedback">
+                                        <span *ngIf="f.title.errors.required">This Field is required.</span>
                                     </div>
                                 </div>
                             </div>
-
                             <!-- Client Name Dropdown -->
+
                             <div class="col-lg-4 mb-2">
                                 <div class="mb-3">
                                     <label for="choices-single-default" class="form-label">Client Name </label>
                                     <ng-select [items]="keyIndicator" bindLabel="keyno" bindValue="keyno"
-                                        formControlName="clientname" placeholder="Client Name"
+                                        formControlName="clientName" placeholder="client Name"
                                         (change)="onKeyIndicatorChange($event)" [addTag]="addNewIndicator">
                                         <ng-template ng-optgroup-tmp let-item="item">
                                             {{item.keyno}}
                                         </ng-template>
                                     </ng-select>
                                 </div>
+                                          
                             </div>
 
-
-                            <!-- Category Dropdown -->
                             <div class="col-lg-4 mb-2">
                                 <div class="mb-3">
                                     <label for="choices-single-default" class="form-label">Select Category </label>
@@ -61,34 +60,17 @@
                                     </div>
                                 </div>
                             </div>
-
-                            <!-- Upload Outer Image -->
-                            <!-- <div class="col-lg-4 mb-2">
+                            <div class="col-lg-4 mb-2">
                                 <div class="form-group mb-3">
-                                    <label for="name">Upload outer image <span class="text-muted">(Required size:
-                                            800x600px)</span></label>
-
-                                    <div class="custom-avatar-uploader">
-                                        <div class="d-flex justify-content-center">
-                                            <label class="custom-upload-box" *ngIf="!imageUrl" tooltip="Upload Image"
-                                                tooltipPosition="above">
-                                                <input type="file" accept="image/*" (change)="uploadImageFile($event)"
-                                                    hidden />
-                                                <a><i class="mdi mdi-plus-circle"></i></a>
-                                            </label>
-                                            <div class="custom-preview-box" *ngIf="imageUrl">
-                                                <img [src]="serverPath+tokenImage" alt="Avatar" />
-                                                <a class="custom-remove-btn" tooltip="Remove Uploaded Image"
-                                                    tooltipPosition="above" (click)="removeUploadedImage(tokenImage)">
-                                                    <i class="mdi mdi-close-circle"></i></a>
-                                            </div>
-                                        </div>
-                                        <ngb-progressbar [value]="uploadProgress" [type]="progressType"
-                                            *ngIf="uploading"></ngb-progressbar>
+                                    <label>Auther Name</label>
+                                    <input type="text" class="form-control" placeholder="Enter Auther Name"
+                                        formControlName="authername"
+                                        [ngClass]="{'is-invalid': f.authername.touched && f.authername.errors}">
+                                    <div *ngIf="f.authername.touched && f.authername.errors" class="invalid-feedback">
+                                        <span *ngIf="f.authername.errors.required">This Field is required.</span>
                                     </div>
                                 </div>
-                            </div> -->
-
+                            </div>
                             <!-- Published Date -->
                             <div class="col-lg-4 mb-2">
                                 <div class="form-group mb-3">
@@ -104,8 +86,8 @@
                             <!-- Inner Image Uploader -->
                             <div class="col-lg-4 mb-2">
                                 <div class="form-group mb-3">
-                                    <label for="innerImage">Upload inner image <span class="text-muted">(Required size:
-                                            800x600px)</span></label>
+                                    <label>Upload Inner Image <span class="text-muted">(Required size: 800x600px)</span>
+                                    </label>
                                     <div class="custom-avatar-uploader">
                                         <div class="d-flex justify-content-center">
                                             <label class="custom-upload-box" *ngIf="!innerImageUrl"
@@ -129,7 +111,7 @@
                             </div>
                             <div class="col-lg-4 mb-2">
                                 <div class="form-group mb-3">
-                                    <label>Case Study Gallery <span class="text-muted">(You can add multiple
+                                    <label>Blog Gallery <span class="text-muted">(You can add multiple
                                             images)</span>
                                     </label>
                                     <div class="d-flex flex-row flex-wrap gap-3 align-items-center">
@@ -174,8 +156,7 @@
                                     </div>
                                 </div>
                             </div>
-
-
+                            <!-- Description CKEditor -->
                             <div class="col-lg-12 mb-2">
                                 <div class="form-group mb-3">
                                     <label>Description</label>
@@ -185,6 +166,8 @@
                                     </div>
                                 </div>
                             </div>
+                            <!-- Portfolio Gallery Uploader -->
+
                         </div>
                     </form>
                     <div class="d-flex justify-content-end gap-2">
@@ -198,18 +181,19 @@
     </div>
 </div>
 
+
 <div class="row" *ngIf="isOpen">
     <div class="col-lg-12">
         <div class="card">
             <div class="card-header">
                 <div class="d-flex justify-content-between">
                     <div>
-                        <h5 class="card-title">Case study </h5>
-                        <p class="card-title-desc">List of all Case study</p>
+                        <h5 class="card-title">Blogs </h5>
+                        <p class="card-title-desc">List of all blog</p>
                     </div>
-                    <button type="button" class="btn btn-primary waves-effect waves-light" (click)="addCaseStudy()">
+                    <button type="button" class="btn btn-primary waves-effect waves-light" (click)="AddBlog()">
                         <i class="fas fa-user-plus "></i>
-                        Add New Case Study</button>
+                        Add New Blog </button>
                 </div>
 
             </div>
@@ -220,8 +204,10 @@
                         <thead class="table-light">
                             <tr>
                                 <th class="text-left">#</th>
-                                <th class="text-center">Title</th>
-                                <th class="text-center">Image</th>
+                                <th class="text-center">Blog Name</th>
+                                <th class="text-center">Client Name</th>
+                                <th class="text-center">Category</th>
+                                <th class="text-center">Published Date</th>
                                 <th class="text-center">Active & Deactive</th>
                                 <th class="text-end">Action</th>
                             </tr>
@@ -230,10 +216,7 @@
                             <tr *ngFor="let c of paginateData;let i=index">
                                 <td class="text-left">{{c.index}}</td>
                                 <td class="text-center">{{c.name}}</td>
-                                <td class="text-center">
-                                    <img src="https://api.cesociety.in{{c.image}}" alt="{{c.keywords}}"
-                                        class="rounded avatar-lg" (click)="openImage(c.index - 1)">
-                                </td>
+
                                 <td class="text-center">
                                     <button type="button" class="btn btn-success waves-effect btn-label waves-light"
                                         *ngIf="c.isactive" (click)="deactiveBanners(c.index)"><i
@@ -242,20 +225,7 @@
                                         *ngIf="!c.isactive" (click)="activeBanners(c.index)"><i
                                             class="bx bx-block label-icon"></i> Deactive</button>
                                 </td>
-                                <td class="text-end">
-                                    <div class="d-flex justify-content-end gap-1">
-                                        <button type="button" class="btn btn-soft-danger waves-effect waves-light"
-                                            data-bs-toggle="tooltip" data-bs-placement="top" title="View & Accept"
-                                            (click)="removeBannersImages(c.id)"><i
-                                                class="bx bx-trash-alt font-size-16 align-middle"></i></button>
-                                        <!-- <div class="d-flex justify-content-end gap-1">
-                                        <button type="button" class="btn btn-soft-primary waves-effect waves-light"
-                                            data-bs-toggle="tooltip" data-bs-placement="top" title="View & Accept"><i
-                                                class="bx bx-edit font-size-16 align-middle"></i></button>
-                                      
-                                    </div> -->
-                                    </div>
-                                </td>
+
 
                             </tr>
                         </tbody>

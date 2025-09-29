@@ -1,12 +1,16 @@
-<div class="row">
+<div class="row" *ngIf="isOpen==false">
     <div class="col-lg-12">
         <div class="card">
             <div class="card-header">
+
                 <div class="d-flex justify-content-between">
                     <div>
                         <h5 class="card-title">Client Portfolio</h5>
                         <p class="card-title-desc"><b>Enter Client Portfolio Details</b> </p>
                     </div>
+                    <button type="button" class="btn btn-danger waves-effect waves-light" (click)="portfolioList()">
+                        <i class="bx bx-arrow-back  "></i>
+                        Back</button>
                 </div>
             </div>
             <div class="card-body">
@@ -25,57 +29,62 @@
                                     </div>
                                 </div>
                             </div>
+
                             <!-- Client Name Dropdown -->
+
                             <div class="col-lg-4 mb-2">
-                                <div class="form-group mb-3">
-                                    <label>Client Name</label>
-                                    <select class="form-control" formControlName="clientName">
-                                        <option value="" disabled selected>Select Client</option>
-                                        <option *ngFor="let client of clients" [value]="client">{{client}}</option>
-                                    </select>
-                                    <div *ngIf="f.clientName.touched && f.clientName.errors" class="invalid-feedback">
-                                        <span *ngIf="f.clientName.errors.required">This Field is required.</span>
-                                    </div>
+                                <div class="mb-3">
+                                    <label for="choices-single-default" class="form-label">Client Name </label>
+                                    <ng-select [items]="keyIndicator" bindLabel="keyno" bindValue="keyno"
+                                        formControlName="clientname" placeholder="Client Name"
+                                        (change)="onKeyIndicatorChange($event)" [addTag]="addNewIndicator">
+                                        <ng-template ng-optgroup-tmp let-item="item">
+                                            {{item.keyno}}
+                                        </ng-template>
+                                    </ng-select>
                                 </div>
                             </div>
+
                             <!-- Category Dropdown -->
                             <div class="col-lg-4 mb-2">
-                                <div class="form-group mb-3">
-                                    <label>Category</label>
-                                    <select class="form-control" formControlName="category">
-                                        <option value="" disabled selected>Select Category</option>
-                                        <option *ngFor="let cat of categories" [value]="cat">{{cat}}</option>
-                                    </select>
+                                <div class="mb-3">
+                                    <label for="choices-single-default" class="form-label">Select Category </label>
+                                    <ng-select [items]="keyIndicator" bindLabel="keyno" bindValue="keyno"
+                                        formControlName="category" placeholder="Select Category" [multiple]="true"
+                                        (change)="onKeyIndicatorChange($event)" [addTag]="addNewIndicator">
+                                        <ng-template ng-optgroup-tmp let-item="item">
+                                            {{item.keyno}}
+                                        </ng-template>
+                                    </ng-select>
                                     <div *ngIf="f.category.touched && f.category.errors" class="invalid-feedback">
                                         <span *ngIf="f.category.errors.required">This Field is required.</span>
                                     </div>
                                 </div>
                             </div>
-                            <!-- Outer Image Uploader -->
+
                             <div class="col-lg-4 mb-2">
                                 <div class="form-group mb-3">
-                                    <label>Upload Outer Image <span class="text-muted">(Required size: 800x600px)</span>
-                                    </label>
-                                    <div class="custom-avatar-uploader">
-                                        <div class="d-flex justify-content-center">
-                                            <label class="custom-upload-box" *ngIf="!imageUrl" tooltip="Upload Image"
-                                                tooltipPosition="above">
-                                                <input type="file" accept="image/*" (change)="uploadImageFile($event)"
-                                                    hidden />
-                                                <a><i class="mdi mdi-plus-circle"></i></a>
-                                            </label>
-                                            <div class="custom-preview-box" *ngIf="imageUrl">
-                                                <img [src]="serverPath+tokenImage" alt="Avatar" />
-                                                <a class="custom-remove-btn" tooltip="Remove Uploaded Image"
-                                                    tooltipPosition="above" (click)="removeUploadedImage(tokenImage)">
-                                                    <i class="mdi mdi-close-circle"></i></a>
-                                            </div>
-                                        </div>
-                                        <ngb-progressbar [value]="uploadProgress" [type]="progressType"
-                                            *ngIf="uploading"></ngb-progressbar>
+                                    <label>Auther Name</label>
+                                    <input type="text" class="form-control" placeholder="Enter Auther Name"
+                                        formControlName="authername"
+                                        [ngClass]="{'is-invalid': f.authername.touched && f.authername.errors}">
+                                    <div *ngIf="f.authername.touched && f.authername.errors" class="invalid-feedback">
+                                        <span *ngIf="f.authername.errors.required">This Field is required.</span>
                                     </div>
                                 </div>
                             </div>
+                            <!-- Published Date -->
+                            <div class="col-lg-4 mb-2">
+                                <div class="form-group mb-3">
+                                    <label>Published Date</label>
+                                    <input type="date" class="form-control" formControlName="publishedDate">
+                                    <div *ngIf="f.publishedDate.touched && f.publishedDate.errors"
+                                        class="invalid-feedback">
+                                        <span *ngIf="f.publishedDate.errors.required">This Field is required.</span>
+                                    </div>
+                                </div>
+                            </div>
+
                             <!-- Inner Image Uploader -->
                             <div class="col-lg-4 mb-2">
                                 <div class="form-group mb-3">
@@ -102,14 +111,52 @@
                                     </div>
                                 </div>
                             </div>
-                            <!-- Published Date -->
+                            <!-- Portfolio Gallery Uploader -->
+
                             <div class="col-lg-4 mb-2">
                                 <div class="form-group mb-3">
-                                    <label>Published Date</label>
-                                    <input type="date" class="form-control" formControlName="publishedDate">
-                                    <div *ngIf="f.publishedDate.touched && f.publishedDate.errors"
-                                        class="invalid-feedback">
-                                        <span *ngIf="f.publishedDate.errors.required">This Field is required.</span>
+                                    <label>Portfolio Gallery <span class="text-muted">(You can add multiple
+                                            images)</span>
+                                    </label>
+                                    <div class="d-flex flex-row flex-wrap gap-3 align-items-center">
+                                        <ng-container
+                                            *ngFor="let uploader of galleryUploaders; let uploaderIndex = index">
+                                            <div
+                                                class="custom-avatar-uploader d-flex flex-wrap gap-2 align-items-center position-relative">
+                                                <!-- Show close button only if more than one uploader -->
+                                                <button *ngIf="galleryUploaders.length > 1" type="button"
+                                                    class="btn btn-sm btn-danger position-absolute top-0 end-0"
+                                                    style="z-index:2;" (click)="removeGalleryUploader(uploaderIndex)">
+                                                    <i class="mdi mdi-close"></i>
+                                                </button>
+                                                <ng-container *ngFor="let img of uploader.images; let i = index">
+                                                    <div class="custom-preview-box">
+                                                        <img [src]="img" alt="Gallery Image" />
+                                                        <a class="custom-remove-btn" tooltip="Remove Image"
+                                                            tooltipPosition="above"
+                                                            (click)="removeGalleryImage(uploaderIndex, i)">
+                                                            <i class="mdi mdi-close-circle"></i>
+                                                        </a>
+                                                    </div>
+                                                </ng-container>
+                                                <!-- Add Image Button for this uploader -->
+                                                <label class="custom-upload-box" tooltip="Add Image"
+                                                    tooltipPosition="above">
+                                                    <input type="file" accept="image/*"
+                                                        (change)="addGalleryImage($event, uploaderIndex)" hidden
+                                                        multiple />
+                                                    <a><i class="mdi mdi-plus-circle"></i></a>
+                                                </label>
+                                            </div>
+                                        </ng-container>
+                                        <!-- Plus button to add another uploader, always at the end -->
+                                        <button type="button" class="btn btn-success ms-2"
+                                            (click)="addGalleryUploader()">
+                                            <i class="bx bx-plus"></i>
+                                        </button>
+                                    </div>
+                                    <div class="custom-progress" *ngIf="galleryUploading">
+                                        Uploading... {{galleryUploadProgress}}%
                                     </div>
                                 </div>
                             </div>
@@ -123,34 +170,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <!-- Portfolio Gallery Uploader -->
-                            <div class="col-lg-12 mb-2">
-                                <div class="form-group mb-3">
-                                    <label>Portfolio Gallery <span class="text-muted">(You can add multiple
-                                            images)</span>
-                                    </label>
-                                    <div class="custom-avatar-uploader d-flex flex-wrap gap-2">
-                                        <ng-container *ngFor="let img of galleryImages; let i = index">
-                                            <div class="custom-preview-box">
-                                                <img [src]="img" alt="Gallery Image" />
-                                                <a class="custom-remove-btn" tooltip="Remove Image"
-                                                    tooltipPosition="above" (click)="removeGalleryImage(i)">
-                                                    <i class="mdi mdi-close-circle"></i>
-                                                </a>
-                                            </div>
-                                        </ng-container>
-                                        <!-- Add Image Button -->
-                                        <label class="custom-upload-box" tooltip="Add Image" tooltipPosition="above">
-                                            <input type="file" accept="image/*" (change)="addGalleryImage($event)"
-                                                hidden multiple />
-                                            <a><i class="mdi mdi-plus-circle"></i></a>
-                                        </label>
-                                    </div>
-                                    <div class="custom-progress" *ngIf="galleryUploading">
-                                        Uploading... {{galleryUploadProgress}}%
-                                    </div>
-                                </div>
-                            </div>
+
                         </div>
                     </form>
                     <div class="d-flex justify-content-end gap-2">
@@ -162,4 +182,69 @@
             </div>
         </div>
     </div>
+</div>
+
+
+<div class="row" *ngIf="isOpen">
+    <div class="col-lg-12">
+        <div class="card">
+            <div class="card-header">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h5 class="card-title">Client Portfolio</h5>
+                        <p class="card-title-desc">List of all Portfolio</p>
+                    </div>
+                    <button type="button" class="btn btn-primary waves-effect waves-light" (click)="addPortfolio()">
+                        <i class="fas fa-user-plus "></i>
+                        Add New portfolio </button>
+                </div>
+
+            </div>
+
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th class="text-left">#</th>
+                                <th class="text-center">Portfolio Name</th>
+                                <th class="text-center">Client Name</th>
+                                <th class="text-center">Category</th>
+
+                                <th class="text-center">Image</th>
+                                <th class="text-center">Active & Deactive</th>
+                                <th class="text-end">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let c of paginateData;let i=index">
+                                <td class="text-left">{{c.index}}</td>
+                                <td class="text-center">{{c.name}}</td>
+
+                                <td class="text-center">
+                                    <button type="button" class="btn btn-success waves-effect btn-label waves-light"
+                                        *ngIf="c.isactive" (click)="deactiveBanners(c.index)"><i
+                                            class="bx bx-check-double label-icon"></i> Active</button>
+                                    <button type="button" class="btn btn-danger waves-effect btn-label waves-light"
+                                        *ngIf="!c.isactive" (click)="activeBanners(c.index)"><i
+                                            class="bx bx-block label-icon"></i> Deactive</button>
+                                </td>
+
+
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="row mt-4">
+                    <ngb-pagination [collectionSize]="collectionSize" [pageSize]="pageSize" [(page)]="page"
+                        [maxSize]="5" [rotate]="true" [ellipses]="false" [boundaryLinks]="true"
+                        (pageChange)="getPagintaion();" aria-label="Default pagination"
+                        class="d-flex justify-content-end pagination-rounded-flat pagination-success"></ngb-pagination>
+                </div>
+            </div>
+            <!-- end card body -->
+        </div>
+        <!-- end card -->
+    </div>
+    <!-- end col -->
 </div>

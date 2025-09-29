@@ -22,7 +22,7 @@ import { DashboardComponent } from './dashboard/dashboard.component';
 
 @NgModule({
   declarations: [
-    DashboardComponent
+    DashboardComponent,
   ],
   imports: [
     CommonModule,
@@ -40,6 +40,6 @@ import { DashboardComponent } from './dashboard/dashboard.component';
     // LightboxModule,
     LeafletModule
   ],
-  schemas:[CUSTOM_ELEMENTS_SCHEMA]
+  schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
 export class PagesModule { }
