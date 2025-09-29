@@ -58,7 +58,7 @@ export class AddBlogComponent {
       title: ['', [Validators.required]],
       clientName: ['', [Validators.required]],
       category: ['', [Validators.required]],
-      authername: ['', [Validators.required]],
+      authorname: ['', [Validators.required]],
       description: ['', [Validators.required]],
       publishedDate: ['', [Validators.required]],
     });
