@@ -4,6 +4,7 @@ import { CategoryComponent } from './category/category.component';
 import { SubCategoryComponent } from './sub-category/sub-category.component';
 import { CategoryTabComponent } from './category-tab/category-tab.component';
 import { SubToSubCategoryComponent } from './sub-to-sub-category/sub-to-sub-category.component';
+import { QuetionsComponent } from './quetions/quetions.component';
 
 const routes: Routes = [
   {
@@ -21,6 +22,10 @@ const routes: Routes = [
   {
     path: 'categorytab',
     component: CategoryTabComponent
+  },
+  {
+    path: 'quetions',
+    component: QuetionsComponent
   },
 ];
 

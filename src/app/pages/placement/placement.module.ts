@@ -16,6 +16,7 @@ import { SharedModule } from 'src/app/shared/shared.module';
 import { WorkfolioRoutingModule } from '../workfolio/workfolio-routing.module';
 import { CategoryTabComponent } from './category-tab/category-tab.component';
 import { SubToSubCategoryComponent } from './sub-to-sub-category/sub-to-sub-category.component';
+import { QuetionsComponent } from './quetions/quetions.component';
 
 
 @NgModule({
@@ -23,7 +24,8 @@ import { SubToSubCategoryComponent } from './sub-to-sub-category/sub-to-sub-cate
     CategoryComponent,
     SubCategoryComponent,
     CategoryTabComponent,
-    SubToSubCategoryComponent
+    SubToSubCategoryComponent,
+    QuetionsComponent
   ],
   imports: [
     CommonModule,
