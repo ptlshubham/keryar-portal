@@ -5,24 +5,27 @@
             <div class="navbar-brand-box">
                 <a routerLink="/" class="logo logo-dark">
                     <span class="logo-sm">
-                        <img src="assets/images/logo-sm.svg" alt="" height="24">
+                        <img src="assets/images/logo-sm.svg" alt="KERYAR" height="40">
                     </span>
                     <span class="logo-lg">
-                        <img src="assets/images/logo-sm.svg" alt="" height="24"> <span class="logo-txt">Minia</span>
+                        <img src="assets/images/logo-sm.svg" alt="KERYAR" height="40"> <span
+                            class="logo-txt">KERYAR</span>
                     </span>
                 </a>
 
                 <a routerLink="/" class="logo logo-light">
                     <span class="logo-sm">
-                        <img src="assets/images/logo-sm.svg" alt="" height="24">
+                        <img src="assets/images/logo-sm.svg" alt="KERYAR" height="40">
                     </span>
                     <span class="logo-lg">
-                        <img src="assets/images/logo-sm.svg" alt="" height="24"> <span class="logo-txt">Minia</span>
+                        <img src="assets/images/logo-sm.svg" alt="KERYAR" height="40"> <span
+                            class="logo-txt">KERYAR</span>
                     </span>
                 </a>
             </div>
 
-            <button type="button" class="btn btn-sm px-3 font-size-16 header-item" id="vertical-menu-btn" (click)="toggleMobileMenu($event)">
+            <button type="button" class="btn btn-sm px-3 font-size-16 header-item" id="vertical-menu-btn"
+                (click)="toggleMobileMenu($event)">
                 <i class="fa fa-fw fa-bars"></i>
             </button>
 
@@ -38,15 +41,18 @@
         <div class="d-flex">
 
             <div class="dropdown d-inline-block d-lg-none ms-2" ngbDropdown>
-                <button type="button" class="btn header-item" id="page-header-search-dropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" ngbDropdownToggle>
+                <button type="button" class="btn header-item" id="page-header-search-dropdown" data-bs-toggle="dropdown"
+                    aria-haspopup="true" aria-expanded="false" ngbDropdownToggle>
                     <i-feather name="search" class="icon-lg"></i-feather>
                 </button>
-                <div class="dropdown-menu dropdown-menu-lg dropdown-menu-end p-0" aria-labelledby="page-header-search-dropdown" ngbDropdownMenu>
+                <div class="dropdown-menu dropdown-menu-lg dropdown-menu-end p-0"
+                    aria-labelledby="page-header-search-dropdown" ngbDropdownMenu>
 
                     <form class="p-3">
                         <div class="form-group m-0">
                             <div class="input-group">
-                                <input type="text" class="form-control" placeholder="Search ..." aria-label="Search Result">
+                                <input type="text" class="form-control" placeholder="Search ..."
+                                    aria-label="Search Result">
 
                                 <button class="btn btn-primary" type="submit"><i class="mdi mdi-magnify"></i></button>
                             </div>
@@ -56,7 +62,8 @@
             </div>
 
             <div class="dropdown d-none d-sm-inline-block" ngbDropdown>
-                <button type="button" class="btn header-item" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" ngbDropdownToggle>
+                <button type="button" class="btn header-item" data-bs-toggle="dropdown" aria-haspopup="true"
+                    aria-expanded="false" ngbDropdownToggle>
                     @if(flagvalue === undefined){
                     <img src="{{valueset}}" alt="Header Language" height="16">}
                     @else {
@@ -65,8 +72,11 @@
                 </button>
                 <div class="dropdown-menu dropdown-menu-end" ngbDropdownMenu>
                     @for (item of listLang; track $index) {
-                    <a href="javascript:void(0);" class="dropdown-item notify-item" (click)="setLanguage(item.text, item.lang, item.flag)" [ngClass]="{'active': cookieValue === item.lang}">
-                        <img src="{{item.flag}}" alt="user-image" class="me-1" height="12"> <span class="align-middle">{{item.text}}</span>
+                    <a href="javascript:void(0);" class="dropdown-item notify-item"
+                        (click)="setLanguage(item.text, item.lang, item.flag)"
+                        [ngClass]="{'active': cookieValue === item.lang}">
+                        <img src="{{item.flag}}" alt="user-image" class="me-1" height="12"> <span
+                            class="align-middle">{{item.text}}</span>
                     </a>
                     }
                 </div>
@@ -87,7 +97,8 @@
             </div>
 
             <div class="dropdown d-none d-lg-inline-block ms-1" ngbDropdown>
-                <button type="button" class="btn header-item" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" ngbDropdownToggle>
+                <button type="button" class="btn header-item" data-bs-toggle="dropdown" aria-haspopup="true"
+                    aria-expanded="false" ngbDropdownToggle>
                     <i-feather name="grid" class="icon-lg"></i-feather>
                 </button>
                 <div class="dropdown-menu dropdown-menu-lg dropdown-menu-end" ngbDropdownMenu>
@@ -138,11 +149,14 @@
             </div>
 
             <div class="dropdown d-inline-block" ngbDropdown>
-                <button type="button" class="btn header-item noti-icon position-relative" id="page-header-notifications-dropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" ngbDropdownToggle>
+                <button type="button" class="btn header-item noti-icon position-relative"
+                    id="page-header-notifications-dropdown" data-bs-toggle="dropdown" aria-haspopup="true"
+                    aria-expanded="false" ngbDropdownToggle>
                     <i-feather name="bell" class="feather-grid icon-lg"></i-feather>
                     <span class="badge bg-danger rounded-pill">5</span>
                 </button>
-                <div class="dropdown-menu dropdown-menu-lg dropdown-menu-end p-0" aria-labelledby="page-header-notifications-dropdown" ngbDropdownMenu>
+                <div class="dropdown-menu dropdown-menu-lg dropdown-menu-end p-0"
+                    aria-labelledby="page-header-notifications-dropdown" ngbDropdownMenu>
                     <div class="p-3">
                         <div class="row align-items-center">
                             <div class="col">
@@ -158,7 +172,8 @@
                         <a href="javascript:void(0);" class="text-reset notification-item">
                             <div class="d-flex">
                                 <div class="flex-shrink-0 me-3">
-                                    <img src="assets/images/users/avatar-3.jpg" class="rounded-circle avatar-sm" alt="user-pic">
+                                    <img src="assets/images/users/avatar-3.jpg" class="rounded-circle avatar-sm"
+                                        alt="user-pic">
                                 </div>
                                 <div class="flex-grow-1">
                                     <h6 class="mb-1">{{ 'HEADER.NOTIFICATIONS.FIRST.TITLE' | translate}}</h6>
@@ -210,7 +225,8 @@
                         <a href="javascript:void(0);" class="text-reset notification-item">
                             <div class="d-flex">
                                 <div class="flex-shrink-0 me-3">
-                                    <img src="assets/images/users/avatar-6.jpg" class="rounded-circle avatar-sm" alt="user-pic">
+                                    <img src="assets/images/users/avatar-6.jpg" class="rounded-circle avatar-sm"
+                                        alt="user-pic">
                                 </div>
                                 <div class="flex-grow-1">
                                     <h6 class="mb-1">{{ 'HEADER.NOTIFICATIONS.FOUR.TITLE' | translate}}</h6>
@@ -241,17 +257,24 @@
             </div>
 
             <div class="dropdown d-inline-block" ngbDropdown>
-                <button type="button" class="btn header-item topbar-light bg-light-subtle border-start border-end" id="page-header-user-dropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" ngbDropdownToggle>
-                    <img class="rounded-circle header-profile-user" src="assets/images/users/avatar-1.jpg" alt="Header Avatar">
+                <button type="button" class="btn header-item topbar-light bg-light-subtle border-start border-end"
+                    id="page-header-user-dropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
+                    ngbDropdownToggle>
+                    <img class="rounded-circle header-profile-user" src="assets/images/users/avatar-1.jpg"
+                        alt="Header Avatar">
                     <span class="d-none d-xl-inline-block ms-1 fw-medium">Shawn L.</span>
                     <i class="mdi mdi-chevron-down d-none d-xl-inline-block"></i>
                 </button>
                 <div class="dropdown-menu dropdown-menu-end" ngbDropdownMenu>
                     <!-- item-->
-                    <a class="dropdown-item" routerLink="/apps/profile"><i class="mdi mdi-face-man font-size-16 align-middle me-1"></i> Profile</a>
-                    <a class="dropdown-item" routerLink="/account/lock-screen"><i class="mdi mdi-lock font-size-16 align-middle me-1"></i> Lock screen</a>
+                    <a class="dropdown-item" routerLink="/apps/profile"><i
+                            class="mdi mdi-face-man font-size-16 align-middle me-1"></i> Profile</a>
+                    <a class="dropdown-item" routerLink="/account/lock-screen"><i
+                            class="mdi mdi-lock font-size-16 align-middle me-1"></i> Lock screen</a>
                     <div class="dropdown-divider"></div>
-                    <a class="dropdown-item" href="javascript: void(0);" (click)="logout()"><i class="mdi mdi-logout text-muted font-size-16 align-middle me-1"></i> <span class="align-middle" key="t-logout">{{ 'MENUITEMS.AUTHENTICATION.LIST.LOGOUT' |
+                    <a class="dropdown-item" href="javascript: void(0);" (click)="logout()"><i
+                            class="mdi mdi-logout text-muted font-size-16 align-middle me-1"></i> <span
+                            class="align-middle" key="t-logout">{{ 'MENUITEMS.AUTHENTICATION.LIST.LOGOUT' |
                             translate}}</span></a>
                 </div>
             </div>
