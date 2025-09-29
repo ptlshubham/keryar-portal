@@ -83,7 +83,7 @@ $(document).ready(function() {
         height: '200',
         chartRangeMax: 50,
         resize: true,
-        lineColor: sparkline5ChartColors[0], //'#5156be',
+        lineColor: sparkline5ChartColors[0], //'#54a8c7',
         fillColor: sparkline5ChartColors[1], //'rgba(81, 86, 190, 0.3)',
         highlightLineColor: 'rgba(0,0,0,.1)',
         highlightSpotColor: 'rgba(0,0,0,.2)',

@@ -12,7 +12,7 @@ document.getElementById("sa-basic").addEventListener("click", function() {
     Swal.fire(
         {
             title: 'Any fool can use a computer',
-            confirmButtonColor: '#5156be',
+            confirmButtonColor: '#54a8c7',
         }
     )
 });
@@ -24,7 +24,7 @@ document.getElementById("sa-title").addEventListener("click", function() {
             title: "The Internet?",
             text: 'That thing is still around?',
             icon: 'question',
-            confirmButtonColor: '#5156be'
+            confirmButtonColor: '#54a8c7'
         }
     )
 });
@@ -37,7 +37,7 @@ document.getElementById("sa-success").addEventListener("click", function() {
             text: 'You clicked the button!',
             icon: 'success',
             showCancelButton: true,
-            confirmButtonColor: '#5156be',
+            confirmButtonColor: '#54a8c7',
             cancelButtonColor: "#fd625e"
         }
     )
@@ -79,7 +79,7 @@ document.getElementById("sa-params").addEventListener("click", function() {
               title: 'Deleted!',
               text: 'Your file has been deleted.',
               icon: 'success',
-              confirmButtonColor: '#5156be',
+              confirmButtonColor: '#54a8c7',
             })
           } else if (
             // Read more about handling dismissals
@@ -89,7 +89,7 @@ document.getElementById("sa-params").addEventListener("click", function() {
               title: 'Cancelled',
               text: 'Your imaginary file is safe :)',
               icon: 'error',
-              confirmButtonColor: '#5156be',
+              confirmButtonColor: '#54a8c7',
             })
           }
     });
@@ -103,7 +103,7 @@ document.getElementById("sa-image").addEventListener("click", function() {
         text: 'Modal with a custom image.',
         imageUrl: 'assets/images/logo-sm.svg',
         imageHeight: 48,
-        confirmButtonColor: "#5156be",
+        confirmButtonColor: "#54a8c7",
         animation: false
     })
 });
@@ -175,7 +175,7 @@ document.getElementById("custom-padding-width-alert").addEventListener("click", 
         title: 'Custom width, padding, background.',
         width: 600,
         padding: 100,
-        confirmButtonColor: "#5156be",
+        confirmButtonColor: "#54a8c7",
         background: '#e0e1f3'
     })
 });
@@ -188,7 +188,7 @@ document.getElementById("ajax-alert").addEventListener("click", function() {
         showCancelButton: true,
         confirmButtonText: 'Submit',
         showLoaderOnConfirm: true,
-        confirmButtonColor: "#5156be",
+        confirmButtonColor: "#54a8c7",
         cancelButtonColor: "#fd625e",
         preConfirm: function (email) {
             return new Promise(function (resolve, reject) {
@@ -206,7 +206,7 @@ document.getElementById("ajax-alert").addEventListener("click", function() {
         Swal.fire({
             icon: 'success',
             title: 'Ajax request finished!',
-            confirmButtonColor: "#5156be",
+            confirmButtonColor: "#54a8c7",
             html: 'Submitted email: ' + email
         })
     })
