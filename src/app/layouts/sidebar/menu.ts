@@ -37,24 +37,35 @@ export const MENU: MenuItem[] = [
             },
             {
                 id: 7,
-                label: 'Case-Studies',
+                label: 'Case Studies',
                 link: '/workfolio/casestudy',
                 parentId: 3
             },
         ]
     },
     {
-        id: 3,
-        label: 'placement',
-        icon: 'mdi mdi-briefcase-outline',
+        id: 8,
+        label: 'Placement',
+        icon: 'mdi mdi-account-search',
         subItems: [
             {
-                id: 4,
-                label: 'category',
+                id: 9,
+                label: 'Category',
                 link: '/placement/category',
-                parentId: 3
+                parentId: 8
             },
-
+            {
+                id: 10,
+                label: 'Sub-Category',
+                link: '/placement/sub-category',
+                parentId: 8
+            },
+            {
+                id: 11,
+                label: 'Sub-to-Subcategory',
+                link: '/placement/sub-to-subcategory',
+                parentId: 8
+            },
 
         ]
     },
