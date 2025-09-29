@@ -32,7 +32,7 @@ export class AddBlogComponent {
   galleryUploadProgress: number = 0;
   galleryUploaders: { images: string[] }[] = [{ images: [] }];
 
-  serverPath: string = 'https://api.cesociety.in';
+  serverPath: string = 'http://localhost:8300';
 
   isOpen: boolean = true;
 

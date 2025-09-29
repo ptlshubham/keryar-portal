@@ -1,6 +1,9 @@
 import { Component } from '@angular/core';
 import { FormGroup, Validators, FormBuilder, UntypedFormBuilder } from '@angular/forms';
 import { Router } from '@angular/router';
+import { Lightbox } from 'ngx-lightbox';
+import { ToastrService } from 'ngx-toastr';
+import { WorkfolioService } from 'src/app/core/services/workfolio.service';
 
 @Component({
   selector: 'app-clients',
@@ -14,27 +17,30 @@ export class ClientsComponent {
   validationForm!: FormGroup;
   imageUrl: any | null = null;
   cardImageBase64: any;
-  tokenImage: any;
+  clientImage: any;
   progressValue: number = 0;
   progressType: string = 'success';
   isProgress: boolean = false;
   uploading: boolean = false;
   uploadProgress: number = 0;
 
-  serverPath: string = 'https://api.cesociety.in';
-
+  serverPath: string = 'http://localhost:8300';
+  clientsData: any = [];
+  album: Array<{ src: string; caption: string; thumb: string }> = [];
   page = 1;
   pageSize = 10;
   collectionSize = 0;
   paginateData: any = [];
 
   constructor(
-    // public toastr: ToastrService,
-    // public homeService: HomeService,
+    public toastr: ToastrService,
+    public workfolioService: WorkfolioService,
     public router: Router,
     public formBuilder: UntypedFormBuilder,
+    private _lightbox: Lightbox,
 
   ) {
+    this.getClients();
   }
   ngOnInit(): void {
     this.breadCrumbItems = [
@@ -68,10 +74,10 @@ export class ClientsComponent {
             this.cardImageBase64 = imgBase64Path;
             const formdata = new FormData();
             formdata.append('file', file);
-            // this.tokensService.uploadTokenImage(formdata).subscribe((response) => {
-            //   this.toastr.success('Image Uploaded Successfully', 'Uploaded', { timeOut: 3000, });
-            //   this.tokenImage = response;
-            // });
+            this.workfolioService.uploadClientLogo(formdata).subscribe((response) => {
+              this.toastr.success('Image Uploaded Successfully', 'Uploaded', { timeOut: 3000, });
+              this.clientImage = response;
+            });
 
           } else {
             this.uploadProgress += 10;
@@ -83,83 +89,100 @@ export class ClientsComponent {
     }
   }
 
-  removeUploadedImage(img: any) {
-    let data = {
-      img: this.tokenImage
-    };
-    // this.homeService.deleteImageFromDb(data).subscribe((res: any) => {
-    //   if (res.success == true) {
-    //     this.toastr.success('Image removed successfully.', 'Deleted', { timeOut: 2000, });
-    //   } else {
-    //     this.toastr.error('Something went wrong try again later', 'Error', { timeOut: 2000, });
-    //   }
-    // })
-    this.tokenImage = null;
-    this.imageUrl = null;
-  }
-  getImagesDataById() {
-    // this.homeService.getBannersImagesById(localStorage.getItem('InstituteId')).subscribe((res: any) => {
-    //   this.imagesData = res;
-    //   this.filterdata = res;
-    //   this.album = this.filterdata.map((s: any) => ({
-    //     src: `https://api.cesociety.in${s.image}`,
-    //     caption: `${s.purpose}`,
-    //     thumb: `https://api.cesociety.in${s.image}`
-    //   }));
-    //   for (let i = 0; i < this.imagesData.length; i++) {
-    //     this.imagesData[i].index = i + 1;
-    //   }
-    //   this.collectionSize = this.imagesData.length;
-    //   this.getPagintaion();
-    // })
-  }
-  openImage(globalIndex: number): void {
-    // Only open if the image exists in album
-    // if (this.album[globalIndex] && this.album[globalIndex].src && !this.album[globalIndex].src.endsWith('null')) {
-    //   this._lightbox.open(this.album, globalIndex, {
-    //     showZoom: true,
-    //     centerVertically: true,
-    //     wrapAround: true,
-    //     showImageNumberLabel: true,
-    //     showDownloadButton: true,
-    //     showThumbnails: true
-    //   });
-    // }
-  }
-  getPagintaion() {
-    // this.paginateData = this.imagesData
-    //   .slice((this.page - 1) * this.pageSize, (this.page - 1) * this.pageSize + this.pageSize);
-  }
-  activeBanners(ind: any) {
-    let inde = ind - 1;
-    // this.imagesData[inde].isactive = true;
-    // this.homeService.activeDeavctiveBanners(this.imagesData[inde]).subscribe((req) => {
-    //   this.toastr.success('Images activated Successfully.', 'Activated', {
-    //     timeOut: 3000,
-    //   });
-    // })
-  }
-  deactiveBanners(ind: any) {
-    let inde = ind - 1;
-    // this.imagesData[inde].isactive = false;
-    // this.homeService.activeDeavctiveBanners(this.imagesData[inde]).subscribe((req) => {
-    //   this.toastr.error('Images deactivated Successfully.', 'Deactivated', {
-    //     timeOut: 3000,
-    //   });
-    // })
+  submitClientDetails() {
+    this.submitted = true;
+    if (this.validationForm.valid) {
+      let data = {
+        name: this.validationForm.value.name,
+        logo: this.clientImage ? this.clientImage : '',
+        isactive: true,
+      }
+      this.workfolioService.saveClientDetails(data).subscribe((res: any) => {
+        if (res.success == true) {
+          this.getClients();
+          this.toastr.success('Client Details Saved Successfully', 'Saved', { timeOut: 3000, });
+          this.validationForm.reset();
+          this.clientImage = null;
+          this.imageUrl = null;
+        } else {
+          this.toastr.error('Something went wrong try again later', 'Error', { timeOut: 3000, });
+        }
+      })
+    }
   }
 
-  removeBannersImages(id: any) {
+  removeUploadedImage(img: any) {
     let data = {
-      id: id,
-      institute_id: localStorage.getItem('InstituteId')
+      img: this.clientImage
+    };
+    this.workfolioService.deleteUploadedImageFromFolder(data).subscribe((res: any) => {
+      if (res.success == true) {
+        this.toastr.success('Image removed successfully.', 'Deleted', { timeOut: 2000, });
+      } else {
+        this.toastr.error('Something went wrong try again later', 'Error', { timeOut: 2000, });
+      }
+    })
+    this.clientImage = null;
+    this.imageUrl = null;
+  }
+  getClients() {
+    this.workfolioService.getAllClients().subscribe((res: any) => {
+      this.clientsData = res;
+
+      this.album = this.clientsData.map((s: any) => ({
+        src: this.serverPath + s.logo,
+        caption: `${s.name}`,
+        thumb: this.serverPath + s.logo
+      }));
+      for (let i = 0; i < this.clientsData.length; i++) {
+        this.clientsData[i].index = i + 1;
+      }
+      this.collectionSize = this.clientsData.length;
+      this.getPagintaion();
+    })
+  }
+  openImage(globalIndex: number): void {
+    if (this.album[globalIndex] && this.album[globalIndex].src && !this.album[globalIndex].src.endsWith('null')) {
+      this._lightbox.open(this.album, globalIndex, {
+        showZoom: true,
+        centerVertically: true,
+        wrapAround: true,
+        showImageNumberLabel: true,
+        showDownloadButton: true,
+        showThumbnails: true
+      });
     }
-    // this.homeService.removeBannersImagesById(data).subscribe((res: any) => {
-    //   this.imagesData = res;
-    //   this.toastr.success('Image Delete Successfully.', 'Deleted', {
-    //     timeOut: 3000,
-    //   });
-    //   this.getImagesDataById();
-    // })
+  }
+  getPagintaion() {
+    this.paginateData = this.clientsData
+      .slice((this.page - 1) * this.pageSize, (this.page - 1) * this.pageSize + this.pageSize);
+  }
+  activeClient(ind: any) {
+    let inde = ind - 1;
+    this.clientsData[inde].isactive = true;
+    this.workfolioService.updateClientActiveDeactive(this.clientsData[inde]).subscribe((req) => {
+      this.toastr.success('Client activated Successfully.', 'Activated', {
+        timeOut: 3000,
+      });
+    })
+  }
+  deactiveClient(ind: any) {
+    let inde = ind - 1;
+    this.clientsData[inde].isactive = false;
+    this.workfolioService.updateClientActiveDeactive(this.clientsData[inde]).subscribe((req) => {
+      this.toastr.error('Client deactivated Successfully.', 'Deactivated', {
+        timeOut: 3000,
+      });
+    })
+  }
+
+  removeClientsData(id: any) {
+    this.workfolioService.removeClientDetailsById(id).subscribe((res: any) => {
+      this.clientsData = res;
+      this.toastr.success('Image Delete Successfully.', 'Deleted', {
+        timeOut: 3000,
+      });
+      this.getClients();
+    })
   }
 }

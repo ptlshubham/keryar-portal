@@ -37,9 +37,9 @@
                                                 <a><i class="mdi mdi-plus-circle"></i></a>
                                             </label>
                                             <div class="custom-preview-box" *ngIf="imageUrl">
-                                                <img [src]="serverPath+tokenImage" alt="Avatar" />
+                                                <img [src]="serverPath+clientImage" alt="Logo" />
                                                 <a class="custom-remove-btn" tooltip="Remove Uploaded Image"
-                                                    tooltipPosition="above" (click)="removeUploadedImage(tokenImage)">
+                                                    tooltipPosition="above" (click)="removeUploadedImage(clientImage)">
                                                     <i class="mdi mdi-close-circle"></i></a>
                                             </div>
                                         </div>
@@ -53,7 +53,7 @@
                     <div class="d-flex justify-content-end gap-2">
                         <button type="button" class="btn btn-danger waves-effect">Cancel</button>
                         <button type="button" class="btn btn-primary waves-effect waves-light"
-                            [disabled]="validationForm.invalid">Submit</button>
+                            (click)="submitClientDetails()" [disabled]="validationForm.invalid">Submit</button>
                     </div>
                 </div>
             </div>
@@ -85,22 +85,22 @@
                                 <td class="text-left">{{c.index}}</td>
                                 <td class="text-center">{{c.name}}</td>
                                 <td class="text-center">
-                                    <img src="https://api.cesociety.in{{c.image}}" alt="{{c.keywords}}"
-                                        class="rounded avatar-lg" (click)="openImage(c.index - 1)">
+                                    <img [src]="serverPath+c.logo" alt="{{c.name}}" class="rounded avatar-lg"
+                                        (click)="openImage(c.index - 1)">
                                 </td>
                                 <td class="text-center">
                                     <button type="button" class="btn btn-success waves-effect btn-label waves-light"
-                                        *ngIf="c.isactive" (click)="deactiveBanners(c.index)"><i
+                                        *ngIf="c.isactive" (click)="deactiveClient(c.index)"><i
                                             class="bx bx-check-double label-icon"></i> Active</button>
                                     <button type="button" class="btn btn-danger waves-effect btn-label waves-light"
-                                        *ngIf="!c.isactive" (click)="activeBanners(c.index)"><i
+                                        *ngIf="!c.isactive" (click)="activeClient(c.index)"><i
                                             class="bx bx-block label-icon"></i> Deactive</button>
                                 </td>
                                 <td class="text-end">
                                     <div class="d-flex justify-content-end gap-1">
                                         <button type="button" class="btn btn-soft-danger waves-effect waves-light"
                                             data-bs-toggle="tooltip" data-bs-placement="top" title="View & Accept"
-                                            (click)="removeBannersImages(c.id)"><i
+                                            (click)="removeClientsData(c.id)"><i
                                                 class="bx bx-trash-alt font-size-16 align-middle"></i></button>
                                         <!-- <div class="d-flex justify-content-end gap-1">
                                         <button type="button" class="btn btn-soft-primary waves-effect waves-light"

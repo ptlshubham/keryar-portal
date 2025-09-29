@@ -12,7 +12,7 @@ export class SubToSubCategoryComponent {
 
   submitted = false;
   validationForm!: FormGroup;
-  serverPath: string = 'https://api.cesociety.in';
+  serverPath: string = 'http://localhost:8300';
   page = 1;
   pageSize = 10;
   collectionSize = 0;

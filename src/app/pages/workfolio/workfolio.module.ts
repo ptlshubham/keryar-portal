@@ -48,6 +48,7 @@ import { CaseStudiesComponent } from './case-studies/case-studies.component';
     NgbTypeaheadModule,
     CountUpModule,
     LightboxModule,
+
   ]
 })
 export class WorkfolioModule { }

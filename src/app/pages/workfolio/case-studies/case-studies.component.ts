@@ -24,7 +24,7 @@ export class CaseStudiesComponent {
   uploading: boolean = false;
   uploadProgress: number = 0;
   isOpen: boolean = true;
-  serverPath: string = 'https://api.cesociety.in';
+  serverPath: string = 'http://localhost:8300';
 
   page = 1;
   pageSize = 10;
@@ -124,9 +124,9 @@ export class CaseStudiesComponent {
     //   this.imagesData = res;
     //   this.filterdata = res;
     //   this.album = this.filterdata.map((s: any) => ({
-    //     src: `https://api.cesociety.in${s.image}`,
+    //     src: `http://localhost:8300${s.image}`,
     //     caption: `${s.purpose}`,
-    //     thumb: `https://api.cesociety.in${s.image}`
+    //     thumb: `http://localhost:8300${s.image}`
     //   }));
     //   for (let i = 0; i < this.imagesData.length; i++) {
     //     this.imagesData[i].index = i + 1;

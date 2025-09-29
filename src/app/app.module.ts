@@ -19,6 +19,7 @@ import { FakeBackendInterceptor } from './core/helpers/fake-backend';
 import { ErrorInterceptor } from './core/helpers/error.interceptor';
 import { JwtInterceptor } from './core/helpers/jwt.interceptor';
 import { CookieService } from 'ngx-cookie-service';
+import { ToastrModule } from 'ngx-toastr';
 
 if (environment.defaultauth === 'firebase') {
   initFirebaseBackend(environment.firebaseConfig);
@@ -31,7 +32,9 @@ export function createTranslateLoader(http: HttpClient): any {
 
 @NgModule({
   declarations: [AppComponent],
-  bootstrap: [AppComponent], imports: [TranslateModule.forRoot({
+  bootstrap: [AppComponent],
+
+  imports: [TranslateModule.forRoot({
     defaultLanguage: 'en',
     loader: {
       provide: TranslateLoader,
@@ -48,6 +51,7 @@ export function createTranslateLoader(http: HttpClient): any {
     NgbTooltipModule,
     NgbPopoverModule,
     NgbNavModule,
+  ToastrModule.forRoot(),
     ExtrapagesModule], providers: [
       CookieService,
       { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true },
