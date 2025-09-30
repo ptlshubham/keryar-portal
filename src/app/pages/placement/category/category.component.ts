@@ -3,7 +3,7 @@ import { FormGroup, UntypedFormBuilder, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { PlacementService } from 'src/app/core/services/placement.service';
-import { WorkfolioService } from 'src/app/core/services/workfolio.service';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-category',
@@ -89,16 +89,36 @@ export class CategoryComponent implements OnInit {
       }
     });
   }
-
-  removePlacementCategory(id: any) {
-    this.placementService.removePlacementCategory(id).subscribe((res: any) => {
-      this.categoryData = res;
-      this.toastr.success('Image Delete Successfully.', 'Deleted', {
-        timeOut: 3000,
-      });
-      this.getCategory();
-    })
+  removePlacementCategory(id: string) {
+    Swal.fire({
+      title: 'Are you sure?',
+      text: 'Do you want to delete this category?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Yes, delete it!',
+      cancelButtonText: 'No, cancel'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.placementService.removePlacementCategory(id).subscribe({
+          next: (res: any) => {
+            if (res.success) {
+              this.toastr.success('category deleted successfully', 'Success');
+              this.getPagintaion();
+            } else {
+              this.toastr.error(res.message, 'Error');
+            }
+          },
+          error: (err) => {
+            this.toastr.error('Failed to delete category', 'Error');
+            console.error(err);
+          }
+        });
+      }
+    });
   }
+
   getPagintaion() {
     this.paginateData = this.categoryData
       .slice((this.page - 1) * this.pageSize, (this.page - 1) * this.pageSize + this.pageSize);

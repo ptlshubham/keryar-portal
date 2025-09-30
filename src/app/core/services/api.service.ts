@@ -40,4 +40,11 @@ export class ApiService {
   public static getAllActiveSubCategoryURL: string = ApiService.HOST_URL + '/keryar/GetAllActiveSubCategory';
   public static updateSubCategoryStatusURL: string = ApiService.HOST_URL + '/keryar/UpdateSubCategoryStatus';
   public static removeSubCategoryURL: string = ApiService.HOST_URL + '/keryar/RemoveSubCategory/';
+
+  // subtosub
+  public static saveSubToSubCategoryURL: string = ApiService.HOST_URL + '/keryar/SaveSubToSubCategory';
+  public static getAllSubToSubCategoryURL: string = ApiService.HOST_URL + '/keryar/GetAllSubToSubCategory';
+  public static getAllActiveSubToSubCategoryURL: string = ApiService.HOST_URL + '/keryar/GetAllActiveSubToSubCategory';
+  public static updateSubToSubCategoryStatusURL: string = ApiService.HOST_URL + '/keryar/UpdateSubToSubCategoryStatus';
+  public static removeSubToSubCategoryURL: string = ApiService.HOST_URL + '/keryar/RemoveSubToSubCategory/';
 }

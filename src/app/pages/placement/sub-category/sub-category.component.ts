@@ -3,6 +3,7 @@ import { FormGroup, UntypedFormBuilder, Validators, FormArray } from '@angular/f
 import { Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { PlacementService } from 'src/app/core/services/placement.service';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-sub-category',
@@ -15,13 +16,11 @@ export class SubCategoryComponent implements OnInit {
   validationForm!: FormGroup;
   submitted = false;
 
-  // table pagination/demo data
   page = 1;
   pageSize = 10;
   collectionSize = 0;
   paginateData: any[] = [];
 
-  // single-select categories
   categories: any = [];
 
   constructor(
@@ -48,13 +47,11 @@ export class SubCategoryComponent implements OnInit {
     this.getCategory();
   }
 
-  // convenience getters
   get f() { return this.validationForm.controls; }
   get subCategories(): FormArray {
     return this.validationForm.get('subCategories') as FormArray;
   }
 
-  // on single-select change
   onCategoryChange(selected: string) {
     while (this.subCategories.length) {
       this.subCategories.removeAt(0);
@@ -141,21 +138,32 @@ export class SubCategoryComponent implements OnInit {
   }
 
   removeSubCategory(id: string) {
-    if (confirm('Are you sure you want to delete this sub-category?')) {
-      this.placementService.removeSubCategory(id).subscribe({
-        next: (res: any) => {
-          if (res.success) {
-            this.toastr.success('Sub-category deleted successfully', 'Success');
-            this.getPagintaion();
-          } else {
-            this.toastr.error(res.message, 'Error');
+    Swal.fire({
+      title: 'Are you sure?',
+      text: 'Do you want to delete this sub-category?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Yes, delete it!',
+      cancelButtonText: 'No, cancel'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.placementService.removeSubCategory(id).subscribe({
+          next: (res: any) => {
+            if (res.success) {
+              this.toastr.success('Sub-category deleted successfully', 'Success');
+              this.getPagintaion();
+            } else {
+              this.toastr.error(res.message, 'Error');
+            }
+          },
+          error: (err) => {
+            this.toastr.error('Failed to delete sub-category', 'Error');
+            console.error(err);
           }
-        },
-        error: (err) => {
-          this.toastr.error('Failed to delete sub-category', 'Error');
-          console.error(err);
-        }
-      });
-    }
+        });
+      }
+    });
   }
 }

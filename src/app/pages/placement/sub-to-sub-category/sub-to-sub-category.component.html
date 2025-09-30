@@ -17,29 +17,53 @@
                         <!-- Select Category Dropdown -->
                         <div class="col-lg-6 mb-3">
                             <label>Select Category</label>
-                            <ng-select [items]="categories" formControlName="selectedCategory"
-                                (change)="onCategoryChange(f.selectedCategory.value)"></ng-select>
+                            <ng-select [items]="categories" bindLabel="name" bindValue="id"
+                                formControlName="selectedCategory" (change)="onCategoryChange($event)">
+                            </ng-select>
+                            <div class="text-danger mt-1"
+                                *ngIf="submitted && f['selectedCategory']?.errors?.['required']">
+                                Category is required.
+                            </div>
                         </div>
-                        <!-- Select Sub Category Dropdown (filtered) -->
+                        <!-- Select Sub Category Dropdown -->
                         <div class="col-lg-6 mb-3">
                             <label>Select Sub Category</label>
-                            <ng-select [items]="filteredSubCategories" [multiple]="true"
-                                formControlName="selectedSubCategory"></ng-select>
+                            <ng-select [items]="filteredSubCategories" [multiple]="true" bindLabel="name" bindValue="id"
+                                formControlName="selectedSubCategory">
+                            </ng-select>
+                            <div class="text-danger mt-1"
+                                *ngIf="submitted && f['selectedSubCategory']?.errors?.['required']">
+                                Sub Category is required.
+                            </div>
                         </div>
                         <!-- Dynamic Sub To Sub Category Fields -->
                         <div class="col-lg-12 mb-2">
                             <label>Sub To Sub Categories</label>
-                            <div *ngFor="let subCat of subToSubCategories.controls; let i = index"
-                                class="d-flex align-items-center mb-2">
-                                <input type="text" class="form-control" formControlName="subCat"
-                                    placeholder="Enter Sub To Sub Category">
-                                <button type="button" class="btn btn-success ms-2" (click)="addSubToSubCategory()">
-                                    <i class="bx bx-plus"></i>
-                                </button>
-                                <button type="button" class="btn btn-danger ms-2" (click)="removeSubToSubCategory(i)"
-                                    [disabled]="subToSubCategories.length === 1">
-                                    <i class="bx bx-minus"></i>
-                                </button>
+                            <div formArrayName="subToSubCategories">
+                                <div *ngFor="let subCat of subToSubCategories.controls; let i = index"
+                                    class="d-flex align-items-center mb-2">
+                                    <input type="text" class="form-control" [formControlName]="i"
+                                        placeholder="Enter Sub To Sub Category">
+                                    <button type="button" class="btn btn-success ms-2" (click)="addSubToSubCategory()">
+                                        <i class="bx bx-plus"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-danger ms-2"
+                                        (click)="removeSubToSubCategory(i)"
+                                        [disabled]="subToSubCategories.length === 1">
+                                        <i class="bx bx-minus"></i>
+                                    </button>
+                                </div>
+                                <div class="text-danger mt-1" *ngIf="submitted && subToSubCategories.invalid">
+                                    Please fill all sub-to-sub category fields.
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-4 mb-2">
+                            <label>Active & Deactive</label>
+                            <div class="form-check form-switch form-switch-lg mb-3" dir="ltr">
+                                <input type="checkbox" class="form-check-input" id="customSwitchsizelg"
+                                    formControlName="isactive" checked>
+                                <label class="form-check-label" for="customSwitchsizelg"></label>
                             </div>
                         </div>
                     </div>
@@ -47,7 +71,7 @@
                 <div class="d-flex justify-content-end gap-2">
                     <button type="button" class="btn btn-danger waves-effect">Cancel</button>
                     <button type="button" class="btn btn-primary waves-effect waves-light"
-                        [disabled]="validationForm.invalid">Submit</button>
+                        [disabled]="validationForm.invalid" (click)="submit()">Submit</button>
                 </div>
             </div>
         </div>
@@ -58,8 +82,8 @@
     <div class="col-lg-12">
         <div class="card">
             <div class="card-header">
-                <h5 class="card-title">Sub Category List</h5>
-                <p class="card-title-desc mb-0">List of all Sub Categorys</p>
+                <h5 class="card-title">Sub To Sub Category List</h5>
+                <p class="card-title-desc mb-0">List of all Sub To Sub Categories</p>
             </div>
             <div class="card-body">
                 <div class="table-responsive">
@@ -68,36 +92,53 @@
                             <tr>
                                 <th class="text-left">#</th>
                                 <th class="text-center">Category Name</th>
-                                <th class="text-center">Title</th>
-                                <th class="text-center">Active & Deactive</th>
+                                <th class="text-center">Sub Category</th>
+                                <th class="text-center">Sub To Sub Category</th>
+                                <th class="text-center">Status</th>
                                 <th class="text-end">Action</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <tr *ngFor="let c of paginateData;let i=index">
-                                <td class="text-left">{{c.index}}</td>
-                                <td class="text-center">{{c.name}}</td>
-                                <td class="text-center">{{c.title}}</td>
+                            <tr *ngFor="let c of paginateData; let i = index">
+                                <td class="text-left">{{ (page - 1) * pageSize + i + 1 }}</td>
+                                <td class="text-center">{{ c.category_name }}</td>
+                                <td class="text-center">{{ c.subcategory_name }}</td>
+                                <td class="text-center">{{ c.name }}</td>
                                 <td class="text-center">
-                                    <button type="button" class="btn btn-success waves-effect btn-label waves-light"><i
-                                            class="bx bx-check-double label-icon"></i> Active</button>
-                                    <button type="button" class="btn btn-danger waves-effect btn-label waves-light"><i
-                                            class="bx bx-block label-icon"></i> Deactive</button>
+                                    <ng-container *ngIf="!c.mixed">
+                                        <button type="button" class="btn btn-success waves-effect btn-label waves-light"
+                                            (click)="updateSubToSubCategoryStatus(c.ids.split(','), false)"
+                                            *ngIf="c.allActive">
+                                            <i class="bx bx-check-double label-icon"></i> Active
+                                        </button>
+                                        <button type="button" class="btn btn-danger waves-effect btn-label waves-light"
+                                            (click)="updateSubToSubCategoryStatus(c.ids.split(','), true)"
+                                            *ngIf="c.allInactive">
+                                            <i class="bx bx-block label-icon"></i> Deactive
+                                        </button>
+                                    </ng-container>
+                                    <ng-container *ngIf="c.mixed">
+                                        <span class="badge bg-warning">Mixed</span>
+                                        <button type="button" class="btn btn-success btn-sm ms-1"
+                                            (click)="updateSubToSubCategoryStatus(c.ids.split(','), true)">Activate
+                                            All</button>
+                                        <button type="button" class="btn btn-danger btn-sm ms-1"
+                                            (click)="updateSubToSubCategoryStatus(c.ids.split(','), false)">Deactivate
+                                            All</button>
+                                    </ng-container>
                                 </td>
                                 <td class="text-end">
                                     <div class="d-flex justify-content-end gap-1">
                                         <button type="button" class="btn btn-soft-danger waves-effect waves-light"
-                                            data-bs-toggle="tooltip" data-bs-placement="top" title="View & Accept"><i
-                                                class="bx bx-trash-alt font-size-16 align-middle"></i></button>
-                                        <!-- <div class="d-flex justify-content-end gap-1">
-                                        <button type="button" class="btn btn-soft-primary waves-effect waves-light"
-                                            data-bs-toggle="tooltip" data-bs-placement="top" title="View & Accept"><i
-                                                class="bx bx-edit font-size-16 align-middle"></i></button>
-                                      
-                                    </div> -->
+                                            data-bs-toggle="tooltip" data-bs-placement="top" title="Delete"
+                                            (click)="removeSubToSubCategories(c.ids)">
+                                            <i class="bx bx-trash-alt font-size-16 align-middle"></i>
+                                        </button>
                                     </div>
                                 </td>
-
+                            </tr>
+                            <tr *ngIf="paginateData.length === 0">
+                                <td colspan="6" class="text-center py-4">No records found.</td>
                             </tr>
                         </tbody>
                     </table>
@@ -105,13 +146,10 @@
                 <div class="row mt-4">
                     <ngb-pagination [collectionSize]="collectionSize" [pageSize]="pageSize" [(page)]="page"
                         [maxSize]="5" [rotate]="true" [ellipses]="false" [boundaryLinks]="true"
-                        (pageChange)="getPagintaion();" aria-label="Default pagination"
+                        (pageChange)="getPagintaion()" aria-label="Default pagination"
                         class="d-flex justify-content-end pagination-rounded-flat pagination-success"></ngb-pagination>
                 </div>
             </div>
-            <!-- end card body -->
         </div>
-        <!-- end card -->
     </div>
-    <!-- end col -->
 </div>
