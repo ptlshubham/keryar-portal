@@ -171,12 +171,15 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-12 mt-2" *ngIf="i.option_type === 'Input' || i.option_type === 'Textarea'">
+                    <div class="col-12 mt-2" *ngIf="i.option_type === 'Textarea' || i.option_type === 'Input'">
                         <div class="form-group mb-3">
                             <label>Correct Answer</label>
-                            <input type="text" class="form-control" placeholder="Enter Correct Answer"
-                                [(ngModel)]="i.correctAnswer" [ngModelOptions]="{standalone: true}"
-                                [id]="'correctAnswer'+ind">
+                            <textarea *ngIf="i.option_type === 'Textarea'" class="form-control"
+                                placeholder="Enter Correct Answer" rows="4" [(ngModel)]="i.correctAnswer"
+                                [ngModelOptions]="{standalone: true}" [id]="'correctAnswer'+ind"></textarea>
+                            <input *ngIf="i.option_type === 'Input'" type="text" class="form-control"
+                                placeholder="Enter Correct Answer" [(ngModel)]="i.correctAnswer"
+                                [ngModelOptions]="{standalone: true}" [id]="'correctAnswer'+ind">
                         </div>
                     </div>
                     <hr class="my-4" *ngIf="ind < questionData.length - 1">
@@ -337,8 +340,10 @@
                                 <div *ngIf="data.option_type === 'Input' || data.option_type === 'Textarea'">
                                     <div class="form-group mt-3">
                                         <label>Correct Answer</label>
-                                        <input type="text" class="form-control" [value]="data.correctAnswer || ''"
-                                            readonly>
+                                        <input *ngIf="data.option_type === 'Input'" type="text" class="form-control"
+                                            [value]="data.correctAnswer || ''" readonly>
+                                        <textarea *ngIf="data.option_type === 'Textarea'" class="form-control" rows="4"
+                                            [value]="data.correctAnswer || ''" readonly></textarea>
                                     </div>
                                 </div>
                             </div>
