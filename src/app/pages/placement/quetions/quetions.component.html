@@ -19,44 +19,38 @@
             <form *ngIf="validationForm" [formGroup]="validationForm">
 
                 <div class="row">
-                    <!-- Replace lines 21-34 with the following: -->
-                    <div class="row">
-                        <div class="form-group mb-3">
-                            <div class="row g-2">
-                                <!-- Category -->
-                                <div class="col">
-                                    <label for="categorySelect" class="form-label">Category</label>
-                                    <select id="categorySelect" class="form-select" formControlName="category"
-                                        (change)="onCategoryChange($any($event.target).value)">
-                                        <option value="" disabled selected>Select Category</option>
-                                        <option *ngFor="let cat of categories" [value]="cat.id">{{cat.name}}</option>
-                                    </select>
-                                </div>
-
-                                <!-- Subcategory -->
-                                <div class="col">
-                                    <label for="subcategorySelect" class="form-label">Subcategory</label>
-                                    <select id="subcategorySelect" class="form-select" formControlName="subcategory"
-                                        [disabled]="!subcategories.length"
-                                        (change)="onSubcategoryChange($any($event.target).value)">
-                                        <option value="" disabled selected>Select Subcategory</option>
-                                        <option *ngFor="let sub of subcategories" [value]="sub.id">{{sub.name}}</option>
-                                    </select>
-                                </div>
-
-                                <!-- Sub-to-subcategory -->
-                                <div class="col">
-                                    <label for="subtosubcategorySelect" class="form-label">Sub-to-subcategory</label>
-                                    <select id="subtosubcategorySelect" class="form-select"
-                                        formControlName="subtosubcategory" [disabled]="!subtosubcategories.length">
-                                        <option value="" disabled selected>Select Sub-to-subcategory</option>
-                                        <option *ngFor="let subsub of subtosubcategories" [value]="subsub.id">
-                                            {{subsub.name}}</option>
-                                    </select>
-                                </div>
+                    <div class="form-group mb-3">
+                        <div class="row g-2">
+                            <!-- Category -->
+                            <div class="col">
+                                <label for="categorySelect" class="form-label">Category</label>
+                                <select id="categorySelect" class="form-select" formControlName="category"
+                                    (change)="onCategoryChange($any($event.target).value)">
+                                    <option value="" disabled selected>Select Category</option>
+                                    <option *ngFor="let cat of categories" [value]="cat.id">{{cat.name}}</option>
+                                </select>
+                            </div>
+                            <!-- Subcategory -->
+                            <div class="col">
+                                <label for="subcategorySelect" class="form-label">Subcategory</label>
+                                <select id="subcategorySelect" class="form-select" formControlName="subcategory"
+                                    (change)="onSubcategoryChange($any($event.target).value)">
+                                    <option value="" disabled selected>Select Subcategory</option>
+                                    <option *ngFor="let sub of subcategories" [value]="sub.id">{{sub.name}}</option>
+                                </select>
+                            </div>
+                            <!-- Sub-to-subcategory -->
+                            <div class="col">
+                                <label for="subtosubcategorySelect" class="form-label">Sub-to-subcategory</label>
+                                <select id="subtosubcategorySelect" class="form-select"
+                                    formControlName="subtosubcategory">
+                                    <option value="" disabled selected>Select Sub-to-subcategory</option>
+                                    <option *ngFor="let subsub of subtosubcategories" [value]="subsub.id">
+                                        {{subsub.name}}
+                                    </option>
+                                </select>
                             </div>
                         </div>
-
                     </div>
                 </div>
                 <hr class="my-4">
