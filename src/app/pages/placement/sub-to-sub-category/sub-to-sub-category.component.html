@@ -1,5 +1,4 @@
-<app-category-tab></app-category-tab>
-
+<!-- Form Section -->
 <div class="row">
     <div class="col-lg-12">
         <div class="card">
@@ -28,8 +27,8 @@
                         <!-- Select Sub Category Dropdown -->
                         <div class="col-lg-6 mb-3">
                             <label>Select Sub Category</label>
-                            <ng-select [items]="filteredSubCategories" [multiple]="true" bindLabel="name" bindValue="id"
-                                formControlName="selectedSubCategory">
+                            <ng-select [items]="filteredSubCategories" bindLabel="name" bindValue="id"
+                                formControlName="selectedSubCategory" [multiple]="false">
                             </ng-select>
                             <div class="text-danger mt-1"
                                 *ngIf="submitted && f['selectedSubCategory']?.errors?.['required']">
@@ -78,6 +77,7 @@
     </div>
 </div>
 
+<!-- Table Section -->
 <div class="row">
     <div class="col-lg-12">
         <div class="card">

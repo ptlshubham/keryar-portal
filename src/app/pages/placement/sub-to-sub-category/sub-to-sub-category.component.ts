@@ -3,13 +3,12 @@ import { FormGroup, UntypedFormBuilder, Validators, FormArray } from '@angular/f
 import { Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { PlacementService } from 'src/app/core/services/placement.service';
-import { forkJoin } from 'rxjs';
 import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-sub-to-sub-category',
   templateUrl: './sub-to-sub-category.component.html',
-  styleUrl: './sub-to-sub-category.component.scss'
+  styleUrls: ['./sub-to-sub-category.component.scss']
 })
 export class SubToSubCategoryComponent implements OnInit {
   breadCrumbItems!: Array<{ label: string; active?: boolean }>;
@@ -41,7 +40,7 @@ export class SubToSubCategoryComponent implements OnInit {
 
     this.validationForm = this.formBuilder.group({
       selectedCategory: ['', Validators.required],
-      selectedSubCategory: [[], Validators.required],
+      selectedSubCategory: ['', Validators.required], // Changed to single value
       subToSubCategories: this.formBuilder.array([this.formBuilder.control('', Validators.required)]),
       isactive: [true, Validators.required]
     });
@@ -97,7 +96,7 @@ export class SubToSubCategoryComponent implements OnInit {
       })
       : [];
     console.log('Filtered sub-categories:', this.filteredSubCategories);
-    this.validationForm.patchValue({ selectedSubCategory: [] });
+    this.validationForm.patchValue({ selectedSubCategory: '' }); // Reset to single value
   }
 
   addSubToSubCategory() {
@@ -117,11 +116,11 @@ export class SubToSubCategoryComponent implements OnInit {
       return;
     }
 
-    const selectedSubCategories = this.validationForm.value.selectedSubCategory;
-    console.log('Selected sub-categories:', selectedSubCategories);
+    const selectedSubCategory = this.validationForm.value.selectedSubCategory;
+    console.log('Selected sub-category:', selectedSubCategory);
 
     const payload = {
-      subcategoriesIds: Array.isArray(selectedSubCategories) ? selectedSubCategories : [selectedSubCategories],
+      subcategoriesId: selectedSubCategory, // Changed to single ID
       subToSubCategories: this.validationForm.value.subToSubCategories,
       isactive: this.validationForm.value.isactive ? 1 : 0
     };

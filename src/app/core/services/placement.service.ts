@@ -59,10 +59,10 @@ export class PlacementService {
 
 
     // sub to sub
-    saveSubToSubCategory(payload: any): Observable<any> {
-        return this.httpClient.post(ApiService.saveSubToSubCategoryURL, payload, { headers: this.getHeaders() });
-    }
 
+    saveSubToSubCategory(payload: any): Observable<any> {
+        return this.httpClient.post(ApiService.saveSubToSubCategoryURL, payload,);
+    }
     getAllSubToSubCategory(): Observable<any> {
         return this.httpClient.get(ApiService.getAllSubToSubCategoryURL, { headers: this.getHeaders() });
     }
