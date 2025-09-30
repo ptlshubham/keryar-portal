@@ -52,6 +52,7 @@ import { QuetionsComponent } from './quetions/quetions.component';
     NgbTypeaheadModule,
     CountUpModule,
     LightboxModule,
+
   ]
 })
 export class PlacementModule { }

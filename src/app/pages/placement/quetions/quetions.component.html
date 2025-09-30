@@ -10,17 +10,38 @@
                     <h5 class="card-title">Update Placement Questions Details</h5>
                     <p class="card-title-desc">Enter Your Placement Questions Details</p>
                 </div>
-                <button type="submit" class="btn btn-danger waves-effect waves-light" (click)="closeQuestionset()">
+                <button type="button" class="btn btn-danger waves-effect waves-light" (click)="closeQuestionset()">
                     <i class="bx bx-arrow-back"></i>
-                    Back</button>
+                    Back
+                </button>
             </div>
         </div>
         <div class="card-body">
             <form *ngIf="validationForm" [formGroup]="validationForm">
-
                 <div class="row">
                     <div class="form-group mb-3">
                         <div class="row g-2">
+                            <!-- Type -->
+                            <div class="col">
+                                <label for="typeInput" class="form-label">Type</label>
+                                <input type="text" class="form-control" id="typeInput" formControlName="type"
+                                    placeholder="Enter Type" />
+                                <div *ngIf="f.type.touched && f.type.invalid" class="text-danger">
+                                    <small *ngIf="f.type.errors?.required">Type is required.</small>
+                                    <small *ngIf="f.type.errors?.minlength">Type must not be empty.</small>
+                                </div>
+                            </div>
+                            <!-- Year -->
+                            <div class="col">
+                                <label for="yearInput" class="form-label">Year</label>
+                                <input type="month" class="form-control" id="yearInput" formControlName="year" />
+                                <div *ngIf="f.year.touched && f.year.invalid" class="text-danger">
+                                    <small *ngIf="f.year.errors?.required">Year is required.</small>
+                                    <small *ngIf="f.year.errors?.pattern">Year must be in YYYY-MM format.</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row g-2 mt-3">
                             <!-- Category -->
                             <div class="col">
                                 <label for="categorySelect" class="form-label">Category</label>
@@ -29,6 +50,9 @@
                                     <option value="" disabled selected>Select Category</option>
                                     <option *ngFor="let cat of categories" [value]="cat.id">{{cat.name}}</option>
                                 </select>
+                                <div *ngIf="f.category.touched && f.category.invalid" class="text-danger">
+                                    <small *ngIf="f.category.errors?.required">Category is required.</small>
+                                </div>
                             </div>
                             <!-- Subcategory -->
                             <div class="col">
@@ -38,6 +62,9 @@
                                     <option value="" disabled selected>Select Subcategory</option>
                                     <option *ngFor="let sub of subcategories" [value]="sub.id">{{sub.name}}</option>
                                 </select>
+                                <div *ngIf="f.subcategory.touched && f.subcategory.invalid" class="text-danger">
+                                    <small *ngIf="f.subcategory.errors?.required">Subcategory is required.</small>
+                                </div>
                             </div>
                             <!-- Sub-to-subcategory -->
                             <div class="col">
@@ -46,9 +73,13 @@
                                     formControlName="subtosubcategory">
                                     <option value="" disabled selected>Select Sub-to-subcategory</option>
                                     <option *ngFor="let subsub of subtosubcategories" [value]="subsub.id">
-                                        {{subsub.name}}
-                                    </option>
+                                        {{subsub.name}}</option>
                                 </select>
+                                <div *ngIf="f.subtosubcategory.touched && f.subtosubcategory.invalid"
+                                    class="text-danger">
+                                    <small *ngIf="f.subtosubcategory.errors?.required">Sub-to-subcategory is
+                                        required.</small>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -99,17 +130,30 @@
                             <div class="col-xl-1 col-md-1 d-flex align-items-center justify-content-center">
                                 <span class="fw-bold">{{ fromCharCode(65 + optInd) }}</span>
                             </div>
-                            <div class="col-xl-4 col-md-4">
+                            <div class="col-xl-3 col-md-3">
                                 <input type="text" class="form-control" placeholder="Enter Option" required
                                     [(ngModel)]="opt.options" [ngModelOptions]="{standalone: true}"
                                     [id]="'options'+ind+optInd">
                             </div>
-                            <div class="col-xl-4 col-md-4">
+                            <div class="col-xl-3 col-md-3">
                                 <input type="number" class="form-control" placeholder="Enter Value" required
                                     [(ngModel)]="opt.value" [ngModelOptions]="{standalone: true}"
                                     [id]="'value'+ind+optInd">
                             </div>
-                            <div class="col-xl-1 col-lg-1 col-md-1 d-flex align-items-center justify-content-center">
+                            <div class="col-xl-3 col-md-3">
+                                <div *ngIf="i.option_type === 'Checkbox'">
+                                    <input type="checkbox" class="form-check-input" [(ngModel)]="opt.isCorrect"
+                                        [ngModelOptions]="{standalone: true}" [id]="'correct'+ind+optInd">
+                                    <label class="form-check-label ms-2" [for]="'correct'+ind+optInd">Correct</label>
+                                </div>
+                                <div *ngIf="i.option_type === 'Radio'">
+                                    <input type="radio" class="form-check-input" [name]="'correctOption'+ind"
+                                        [(ngModel)]="i.correctAnswer" [value]="optInd"
+                                        [ngModelOptions]="{standalone: true}" [id]="'correct'+ind+optInd">
+                                    <label class="form-check-label ms-2" [for]="'correct'+ind+optInd">Correct</label>
+                                </div>
+                            </div>
+                            <div class="col-xl-1 col-md-1 d-flex align-items-center justify-content-center">
                                 <button type="button" class="btn btn-outline-danger btn-sm"
                                     *ngIf="i.optionsArr.length > 1" (click)="removeOption(ind, optInd)"
                                     title="Remove Option">
@@ -125,6 +169,14 @@
                                     <i class="bx bx-plus"></i> Add Option
                                 </button>
                             </div>
+                        </div>
+                    </div>
+                    <div class="col-12 mt-2" *ngIf="i.option_type === 'Input' || i.option_type === 'Textarea'">
+                        <div class="form-group mb-3">
+                            <label>Correct Answer</label>
+                            <input type="text" class="form-control" placeholder="Enter Correct Answer"
+                                [(ngModel)]="i.correctAnswer" [ngModelOptions]="{standalone: true}"
+                                [id]="'correctAnswer'+ind">
                         </div>
                     </div>
                     <hr class="my-4" *ngIf="ind < questionData.length - 1">
@@ -147,9 +199,10 @@
         <div class="card-header">
             <div class="d-flex justify-content-between">
                 <h5 class="card-title">Self Question Set List</h5>
-                <button type="submit" class="btn btn-primary waves-effect waves-light" (click)="openQuestionset()">
+                <button type="button" class="btn btn-primary waves-effect waves-light" (click)="openQuestionset()">
                     <i class="mdi mdi-clipboard-list-outline"></i>
-                    Add Question Set</button>
+                    Add Question Set
+                </button>
             </div>
         </div>
         <div class="card-body">
@@ -160,18 +213,24 @@
                             <th class="text-left">#</th>
                             <th class="text-center">Type</th>
                             <th class="text-center">Year</th>
+                            <th class="text-center">Category</th>
+                            <th class="text-center">Subcategory</th>
+                            <th class="text-center">Sub-to-subcategory</th>
                             <th class="text-center">Question Count</th>
                             <th class="text-end">Action</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr *ngFor="let c of paginateData;let i=index">
+                        <tr *ngFor="let c of paginateData; let i=index">
                             <td class="text-left">{{c.index}}</td>
                             <th class="text-center">
                                 <span class="badge bg-info" *ngIf="c.type == 'College'">{{c.type}}</span>
-                                <span class="badge bg-primary" *ngIf="c.type== 'School'">{{c.type}}</span>
+                                <span class="badge bg-primary" *ngIf="c.type != 'College'">{{c.type}}</span>
                             </th>
                             <td class="text-center">{{c.year}}</td>
+                            <td class="text-center">{{ getCategoryName(c.categoriesid) }}</td>
+                            <td class="text-center">{{ getSubcategoryName(c.subcategoriesid) }}</td>
+                            <td class="text-center">{{ getSubToSubcategoryName(c.subtosubcategoriesid) }}</td>
                             <td class="text-center">
                                 <span class="badge bg-info">{{ c.questions?.length ?? 0 }}</span>
                             </td>
@@ -180,16 +239,19 @@
                                     <button type="button" class="btn btn-soft-primary waves-effect waves-light"
                                         data-bs-toggle="modal" data-bs-target=".bs-example-modal-xl"
                                         data-bs-toggle="tooltip" data-bs-placement="top" title="View Details"
-                                        (click)="openQuestionList(exlargeModal,c)"><i
-                                            class="fa fa-eye font-size-16 align-middle"></i></button>
+                                        (click)="openQuestionList(exlargeModal,c)">
+                                        <i class="fa fa-eye font-size-16 align-middle"></i>
+                                    </button>
                                     <button type="button" class="btn btn-soft-primary waves-effect waves-light"
                                         data-bs-toggle="tooltip" data-bs-placement="top" title="Edit Details"
-                                        (click)="editQuestionSet(c)"><i
-                                            class="bx bx-edit font-size-16 align-middle"></i></button>
+                                        (click)="editQuestionSet(c)">
+                                        <i class="bx bx-edit font-size-16 align-middle"></i>
+                                    </button>
                                     <button type="button" class="btn btn-soft-danger waves-effect waves-light"
                                         data-bs-toggle="tooltip" data-bs-placement="top" title="Remove"
-                                        (click)="removeSelfAssessmentQuestionSet(c.id)"><i
-                                            class="bx bx-trash-alt font-size-16 align-middle"></i></button>
+                                        (click)="removeSelfAssessmentQuestionSet(c.id)">
+                                        <i class="bx bx-trash-alt font-size-16 align-middle"></i>
+                                    </button>
                                 </div>
                             </td>
                         </tr>
@@ -203,7 +265,6 @@
                     class="d-flex justify-content-end pagination-rounded-flat pagination-success"></ngb-pagination>
             </div>
         </div>
-        <!-- end card body -->
     </div>
 </div>
 
@@ -211,61 +272,78 @@
     <ng-template #exlargeModal let-modal>
         <div class="modal-header">
             <h5 class="modal-title mt-0">Question Set</h5>
-            <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss('Close click')">
-            </button>
+            <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss('Close click')"></button>
         </div>
         <div class="modal-body">
             <div class="d-flex justify-content-between align-items-center">
-                <h5 class="modal-title mt-0">Form Type : {{viewQuestions.type}}</h5>
-                <h5 class="modal-title mt-0">Year : {{viewQuestions.year}}</h5>
+                <h5 class="modal-title mt-0">Form Type: {{viewQuestions.type}}</h5>
+                <h5 class="modal-title mt-0">Year: {{viewQuestions.year}}</h5>
             </div>
             <h5 class="title text-center mb-3">Question List</h5>
-
             <div class="row">
                 <div class="col-12">
                     <div class="card" *ngFor="let data of (viewQuestions?.questions ?? []); let i = index">
                         <div class="card-body overflow-hidden position-relative">
                             <div class="faq-count">
                                 <div class="d-flex justify-content-between align-items-center gap-2">
-                                    <h5>{{i+1}}. {{data.question_text}} </h5>
+                                    <h5>{{i+1}}. {{data.question_text}}</h5>
                                     <h5 class="badge bg-primary" style="font-size:medium;">{{data.weight}}</h5>
                                 </div>
-                                <div class="options-table mt-3">
-                                    <table class="table table-bordered mb-0" style="background: #f9f9f9;">
-                                        <thead class="table-light">
-                                            <tr>
-                                                <th style="width: 60%">Option</th>
-                                                <th style="width: 20%">Select</th>
-                                                <th style="width: 20%">Value</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <ng-container *ngIf="data.option_type === 'Checkbox'">
-                                                <tr *ngFor="let opt of data.optionsArr">
-                                                    <td class="fw-bold" style="font-size: 1rem;">{{opt.options}}</td>
-                                                    <td>
-                                                        <input class="form-check-input" type="checkbox" />
-                                                    </td>
-                                                    <td class="fw-bold" style="font-size: 1rem;">{{opt.value}}</td>
+                                <div *ngIf="data.option_type === 'Checkbox' || data.option_type === 'Radio'">
+                                    <div class="options-table mt-3">
+                                        <table class="table table-bordered mb-0" style="background: #f9f9f9;">
+                                            <thead class="table-light">
+                                                <tr>
+                                                    <th style="width: 50%">Option</th>
+                                                    <th style="width: 20%">Select</th>
+                                                    <th style="width: 20%">Value</th>
+                                                    <th style="width: 10%">Correct</th>
                                                 </tr>
-                                            </ng-container>
-                                            <ng-container *ngIf="data.option_type === 'Radio'">
-                                                <tr *ngFor="let opt of data.optionsArr">
-                                                    <td class="fw-bold" style="font-size: 1rem;">{{opt.options}}</td>
-                                                    <td>
-                                                        <input class="form-check-input" type="radio"
-                                                            [name]="'radio'+i" />
-                                                    </td>
-                                                    <td class="fw-bold" style="font-size: 1rem;">{{opt.value}}</td>
-                                                </tr>
-                                            </ng-container>
-                                        </tbody>
-                                    </table>
+                                            </thead>
+                                            <tbody>
+                                                <ng-container *ngIf="data.option_type === 'Checkbox'">
+                                                    <tr *ngFor="let opt of data.optionsArr; let optInd = index">
+                                                        <td class="fw-bold" style="font-size: 1rem;">{{opt.options}}
+                                                        </td>
+                                                        <td>
+                                                            <input class="form-check-input" type="checkbox" disabled />
+                                                        </td>
+                                                        <td class="fw-bold" style="font-size: 1rem;">{{opt.value}}</td>
+                                                        <td>
+                                                            <i class="bx bx-check text-success font-size-18"
+                                                                *ngIf="opt.isCorrect"></i>
+                                                        </td>
+                                                    </tr>
+                                                </ng-container>
+                                                <ng-container *ngIf="data.option_type === 'Radio'">
+                                                    <tr *ngFor="let opt of data.optionsArr; let optInd = index">
+                                                        <td class="fw-bold" style="font-size: 1rem;">{{opt.options}}
+                                                        </td>
+                                                        <td>
+                                                            <input class="form-check-input" type="radio"
+                                                                [name]="'radio'+i" disabled />
+                                                        </td>
+                                                        <td class="fw-bold" style="font-size: 1rem;">{{opt.value}}</td>
+                                                        <td>
+                                                            <i class="bx bx-check text-success font-size-18"
+                                                                *ngIf="optInd === data.correctAnswer"></i>
+                                                        </td>
+                                                    </tr>
+                                                </ng-container>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                                <div *ngIf="data.option_type === 'Input' || data.option_type === 'Textarea'">
+                                    <div class="form-group mt-3">
+                                        <label>Correct Answer</label>
+                                        <input type="text" class="form-control" [value]="data.correctAnswer || ''"
+                                            readonly>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <!-- end card body -->
                 </div>
             </div>
         </div>

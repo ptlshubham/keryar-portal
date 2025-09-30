@@ -47,4 +47,11 @@ export class ApiService {
   public static getAllActiveSubToSubCategoryURL: string = ApiService.HOST_URL + '/keryar/GetAllActiveSubToSubCategory';
   public static updateSubToSubCategoryStatusURL: string = ApiService.HOST_URL + '/keryar/UpdateSubToSubCategoryStatus';
   public static removeSubToSubCategoryURL: string = ApiService.HOST_URL + '/keryar/RemoveSubToSubCategory/';
+
+
+  // quetions
+  public static saveSelfAssessmentQuestionSetURL: string = ApiService.HOST_URL + '/keryar/SaveSelfAssessmentQuestionSet';
+  public static getAllSelfQuestionSetDetailsURL: string = ApiService.HOST_URL + '/keryar/GetAllSelfQuestionSetDetails';
+  public static updateSelfAssessmentQuestionSetURL: string = ApiService.HOST_URL + '/keryar/UpdateSelfAssessmentQuestionSet';
+  public static removeSelfAssessmentQuestionSetURL: string = ApiService.HOST_URL + '/keryar/RemoveSelfAssessmentQuestionSet/';
 }

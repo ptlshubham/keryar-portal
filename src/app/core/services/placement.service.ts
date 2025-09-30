@@ -80,4 +80,21 @@ export class PlacementService {
         const observables = ids.map(id => this.httpClient.get(ApiService.removeSubToSubCategoryURL + id, { headers: this.getHeaders() }));
         return forkJoin(observables);
     }
+
+    // quetions
+    saveSelfAssessmentQuestionSetDetails(data: any): Observable<any> {
+        return this.httpClient.post(ApiService.saveSelfAssessmentQuestionSetURL, data);
+    }
+
+    getAllSelfQuestionSetDetails(): Observable<any> {
+        return this.httpClient.get(ApiService.getAllSelfQuestionSetDetailsURL);
+    }
+
+    updateSelfAssessmentQuestionSetDetails(data: any): Observable<any> {
+        return this.httpClient.post(ApiService.updateSelfAssessmentQuestionSetURL, data);
+    }
+
+    removeSelfAssessmentQuestionSet(id: string): Observable<any> {
+        return this.httpClient.get(`${ApiService.removeSelfAssessmentQuestionSetURL}${id}`);
+    }
 }

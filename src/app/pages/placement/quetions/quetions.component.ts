@@ -19,15 +19,14 @@ export class QuetionsComponent implements OnInit {
   collectionSize = 0;
   paginateData: any = [];
 
-  questionData: any[] = [{ question_text: null, option_type: '', weight: null, optionsArr: [{ options: '', value: null }] }];
+  questionData: any[] = [{ question_text: null, option_type: '', weight: null, optionsArr: [{ options: '', value: null, isCorrect: false }], correctAnswer: null }];
   questionModel: any = {};
   viewQuestions: any = {};
-
-  questionsSetData: any = [];
 
   categories: any[] = [];
   subcategories: any[] = [];
   subtosubcategories: any[] = [];
+  questionsSetData: any = [];
 
   constructor(
     private fb: FormBuilder,
@@ -38,19 +37,17 @@ export class QuetionsComponent implements OnInit {
 
   ngOnInit(): void {
     this.validationForm = this.fb.group({
-      type: ['School', Validators.required],
+      type: ['', [Validators.required, Validators.minLength(1)]],
+      year: ['', [Validators.required, Validators.pattern(/^\d{4}-\d{2}$/)]],
       category: ['', Validators.required],
       subcategory: ['', Validators.required],
       subtosubcategory: ['', Validators.required],
     });
 
-    // Disable subcategory and sub-to-sub category initially
     this.validationForm.get('subcategory')?.disable();
     this.validationForm.get('subtosubcategory')?.disable();
 
-    // Fetch categories and initialize data
-    this.getCategories();
-    this.getAllSelfQuestionSetDetails();
+    this.loadAllData();
   }
 
   get f() { return this.validationForm.controls; }
@@ -58,7 +55,12 @@ export class QuetionsComponent implements OnInit {
   get isQuestionValid(): boolean {
     const enteredQuestions = this.questionData.filter(q => q.question_text && q.question_text.trim().length > 0);
     if (enteredQuestions.length === 0) return false;
-    return enteredQuestions.every(q => q.weight !== null && q.weight !== undefined && q.weight.toString().trim().length > 0);
+    return enteredQuestions.every(q =>
+      q.weight !== null && q.weight !== undefined && q.weight.toString().trim().length > 0 &&
+      (q.option_type === 'Checkbox' || q.option_type === 'Radio' ? q.optionsArr.length > 0 : true) &&
+      (q.option_type === 'Radio' ? q.correctAnswer !== null && q.correctAnswer !== undefined : true) &&
+      (q.option_type === 'Input' || q.option_type === 'Textarea' ? q.correctAnswer !== null && q.correctAnswer?.trim().length > 0 : true)
+    );
   }
 
   get isFormValid(): boolean {
@@ -69,12 +71,12 @@ export class QuetionsComponent implements OnInit {
     return String.fromCharCode(code);
   }
 
-  // Fetch all active categories
-  getCategories() {
+  loadAllData() {
     this.placementService.getAllActivePlacementCategory().subscribe({
       next: (res: any) => {
-        this.categories = res; // Assuming res is an array of { id, name, isactive, ... }
+        this.categories = res;
         console.log('Fetched categories:', this.categories);
+        this.loadSubcategories();
       },
       error: (err) => {
         this.toastr.error('Failed to fetch categories', 'Error');
@@ -83,7 +85,53 @@ export class QuetionsComponent implements OnInit {
     });
   }
 
-  // Fetch subcategories based on selected category
+  loadSubcategories() {
+    this.placementService.getAllActiveSubCategory().subscribe({
+      next: (res: any) => {
+        this.subcategories = res.data;
+        console.log('Fetched subcategories:', this.subcategories);
+        this.loadSubToSubcategories();
+      },
+      error: (err) => {
+        this.toastr.error('Failed to fetch subcategories', 'Error');
+        console.error('Error fetching subcategories:', err);
+      }
+    });
+  }
+
+  loadSubToSubcategories() {
+    this.placementService.getAllActiveSubToSubCategory().subscribe({
+      next: (res: any) => {
+        this.subtosubcategories = res.data.map((ssc: any) => ({
+          id: ssc.id,
+          name: ssc.name,
+          subcategoriesid: ssc.subcategoriesid
+        }));
+        console.log('Fetched sub-to-sub categories:', this.subtosubcategories);
+        this.getAllSelfQuestionSetDetails();
+      },
+      error: (err) => {
+        this.toastr.error('Failed to fetch sub-to-sub categories', 'Error');
+        console.error('Error fetching sub-to-sub categories:', err);
+      }
+    });
+  }
+
+  getCategoryName(categoryId: string): string {
+    const category = this.categories.find(cat => cat.id === categoryId);
+    return category ? category.name : 'N/A';
+  }
+
+  getSubcategoryName(subcategoryId: string): string {
+    const subcategory = this.subcategories.find(sub => sub.id === subcategoryId);
+    return subcategory ? subcategory.name : 'N/A';
+  }
+
+  getSubToSubcategoryName(subtosubcategoryId: string): string {
+    const subtosubcategory = this.subtosubcategories.find(subsub => subsub.id === subtosubcategoryId);
+    return subtosubcategory ? subtosubcategory.name : 'N/A';
+  }
+
   onCategoryChange(categoryId: any) {
     this.subcategories = [];
     this.subtosubcategories = [];
@@ -108,7 +156,6 @@ export class QuetionsComponent implements OnInit {
     }
   }
 
-  // Fetch sub-to-sub categories based on selected subcategory
   onSubcategoryChange(subcategoryId: any) {
     this.subtosubcategories = [];
     this.validationForm.patchValue({ subtosubcategory: '' });
@@ -120,8 +167,8 @@ export class QuetionsComponent implements OnInit {
           this.subtosubcategories = res.data
             .filter((ssc: any) => ssc.subcategoriesid === subcategoryId)
             .map((ssc: any) => ({
-              id: ssc.id, // Use the single id field
-              name: ssc.name // Use the name field directly
+              id: ssc.id,
+              name: ssc.name
             }));
           console.log('Filtered sub-to-sub categories:', this.subtosubcategories);
           if (this.subtosubcategories.length > 0) {
@@ -135,6 +182,7 @@ export class QuetionsComponent implements OnInit {
       });
     }
   }
+
   openQuestionset() {
     this.isOpen = true;
     this.isUpdate = false;
@@ -144,10 +192,11 @@ export class QuetionsComponent implements OnInit {
   closeQuestionset() {
     this.isOpen = false;
     this.isUpdate = false;
+    this.formReset();
   }
 
   addQuestion() {
-    this.questionData.push({ question_text: null, option_type: '', weight: null, optionsArr: [{ options: '', value: null }] });
+    this.questionData.push({ question_text: null, option_type: '', weight: null, optionsArr: [{ options: '', value: null, isCorrect: false }], correctAnswer: null });
   }
 
   removeQuestion(index: number) {
@@ -160,7 +209,7 @@ export class QuetionsComponent implements OnInit {
     if (!this.questionData[qIndex].optionsArr) {
       this.questionData[qIndex].optionsArr = [];
     }
-    this.questionData[qIndex].optionsArr.push({ options: '', value: null });
+    this.questionData[qIndex].optionsArr.push({ options: '', value: null, isCorrect: false });
   }
 
   removeOption(qIndex: number, optIndex: number) {
@@ -173,41 +222,52 @@ export class QuetionsComponent implements OnInit {
     if (this.isFormValid) {
       let data = {
         type: this.validationForm.value.type,
-        categoryId: this.validationForm.value.category,
-        subcategoryId: this.validationForm.value.subcategory,
-        subtosubcategoryId: this.validationForm.value.subtosubcategory,
+        categoriesid: this.validationForm.value.category,
+        subcategoriesid: this.validationForm.value.subcategory,
+        subtosubcategoriesid: this.validationForm.value.subtosubcategory,
         questions: this.questionData.filter(q => q.question_text && q.question_text.trim().length > 0).map(q => ({
           question_text: q.question_text,
           option_type: q.option_type,
           weight: q.weight,
-          optionsArr: q.optionsArr,
+          optionsArr: q.optionsArr?.map((opt: any) => ({
+            options: opt.options,
+            value: opt.value,
+            isCorrect: opt.isCorrect
+          })) || [],
+          correctAnswer: q.correctAnswer
         })),
-        year: new Date().getFullYear(),
-        isactive: true
+        year: this.validationForm.value.year ? this.validationForm.value.year.split('-')[0] : new Date().getFullYear().toString()
       };
 
-      // Implement the service call to save the question set
-      // this.placementService.saveSelfAssessmentQuestionSetDetails(data).subscribe((res: any) => {
-      //   this.formReset();
-      //   this.getAllSelfQuestionSetDetails();
-      //   this.isUpdate = false;
-      //   this.isOpen = false;
-      //   this.toastr.success('Question set saved successfully.');
-      // }, (error) => {
-      //   this.toastr.error('Error saving question set.');
-      // });
+      this.placementService.saveSelfAssessmentQuestionSetDetails(data).subscribe({
+        next: (res: any) => {
+          this.formReset();
+          this.loadAllData();
+          this.isUpdate = false;
+          this.isOpen = false;
+          this.toastr.success('Question set saved successfully.');
+        },
+        error: (err) => {
+          this.toastr.error('Error saving question set.', 'Error');
+          console.error('Error saving question set:', err);
+        }
+      });
     } else {
       let msg = '';
-      if (!this.isQuestionValid) {
-        msg += 'Please enter at least one question with a valid weight.';
+      if (!this.validationForm.valid) {
+        msg += 'Please fill all required fields (Type, Year, Category, Subcategory, Sub-to-subcategory). ';
       }
-      this.toastr.error(msg || 'Please fill all required fields and questions.');
+      if (!this.isQuestionValid) {
+        msg += 'Please enter at least one question with a valid weight and correct answer.';
+      }
+      this.toastr.error(msg || 'Please complete the form correctly.', 'Validation Error');
     }
   }
 
   formReset() {
     this.validationForm.reset({
-      type: 'School',
+      type: '',
+      year: '',
       category: '',
       subcategory: '',
       subtosubcategory: ''
@@ -218,24 +278,28 @@ export class QuetionsComponent implements OnInit {
       question_text: null,
       option_type: '',
       weight: null,
-      optionsArr: [{ options: '', value: null }]
+      optionsArr: [{ options: '', value: null, isCorrect: false }],
+      correctAnswer: null
     }];
     this.subcategories = [];
     this.subtosubcategories = [];
   }
 
   getAllSelfQuestionSetDetails() {
-    // Implement the service call to fetch question sets
-    // this.placementService.getAllSelfQuestionSetDetails().subscribe((res: any) => {
-    //   for (let i = 0; i < res.length; i++) {
-    //     res[i].index = i + 1;
-    //   }
-    //   this.questionsSetData = res;
-    //   this.collectionSize = this.questionsSetData.length;
-    //   this.getPagintaion();
-    // }, (error) => {
-    //   this.toastr.error('Error fetching question sets.');
-    // });
+    this.placementService.getAllSelfQuestionSetDetails().subscribe({
+      next: (res: any) => {
+        for (let i = 0; i < res.data.length; i++) {
+          res.data[i].index = i + 1;
+        }
+        this.questionsSetData = res.data;
+        this.collectionSize = this.questionsSetData.length;
+        this.getPagintaion();
+      },
+      error: (err) => {
+        this.toastr.error('Error fetching question sets.', 'Error');
+        console.error('Error fetching question sets:', err);
+      }
+    });
   }
 
   getPagintaion() {
@@ -249,33 +313,79 @@ export class QuetionsComponent implements OnInit {
   }
 
   removeSelfAssessmentQuestionSet(id: any) {
-    // Implement the service call to remove question set
-    // this.placementService.removeSelfAssessmentQuestionSet(id).subscribe((res: any) => {
-    //   this.toastr.success('Question set removed successfully.');
-    //   this.getAllSelfQuestionSetDetails();
-    // }, (error) => {
-    //   this.toastr.error('Error removing question set.');
-    // });
+    this.placementService.removeSelfAssessmentQuestionSet(id).subscribe({
+      next: (res: any) => {
+        this.toastr.success('Question set removed successfully.');
+        this.loadAllData();
+      },
+      error: (err) => {
+        this.toastr.error('Error removing question set.', 'Error');
+        console.error('Error removing question set:', err);
+      }
+    });
   }
 
   editQuestionSet(data: any) {
     this.questionModel = { ...data };
     this.validationForm.patchValue({
       type: data.type,
-      category: data.categoryId,
-      subcategory: data.subcategoryId,
-      subtosubcategory: data.subtosubcategoryId
+      year: data.year ? `${data.year}-01` : '',
+      category: data.categoriesid,
+      subcategory: data.subcategoriesid,
+      subtosubcategory: data.subtosubcategoriesid
     });
-    this.questionData = data.questions;
+    this.questionData = data.questions.map((q: any) => ({
+      queid: q.id,
+      question_text: q.question_text,
+      option_type: q.option_type,
+      weight: q.weight,
+      optionsArr: q.optionsArr?.map((opt: any) => ({
+        id: opt.id,
+        options: opt.options,
+        value: opt.value,
+        isCorrect: opt.isCorrect
+      })) || [],
+      correctAnswer: q.correctAnswer
+    }));
     this.isUpdate = true;
     this.isOpen = true;
 
-    // Fetch subcategories and sub-to-sub categories for editing
-    if (data.categoryId) {
-      this.onCategoryChange(data.categoryId);
-      if (data.subcategoryId) {
-        this.onSubcategoryChange(data.subcategoryId);
-      }
+    if (data.categoriesid) {
+      this.placementService.getAllActiveSubCategory().subscribe({
+        next: (res: any) => {
+          this.subcategories = res.data.filter((sc: any) => sc.categoriesid === data.categoriesid);
+          console.log('Filtered subcategories:', this.subcategories);
+          if (this.subcategories.length > 0) {
+            this.validationForm.get('subcategory')?.enable();
+            this.validationForm.patchValue({ subcategory: data.subcategoriesid });
+          }
+          if (data.subcategoriesid) {
+            this.placementService.getAllActiveSubToSubCategory().subscribe({
+              next: (res: any) => {
+                this.subtosubcategories = res.data
+                  .filter((ssc: any) => ssc.subcategoriesid === data.subcategoriesid)
+                  .map((ssc: any) => ({
+                    id: ssc.id,
+                    name: ssc.name
+                  }));
+                console.log('Filtered sub-to-sub categories:', this.subtosubcategories);
+                if (this.subtosubcategories.length > 0) {
+                  this.validationForm.get('subtosubcategory')?.enable();
+                  this.validationForm.patchValue({ subtosubcategory: data.subtosubcategoriesid });
+                }
+              },
+              error: (err) => {
+                this.toastr.error('Failed to fetch sub-to-sub categories', 'Error');
+                console.error('Error fetching sub-to-sub categories:', err);
+              }
+            });
+          }
+        },
+        error: (err) => {
+          this.toastr.error('Failed to fetch subcategories', 'Error');
+          console.error('Error fetching subcategories:', err);
+        }
+      });
     }
   }
 
@@ -283,9 +393,9 @@ export class QuetionsComponent implements OnInit {
     const data = {
       id: this.questionModel.id,
       type: this.validationForm.value.type,
-      categoryId: this.validationForm.value.category,
-      subcategoryId: this.validationForm.value.subcategory,
-      subtosubcategoryId: this.validationForm.value.subtosubcategory,
+      categoriesid: this.validationForm.value.category,
+      subcategoriesid: this.validationForm.value.subcategory,
+      subtosubcategoriesid: this.validationForm.value.subtosubcategory,
       questions: this.questionData
         .filter(q => q.question_text && q.question_text.trim().length > 0)
         .map(q => ({
@@ -293,27 +403,29 @@ export class QuetionsComponent implements OnInit {
           question_text: q.question_text,
           option_type: q.option_type,
           weight: q.weight,
-          optionsArr: Array.isArray(q.optionsArr)
-            ? q.optionsArr.map((opt: any) => ({
-              id: opt.id,
-              options: opt.options,
-              value: opt.value
-            }))
-            : [],
+          optionsArr: q.optionsArr?.map((opt: any) => ({
+            id: opt.id,
+            options: opt.options,
+            value: opt.value,
+            isCorrect: opt.isCorrect
+          })) || [],
+          correctAnswer: q.correctAnswer
         })),
-      year: new Date().getFullYear(),
-      isactive: true
+      year: this.validationForm.value.year ? this.validationForm.value.year.split('-')[0] : new Date().getFullYear().toString()
     };
 
-    // Implement the service call to update question set
-    // this.placementService.updateSelfQuestionSetDetails(data).subscribe((res: any) => {
-    //   this.toastr.success('Question set updated successfully.');
-    //   this.getAllSelfQuestionSetDetails();
-    //   this.formReset();
-    //   this.isOpen = false;
-    //   this.isUpdate = false;
-    // }, (error) => {
-    //   this.toastr.error('Error updating question set.');
-    // });
+    this.placementService.updateSelfAssessmentQuestionSetDetails(data).subscribe({
+      next: (res: any) => {
+        this.toastr.success('Question set updated successfully.');
+        this.loadAllData();
+        this.formReset();
+        this.isOpen = false;
+        this.isUpdate = false;
+      },
+      error: (err) => {
+        this.toastr.error('Error updating question set.', 'Error');
+        console.error('Error updating question set:', err);
+      }
+    });
   }
 }
