@@ -26,4 +26,18 @@ export class ApiService {
   public static updateClientActiveDeactiveURL: string = ApiService.HOST_URL + '/keryar/UpdateClientActiveDeactive';
   public static deleteUploadedImageFromFolderURL: string = ApiService.HOST_URL + '/keryar/DeleteUploadedImageFromFolder';
 
+
+  // placement
+  public static savePlacementCategoryURL: string = ApiService.HOST_URL + '/keryar/SavePlacementCategory';
+  public static getAllPlacementCategoryURL: string = ApiService.HOST_URL + '/keryar/GetAllPlacementCategory';
+  public static getAllActivePlacementCategoryURL: string = ApiService.HOST_URL + '/keryar/GetAllActivePlacementCategory';
+  public static updateCategoryStatusURL: string = ApiService.HOST_URL + '/keryar/UpdateCategoryStatus';
+  public static removePlacementCategoryURL: string = ApiService.HOST_URL + '/keryar/RemovePlacementCategory/';
+
+  // sub
+  public static saveSubCategoryURL: string = ApiService.HOST_URL + '/keryar/SaveSubCategory';
+  public static getAllSubCategoryURL: string = ApiService.HOST_URL + '/keryar/GetAllSubCategory';
+  public static getAllActiveSubCategoryURL: string = ApiService.HOST_URL + '/keryar/GetAllActiveSubCategory';
+  public static updateSubCategoryStatusURL: string = ApiService.HOST_URL + '/keryar/UpdateSubCategoryStatus';
+  public static removeSubCategoryURL: string = ApiService.HOST_URL + '/keryar/RemoveSubCategory/';
 }

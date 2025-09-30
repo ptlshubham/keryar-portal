@@ -19,8 +19,8 @@
                             <!-- Single select -->
                             <div class="col-lg-6 mb-2">
                                 <label>Select Category</label>
-                                <ng-select [items]="categories" formControlName="selectedCategory"
-                                    (change)="onCategoryChange($event)">
+                                <ng-select [items]="categories" bindLabel="name" bindValue="id"
+                                    formControlName="selectedCategory" (change)="onCategoryChange($event)">
                                 </ng-select>
                                 <div class="text-danger mt-1"
                                     *ngIf="submitted && f['selectedCategory']?.errors?.['required']">
@@ -30,31 +30,32 @@
 
                             <!-- Sub-category inputs -->
                             <div class="col-lg-6 mb-2" *ngIf="subCategories.length > 0">
-                                <label>
-                                    Sub Categories for {{ validationForm.get('selectedCategory')?.value }}
-                                </label>
-
+                                <label>Sub Categories</label>
                                 <div formArrayName="subCategories">
                                     <div class="d-flex align-items-center mb-2"
                                         *ngFor="let ctrl of subCategories.controls; let i = index">
                                         <input type="text" class="form-control" [formControlName]="i"
                                             placeholder="Enter Sub Category" />
-
                                         <button type="button" class="btn btn-success ms-2"
                                             (click)="addSubCategoryField()">
                                             <i class="bx bx-plus"></i>
                                         </button>
-
                                         <button type="button" class="btn btn-danger ms-2"
                                             (click)="removeSubCategoryField(i)" [disabled]="subCategories.length === 1">
                                             <i class="bx bx-minus"></i>
                                         </button>
                                     </div>
-
-                                    <!-- simple validation -->
                                     <div class="text-danger mt-1" *ngIf="submitted && subCategories.invalid">
                                         Please fill all sub-category fields.
                                     </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-4 mb-2">
+                                <label>Active & Deactive</label>
+                                <div class="form-check form-switch form-switch-lg mb-3" dir="ltr">
+                                    <input type="checkbox" class="form-check-input" id="customSwitchsizelg"
+                                        formControlName="isactive" checked>
+                                    <label class="form-check-label" for="customSwitchsizelg"></label>
                                 </div>
                             </div>
                         </div>
@@ -73,7 +74,7 @@
     </div>
 </div>
 
-<!-- List (demo) -->
+<!-- List -->
 <div class="row">
     <div class="col-lg-12">
         <div class="card">
@@ -88,28 +89,31 @@
                             <tr>
                                 <th class="text-left">#</th>
                                 <th class="text-center">Category Name</th>
-                                <th class="text-center">Title</th>
-                                <th class="text-center">Active & Deactive</th>
+                                <th class="text-center">Sub Category</th>
+                                <th class="text-center">Status</th>
                                 <th class="text-end">Action</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr *ngFor="let c of paginateData; let i = index">
-                                <td class="text-left">{{ c.index }}</td>
+                                <td class="text-left">{{ (page - 1) * pageSize + i + 1 }}</td>
+                                <td class="text-center">{{ c.category_name }}</td>
                                 <td class="text-center">{{ c.name }}</td>
-                                <td class="text-center">{{ c.title }}</td>
                                 <td class="text-center">
-                                    <button type="button" class="btn btn-success waves-effect btn-label waves-light">
+                                    <button type="button" class="btn btn-success waves-effect btn-label waves-light"
+                                        (click)="updateSubCategoryStatus(c.id, !c.isactive)" *ngIf="c.isactive">
                                         <i class="bx bx-check-double label-icon"></i> Active
                                     </button>
-                                    <button type="button" class="btn btn-danger waves-effect btn-label waves-light">
+                                    <button type="button" class="btn btn-danger waves-effect btn-label waves-light"
+                                        (click)="updateSubCategoryStatus(c.id, !c.isactive)" *ngIf="!c.isactive">
                                         <i class="bx bx-block label-icon"></i> Deactive
                                     </button>
                                 </td>
                                 <td class="text-end">
                                     <div class="d-flex justify-content-end gap-1">
                                         <button type="button" class="btn btn-soft-danger waves-effect waves-light"
-                                            data-bs-toggle="tooltip" data-bs-placement="top" title="Delete">
+                                            data-bs-toggle="tooltip" data-bs-placement="top" title="Delete"
+                                            (click)="removeSubCategory(c.id)">
                                             <i class="bx bx-trash-alt font-size-16 align-middle"></i>
                                         </button>
                                     </div>
