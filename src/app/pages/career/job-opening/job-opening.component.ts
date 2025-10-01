@@ -5,6 +5,7 @@ import { ToastrService } from 'ngx-toastr';
 import { CareerService } from 'src/app/core/services/career.service';
 import { PlacementService } from 'src/app/core/services/placement.service';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-job-opening',
@@ -23,11 +24,11 @@ export class JobOpeningComponent {
   editMode = false;
   currentJobId: string | null = null;
   isOpen: boolean = true;
-  departments: any[] = []; // Categories
+  departments: any[] = [];
   subcategories: any[] = [];
   subtosubcategories: any[] = [];
   questionSets: any[] = [];
-  selectedJob: any = null; // Store the job for preview
+  selectedJob: any = null;
 
   experienceOptions = [
     { label: '0-2 years', value: '0-2 years' },
@@ -206,7 +207,7 @@ export class JobOpeningComponent {
   }
 
   openPreviewModal(content: any, job: any) {
-    this.selectedJob = job; // Store the selected job for preview
+    this.selectedJob = job;
     this.modalService.open(content, { size: 'lg', centered: true });
   }
 
@@ -226,13 +227,32 @@ export class JobOpeningComponent {
     });
   }
 
-  removeJobOpeningsData(id: string) {
-    this.careerService.deleteJobOpening(id).subscribe((res: any) => {
-      if (res.success) {
-        this.toastr.success('Job Opening deleted successfully', 'Deleted', { timeOut: 3000 });
-        this.loadJobOpenings();
-      } else {
-        this.toastr.error('Failed to delete job opening', 'Error', { timeOut: 3000 });
+  removeJobOpeningsData(id: any) {
+    Swal.fire({
+      title: 'Are you sure?',
+      text: 'Do you want to delete this job opening?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Yes, delete it!',
+      cancelButtonText: 'No, cancel'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.careerService.deleteJobOpening(id).subscribe({
+          next: (res: any) => {
+            if (res.success) {
+              this.toastr.success('Job opening deleted successfully', 'Success', { timeOut: 3000 });
+              this.loadJobOpenings();
+            } else {
+              this.toastr.error(res.message || 'Failed to delete job opening', 'Error', { timeOut: 3000 });
+            }
+          },
+          error: (err) => {
+            this.toastr.error('Failed to delete job opening', 'Error', { timeOut: 3000 });
+            console.error(err);
+          }
+        });
       }
     });
   }
