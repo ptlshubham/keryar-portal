@@ -1,8 +1,7 @@
-<div class="row" *ngIf="isOpen==false">
+<div class="row" *ngIf="!isOpen">
     <div class="col-lg-12">
         <div class="card">
             <div class="card-header">
-
                 <div class="d-flex justify-content-between">
                     <div>
                         <h5 class="card-title">Job Opening</h5>
@@ -10,8 +9,9 @@
                                 Details' }}</b></p>
                     </div>
                     <button type="button" class="btn btn-danger waves-effect waves-light" (click)="JobList()">
-                        <i class="bx bx-arrow-back  "></i>
-                        Back</button>
+                        <i class="bx bx-arrow-back"></i>
+                        Back
+                    </button>
                 </div>
             </div>
 
@@ -44,7 +44,6 @@
                                     </div>
                                 </div>
                             </div>
-
                             <div class="col-lg-4 mb-3">
                                 <div class="form-group mb-3">
                                     <label>Job Type</label>
@@ -57,13 +56,11 @@
                                         <option value="Contract">Contract</option>
                                         <option value="Remote">Remote</option>
                                     </select>
-
                                     <div *ngIf="f.jobtype.touched && f.jobtype.errors" class="invalid-feedback">
                                         <span *ngIf="f.jobtype.errors.required">This field is required.</span>
                                     </div>
                                 </div>
                             </div>
-
                             <div class="col-lg-4 mb-3">
                                 <div class="form-group mb-3">
                                     <label>Location</label>
@@ -82,13 +79,11 @@
                                         [multiple]="true" placeholder="Select Experience" formControlName="experience"
                                         [ngClass]="{'is-invalid': f.experience.touched && f.experience.errors}">
                                     </ng-select>
-
                                     <div *ngIf="f.experience.touched && f.experience.errors" class="invalid-feedback">
                                         <span *ngIf="f.experience.errors.required">This field is required.</span>
                                     </div>
                                 </div>
                             </div>
-
                             <div class="col-lg-4 mb-3">
                                 <div class="form-group mb-3">
                                     <label>Question Sets</label>
@@ -98,7 +93,6 @@
                                     </ng-select>
                                 </div>
                             </div>
-
                             <div class="col-12 mb-3" *ngIf="f.questionSets.value?.length > 0">
                                 <h5>Selected Question Sets Details</h5>
                                 <div class="table-responsive">
@@ -127,7 +121,6 @@
                                     </table>
                                 </div>
                             </div>
-
                             <div class="col-lg-4 mb-3">
                                 <div class="form-group mb-3">
                                     <label>Salary Range / CTC</label>
@@ -205,19 +198,71 @@
     </div>
 </div>
 
-<div class="row" *ngIf="isOpen==true">
+<!-- Preview Modal -->
+<ng-template #previewModal let-modal>
+    <div class="modal-header">
+        <h5 class="modal-title">Job Opening Preview</h5>
+        <button type="button" class="btn-close" (click)="modal.dismiss('Close click')"></button>
+    </div>
+    <div class="modal-body">
+        <h6><strong>Job Title:</strong> {{ selectedJob?.jobtitle || 'N/A' }}</h6>
+        <p><strong>Department:</strong> {{ selectedJob?.department || 'N/A' }}</p>
+        <p><strong>Job Type:</strong> {{ selectedJob?.jobtype || 'N/A' }}</p>
+        <p><strong>Location:</strong> {{ selectedJob?.location || 'N/A' }}</p>
+        <p><strong>Experience:</strong> {{ selectedJob?.experience || 'N/A' }}</p>
+        <p><strong>Salary Range / CTC:</strong> {{ selectedJob?.salary || 'Not specified' }}</p>
+        <p><strong>Job Description:</strong> {{ selectedJob?.description || 'N/A' }}</p>
+        <p><strong>Required Skills:</strong> {{ selectedJob?.skills || 'N/A' }}</p>
+        <p><strong>Educational Qualification:</strong> {{ selectedJob?.qualification || 'N/A' }}</p>
+        <p><strong>Number of Openings:</strong> {{ selectedJob?.openings || 'N/A' }}</p>
+        <p><strong>Status:</strong> {{ selectedJob?.isactive ? 'Active' : 'Inactive' }}</p>
+        <div *ngIf="selectedJob?.questionsets?.length > 0">
+            <h6><strong>Selected Question Sets:</strong></h6>
+            <div class="table-responsive">
+                <table class="table mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Question Set</th>
+                            <th>Category</th>
+                            <th>Subcategory</th>
+                            <th>Sub-to-Subcategory</th>
+                            <th>Difficulty</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let setId of selectedJob?.questionsets?.split(',') || []">
+                            <td>{{ getQuestionSetDisplayName(setId) }}</td>
+                            <td>{{ getCategoryName(getQuestionSet(setId)?.categoriesid) }}</td>
+                            <td>{{ getSubcategoryName(getQuestionSet(setId)?.subcategoriesid) }}</td>
+                            <td>{{ getSubToSubcategoryName(getQuestionSet(setId)?.subtosubcategoriesid) }}</td>
+                            <td>{{ getQuestionSet(setId)?.difficulty || 'N/A' }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div *ngIf="!(selectedJob?.questionsets?.length > 0)">
+            <p><strong>Selected Question Sets:</strong> None</p>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="modal.close('Close click')">Close</button>
+    </div>
+</ng-template>
+
+<div class="row" *ngIf="isOpen">
     <div class="col-lg-12">
         <div class="card">
             <div class="card-header">
-
                 <div class="d-flex justify-content-between">
                     <div>
                         <h5 class="card-title">Job Opening List</h5>
                         <p class="card-title-desc mb-0">List of all Job Openings</p>
                     </div>
                     <button type="button" class="btn btn-primary waves-effect waves-light" (click)="addJobOpenings()">
-                        <i class="fas fa-user-plus "></i>
-                        Add New Job Openings </button>
+                        <i class="fas fa-user-plus"></i>
+                        Add New Job Openings
+                    </button>
                 </div>
             </div>
             <div class="card-body">
@@ -259,14 +304,21 @@
                                 </td>
                                 <td class="text-end">
                                     <div class="d-flex justify-content-end gap-1">
+                                        <button type="button" class="btn btn-soft-info waves-effect waves-light"
+                                            data-bs-toggle="tooltip" data-bs-placement="top" title="Preview"
+                                            (click)="openPreviewModal(previewModal, c)">
+                                            <i class="bx bx-show font-size-16 align-middle"></i>
+                                        </button>
                                         <button type="button" class="btn btn-soft-danger waves-effect waves-light"
                                             data-bs-toggle="tooltip" data-bs-placement="top" title="Delete"
-                                            (click)="removeJobOpeningsData(c.id)"><i
-                                                class="bx bx-trash-alt font-size-16 align-middle"></i></button>
+                                            (click)="removeJobOpeningsData(c.id)">
+                                            <i class="bx bx-trash-alt font-size-16 align-middle"></i>
+                                        </button>
                                         <button type="button" class="btn btn-soft-primary waves-effect waves-light"
                                             data-bs-toggle="tooltip" data-bs-placement="top" title="Edit"
-                                            (click)="editJobOpening(c.id)"><i
-                                                class="bx bx-edit font-size-16 align-middle"></i></button>
+                                            (click)="editJobOpening(c.id)">
+                                            <i class="bx bx-edit font-size-16 align-middle"></i>
+                                        </button>
                                     </div>
                                 </td>
                             </tr>
