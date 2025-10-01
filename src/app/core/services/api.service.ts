@@ -54,4 +54,14 @@ export class ApiService {
   public static getAllSelfQuestionSetDetailsURL: string = ApiService.HOST_URL + '/keryar/GetAllSelfQuestionSetDetails';
   public static updateSelfAssessmentQuestionSetURL: string = ApiService.HOST_URL + '/keryar/UpdateSelfAssessmentQuestionSet';
   public static removeSelfAssessmentQuestionSetURL: string = ApiService.HOST_URL + '/keryar/RemoveSelfAssessmentQuestionSet/';
+
+
+  // job Openings
+  public static saveJobOpeningDetailsURL: string = ApiService.HOST_URL + '/keryar/SaveJobOpeningDetails';
+  public static getAllJobOpeningsURL: string = ApiService.HOST_URL + '/keryar/GetAllJobOpenings';
+  public static updateJobOpeningActiveDeactiveURL: string = ApiService.HOST_URL + '/keryar/UpdateJobOpeningActiveDeactive';
+  public static updateJobOpeningURL: string = ApiService.HOST_URL + '/keryar/UpdateJobOpening';
+  public static deleteJobOpeningURL: string = ApiService.HOST_URL + '/keryar/DeleteJobOpening';
+
+
 }

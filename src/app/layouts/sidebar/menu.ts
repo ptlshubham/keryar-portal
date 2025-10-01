@@ -44,7 +44,7 @@ export const MENU: MenuItem[] = [
         ]
     },
     {
-        id: 8,
+        id: 4,
         label: 'Placement',
         icon: 'mdi mdi-account-search',
         subItems: [
@@ -64,7 +64,7 @@ export const MENU: MenuItem[] = [
         ]
     },
     {
-        id: 3,
+        id: 5,
         label: 'blog',
         icon: 'mdi mdi-briefcase-outline',
         subItems: [
@@ -76,6 +76,19 @@ export const MENU: MenuItem[] = [
             },
 
 
+        ]
+    },
+    {
+        id: 6,
+        label: 'career',
+        icon: 'mdi mdi-briefcase-outline',
+        subItems: [
+            {
+                id: 10,
+                label: 'Jon Opening',
+                link: '/career/job-opening',
+                parentId: 10
+            },
         ]
     },
 ];
