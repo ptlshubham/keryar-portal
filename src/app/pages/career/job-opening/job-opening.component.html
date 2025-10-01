@@ -36,13 +36,9 @@
                                     <select class="form-control" formControlName="department"
                                         [ngClass]="{'is-invalid': f.department.touched && f.department.errors}">
                                         <option [ngValue]="null" disabled>Select Department</option>
-                                        <option value="IT">IT</option>
-                                        <option value="Marketing">Marketing</option>
-                                        <option value="Design">Design</option>
-                                        <option value="Sales">Sales</option>
-                                        <option value="Other">Other</option>
+                                        <option *ngFor="let dept of departments" [ngValue]="dept.name">{{ dept.name }}
+                                        </option>
                                     </select>
-
                                     <div *ngIf="f.department.touched && f.department.errors" class="invalid-feedback">
                                         <span *ngIf="f.department.errors.required">This field is required.</span>
                                     </div>
@@ -82,19 +78,17 @@
                             <div class="col-lg-4 mb-3">
                                 <div class="form-group mb-3">
                                     <label>Experience Required</label>
-                                    <select class="form-control" formControlName="experience"
+                                    <ng-select [items]="experienceOptions" bindLabel="label" bindValue="value"
+                                        [multiple]="true" placeholder="Select Experience" formControlName="experience"
                                         [ngClass]="{'is-invalid': f.experience.touched && f.experience.errors}">
-                                        <option [ngValue]="null" disabled>Select Experience</option>
-                                        <option value="0-2 years">0-2 years</option>
-                                        <option value="3-5 years">3-5 years</option>
-                                        <option value="5+ years">5+ years</option>
-                                    </select>
+                                    </ng-select>
 
                                     <div *ngIf="f.experience.touched && f.experience.errors" class="invalid-feedback">
                                         <span *ngIf="f.experience.errors.required">This field is required.</span>
                                     </div>
                                 </div>
                             </div>
+
                             <div class="col-lg-4 mb-3">
                                 <div class="form-group mb-3">
                                     <label>Salary Range / CTC</label>
