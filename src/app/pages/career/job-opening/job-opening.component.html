@@ -91,6 +91,45 @@
 
                             <div class="col-lg-4 mb-3">
                                 <div class="form-group mb-3">
+                                    <label>Question Sets</label>
+                                    <ng-select [items]="questionSets" bindLabel="displayName" bindValue="id"
+                                        [multiple]="true" placeholder="Select Question Sets"
+                                        formControlName="questionSets">
+                                    </ng-select>
+                                </div>
+                            </div>
+
+                            <div class="col-12 mb-3" *ngIf="f.questionSets.value?.length > 0">
+                                <h5>Selected Question Sets Details</h5>
+                                <div class="table-responsive">
+                                    <table class="table mb-0">
+                                        <thead class="table-light">
+                                            <tr>
+                                                <th>Question Set</th>
+                                                <th>Category</th>
+                                                <th>Subcategory</th>
+                                                <th>Sub-to-Subcategory</th>
+                                                <th>Difficulty</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr *ngFor="let setId of f.questionSets.value || []">
+                                                <td>{{ getQuestionSetDisplayName(setId) }}</td>
+                                                <td>{{ getCategoryName(getQuestionSet(setId)?.categoriesid) }}</td>
+                                                <td>{{ getSubcategoryName(getQuestionSet(setId)?.subcategoriesid) }}
+                                                </td>
+                                                <td>{{
+                                                    getSubToSubcategoryName(getQuestionSet(setId)?.subtosubcategoriesid)
+                                                    }}</td>
+                                                <td>{{ getQuestionSet(setId)?.difficulty || 'N/A' }}</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-4 mb-3">
+                                <div class="form-group mb-3">
                                     <label>Salary Range / CTC</label>
                                     <input type="text" class="form-control" placeholder="Enter Salary Range (Optional)"
                                         formControlName="salary">
@@ -194,6 +233,7 @@
                                 <th class="text-center">Experience</th>
                                 <th class="text-center">Salary</th>
                                 <th class="text-center">Openings</th>
+                                <th class="text-center">Question Sets Count</th>
                                 <th class="text-center">Active & Deactive</th>
                                 <th class="text-end">Action</th>
                             </tr>
@@ -208,6 +248,7 @@
                                 <td class="text-center">{{c.experience}}</td>
                                 <td class="text-center">{{c.salary || 'Not specified'}}</td>
                                 <td class="text-center">{{c.openings}}</td>
+                                <td class="text-center">{{c.questionsets ? c.questionsets.split(',').length : 0}}</td>
                                 <td class="text-center">
                                     <button type="button" class="btn"
                                         [ngClass]="c.isactive ? 'btn-success' : 'btn-danger'"
