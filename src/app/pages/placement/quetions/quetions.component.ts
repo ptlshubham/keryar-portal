@@ -42,6 +42,7 @@ export class QuetionsComponent implements OnInit {
       category: ['', Validators.required],
       subcategory: ['', Validators.required],
       subtosubcategory: ['', Validators.required],
+      difficulty: ['', Validators.required]
     });
 
     this.validationForm.get('subcategory')?.disable();
@@ -225,6 +226,7 @@ export class QuetionsComponent implements OnInit {
         categoriesid: this.validationForm.value.category,
         subcategoriesid: this.validationForm.value.subcategory,
         subtosubcategoriesid: this.validationForm.value.subtosubcategory,
+        difficulty: this.validationForm.value.difficulty,
         questions: this.questionData.filter(q => q.question_text && q.question_text.trim().length > 0).map(q => ({
           question_text: q.question_text,
           option_type: q.option_type,
@@ -255,7 +257,7 @@ export class QuetionsComponent implements OnInit {
     } else {
       let msg = '';
       if (!this.validationForm.valid) {
-        msg += 'Please fill all required fields (Type, Year, Category, Subcategory, Sub-to-subcategory). ';
+        msg += 'Please fill all required fields (Type, Year, Difficulty, Category, Subcategory, Sub-to-subcategory). ';
       }
       if (!this.isQuestionValid) {
         msg += 'Please enter at least one question with a valid weight and correct answer.';
@@ -270,7 +272,8 @@ export class QuetionsComponent implements OnInit {
       year: '',
       category: '',
       subcategory: '',
-      subtosubcategory: ''
+      subtosubcategory: '',
+      difficulty: ''
     });
     this.validationForm.get('subcategory')?.disable();
     this.validationForm.get('subtosubcategory')?.disable();
@@ -332,7 +335,8 @@ export class QuetionsComponent implements OnInit {
       year: data.year ? `${data.year}-01` : '',
       category: data.categoriesid,
       subcategory: data.subcategoriesid,
-      subtosubcategory: data.subtosubcategoriesid
+      subtosubcategory: data.subtosubcategoriesid,
+      difficulty: data.difficulty
     });
     this.questionData = data.questions.map((q: any) => ({
       queid: q.id,
@@ -396,6 +400,7 @@ export class QuetionsComponent implements OnInit {
       categoriesid: this.validationForm.value.category,
       subcategoriesid: this.validationForm.value.subcategory,
       subtosubcategoriesid: this.validationForm.value.subtosubcategory,
+      difficulty: this.validationForm.value.difficulty,
       questions: this.questionData
         .filter(q => q.question_text && q.question_text.trim().length > 0)
         .map(q => ({

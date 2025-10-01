@@ -18,6 +18,32 @@
         </div>
         <div class="card-body">
             <form *ngIf="validationForm" [formGroup]="validationForm">
+                <!-- Difficulty Radio Buttons -->
+                <div class="row mb-3">
+                    <div class="col-12 text-center">
+                        <label class="form-label">Difficulty Level</label>
+                        <div class="d-flex justify-content-center gap-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" id="difficultyEasy" value="Easy"
+                                    formControlName="difficulty">
+                                <label class="form-check-label" for="difficultyEasy">Easy</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" id="difficultyMedium" value="Medium"
+                                    formControlName="difficulty">
+                                <label class="form-check-label" for="difficultyMedium">Medium</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" id="difficultyHard" value="Hard"
+                                    formControlName="difficulty">
+                                <label class="form-check-label" for="difficultyHard">Hard</label>
+                            </div>
+                        </div>
+                        <div *ngIf="f.difficulty.touched && f.difficulty.invalid" class="text-danger text-center">
+                            <small *ngIf="f.difficulty.errors?.required">Difficulty level is required.</small>
+                        </div>
+                    </div>
+                </div>
                 <div class="row">
                     <div class="form-group mb-3">
                         <div class="row g-2">
@@ -216,6 +242,7 @@
                             <th class="text-left">#</th>
                             <th class="text-center">Type</th>
                             <th class="text-center">Year</th>
+                            <th class="text-center">Difficulty</th>
                             <th class="text-center">Category</th>
                             <th class="text-center">Subcategory</th>
                             <th class="text-center">Sub-to-subcategory</th>
@@ -231,6 +258,11 @@
                                 <span class="badge bg-primary" *ngIf="c.type != 'College'">{{c.type}}</span>
                             </th>
                             <td class="text-center">{{c.year}}</td>
+                            <td class="text-center">
+                                <span class="badge bg-success" *ngIf="c.difficulty == 'Easy'">{{c.difficulty}}</span>
+                                <span class="badge bg-warning" *ngIf="c.difficulty == 'Medium'">{{c.difficulty}}</span>
+                                <span class="badge bg-danger" *ngIf="c.difficulty == 'Hard'">{{c.difficulty}}</span>
+                            </td>
                             <td class="text-center">{{ getCategoryName(c.categoriesid) }}</td>
                             <td class="text-center">{{ getSubcategoryName(c.subcategoriesid) }}</td>
                             <td class="text-center">{{ getSubToSubcategoryName(c.subtosubcategoriesid) }}</td>
@@ -281,6 +313,7 @@
             <div class="d-flex justify-content-between align-items-center">
                 <h5 class="modal-title mt-0">Form Type: {{viewQuestions.type}}</h5>
                 <h5 class="modal-title mt-0">Year: {{viewQuestions.year}}</h5>
+                <h5 class="modal-title mt-0">Difficulty: {{viewQuestions.difficulty}}</h5>
             </div>
             <h5 class="title text-center mb-3">Question List</h5>
             <div class="row">
