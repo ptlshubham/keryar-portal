@@ -33,6 +33,7 @@ export class ApiService {
   public static savePortfolioDetailsURL: string = ApiService.HOST_URL + '/keryar/SavePortfolioDetails';
   public static getAllPortfolioDataURL: string = ApiService.HOST_URL + '/keryar/GetAllPortfolioDetails';
   public static removePortfolioDetailsByIdURL: string = ApiService.HOST_URL + '/keryar/RemovePortfolioDetailsById/'
+  public static updatePortfolioDetailsURL: string = ApiService.HOST_URL + '/keryar/UpdatePortfolioDetails';
 
   // placement
   public static savePlacementCategoryURL: string = ApiService.HOST_URL + '/keryar/SavePlacementCategory';

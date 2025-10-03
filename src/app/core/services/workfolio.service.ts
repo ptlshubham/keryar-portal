@@ -130,6 +130,7 @@ export class WorkfolioService {
         return this.httpClient.get(ApiService.removePortfolioDetailsByIdURL + id);
     }
 
-
-    
+    updatePortfolioDetails(data: any) {
+        return this.httpClient.post(ApiService.updatePortfolioDetailsURL, data);
+    }
 }

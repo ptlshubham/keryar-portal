@@ -17,6 +17,8 @@ export class PortfolioComponent {
 
   submitted = false;
   validationForm!: FormGroup;
+  isEditing = false; // Flag to track if we are editing
+  currentPortfolioId: string | null = null; // To store the ID of the portfolio being edited
 
   // Dropdown arrays
   clientsData: any = [];
@@ -92,6 +94,8 @@ export class PortfolioComponent {
     this.galleryMultiImage = [];
     this.galleryUploaders = [{ images: [] }];
     this.submitted = false;
+    this.isEditing = false;
+    this.currentPortfolioId = null;
     this.getClients();
   }
 
@@ -169,7 +173,6 @@ export class PortfolioComponent {
     return { category: term };
   }
 
-  // gallery images
   removeGalleryUploader(uploaderIndex: number) {
     this.galleryUploaders.splice(uploaderIndex, 1);
   }
@@ -226,6 +229,7 @@ export class PortfolioComponent {
       }
     });
     this.galleryUploaders[uploaderIndex].images.splice(imageIndex, 1);
+    this.galleryMultiImage = this.galleryUploaders.flatMap(u => u.img ? [u.img] : []);
   }
 
   submitPortfolioDetails() {
@@ -237,20 +241,42 @@ export class PortfolioComponent {
       data.coverimage = this.coverImage ? this.coverImage : '';
       data.galleryMultiImage = this.galleryMultiImage ? this.galleryMultiImage : [];
 
-      this.workfolioService.savePortfolioData(data).subscribe((res: any) => {
-        if (res.success == true) {
-          this.validationForm.reset();
-          this.coverImage = null;
-          this.coverImageUrl = null;
-          this.galleryMultiImage = [];
-          this.galleryUploaders = [{ images: [] }];
-          this.submitted = false;
-          this.isOpen = true;
-          this.toastr.success('Portfolio details saved successfully.', 'Success', { timeOut: 2000 });
-        } else {
-          this.toastr.error('Something went wrong try again later', 'Error', { timeOut: 2000 });
-        }
-      });
+      if (this.isEditing && this.currentPortfolioId) {
+        data.id = this.currentPortfolioId;
+        this.workfolioService.updatePortfolioDetails(data).subscribe((res: any) => {
+          if (res.success == true) {
+            this.validationForm.reset();
+            this.coverImage = null;
+            this.coverImageUrl = null;
+            this.galleryMultiImage = [];
+            this.galleryUploaders = [{ images: [] }];
+            this.submitted = false;
+            this.isOpen = true;
+            this.isEditing = false;
+            this.currentPortfolioId = null;
+            this.toastr.success('Portfolio details updated successfully.', 'Success', { timeOut: 2000 });
+            this.getAllPortfolio();
+          } else {
+            this.toastr.error('Something went wrong try again later', 'Error', { timeOut: 2000 });
+          }
+        });
+      } else {
+        this.workfolioService.savePortfolioData(data).subscribe((res: any) => {
+          if (res.success == true) {
+            this.validationForm.reset();
+            this.coverImage = null;
+            this.coverImageUrl = null;
+            this.galleryMultiImage = [];
+            this.galleryUploaders = [{ images: [] }];
+            this.submitted = false;
+            this.isOpen = true;
+            this.toastr.success('Portfolio details saved successfully.', 'Success', { timeOut: 2000 });
+            this.getAllPortfolio();
+          } else {
+            this.toastr.error('Something went wrong try again later', 'Error', { timeOut: 2000 });
+          }
+        });
+      }
     }
   }
 
@@ -284,7 +310,6 @@ export class PortfolioComponent {
     }
   }
 
-  // pagination
   getPagintaion() {
     this.paginateData = this.portfolioData
       .slice((this.page - 1) * this.pageSize, (this.page - 1) * this.pageSize + this.pageSize);
@@ -323,13 +348,15 @@ export class PortfolioComponent {
 
   editPortfolioById(data: any) {
     console.log('editPortfolioById - Incoming data:', data);
-    console.log('editPortfolioById - Initial galleryUploaders:', this.galleryUploaders); // Debug initial state
+    console.log('editPortfolioById - Initial galleryUploaders:', this.galleryUploaders);
     this.isOpen = false;
+    this.isEditing = true;
+    this.currentPortfolioId = data.id;
     // Format publishdate to YYYY-MM-DD for the date input
     let formattedPublishDate = '';
     if (data.publishdate) {
       const date = new Date(data.publishdate);
-      formattedPublishDate = date.toISOString().split('T')[0]; // Converts to YYYY-MM-DD
+      formattedPublishDate = date.toISOString().split('T')[0];
     }
 
     this.validationForm.patchValue({
@@ -344,10 +371,8 @@ export class PortfolioComponent {
     this.coverImage = data.coverimage;
     this.coverImageUrl = this.serverPath + data.coverimage;
     console.log('editPortfolioById - galleryImages:', data.galleryImages);
-    // Ensure galleryImages is an array and extract image paths
     this.galleryMultiImage = Array.isArray(data.galleryImages) ? data.galleryImages.map((img: any) => img.image) : [];
     console.log('editPortfolioById - galleryMultiImage:', this.galleryMultiImage);
-    // Reset galleryUploaders to a single uploader with existing images only
     this.galleryUploaders = [{ images: this.galleryMultiImage.map((img: string) => this.serverPath + img), img: this.galleryMultiImage[0] || '' }];
     console.log('editPortfolioById - Final galleryUploaders:', this.galleryUploaders);
 
