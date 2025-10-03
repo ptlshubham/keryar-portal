@@ -34,6 +34,15 @@ export class ApiService {
   public static getAllPortfolioDataURL: string = ApiService.HOST_URL + '/keryar/GetAllPortfolioDetails';
   public static removePortfolioDetailsByIdURL: string = ApiService.HOST_URL + '/keryar/RemovePortfolioDetailsById/'
 
+  // Case Study Details APIs 
+
+  public static uploadCaseStudyCoverImagesURL: string = ApiService.HOST_URL + '/keryar/UploadCaseStudyCoverImages';
+  public static uploadCaseStudyMultiImageURL: string = ApiService.HOST_URL + '/keryar/UploadCaseStudyMultiImage';
+  public static saveCaseStudyDetailsURL: string = ApiService.HOST_URL + '/keryar/SaveCaseStudyDetails';
+  public static getAllCaseStudyDataURL: string = ApiService.HOST_URL + '/keryar/GetAllCaseStudyDetails';
+  public static removeCaseStudyDetailsByIdURL: string = ApiService.HOST_URL + '/keryar/RemoveCaseStudyDetailsById/';
+  public static updateCaseStudyActiveDeactiveURL: string = ApiService.HOST_URL + '/keryar/UpdateCaseStudyActiveDeactive';
+
   // placement
   public static savePlacementCategoryURL: string = ApiService.HOST_URL + '/keryar/SavePlacementCategory';
   public static getAllPlacementCategoryURL: string = ApiService.HOST_URL + '/keryar/GetAllPlacementCategory';

@@ -1,6 +1,9 @@
 import { Component } from '@angular/core';
 import { FormGroup, Validators, FormBuilder, UntypedFormBuilder } from '@angular/forms';
 import { Router } from '@angular/router';
+import { Lightbox } from 'ngx-lightbox';
+import { ToastrService } from 'ngx-toastr';
+import { WorkfolioService } from 'src/app/core/services/workfolio.service';
 
 import * as ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 
@@ -15,177 +18,80 @@ export class CaseStudiesComponent {
 
   submitted = false;
   validationForm!: FormGroup;
-  imageUrl: any | null = null;
-  cardImageBase64: any;
-  tokenImage: any;
-  progressValue: number = 0;
-  progressType: string = 'success';
-  isProgress: boolean = false;
-  uploading: boolean = false;
-  uploadProgress: number = 0;
-  isOpen: boolean = true;
-  serverPath: string = 'http://localhost:8300';
 
-  page = 1;
-  pageSize = 10;
-  collectionSize = 0;
-  paginateData: any = [];
+  // Dropdown arrays
+  clientsData: any = [];
+  selectedClientName: any;
 
-  categories: string[] = ['Design', 'Development', 'Marketing', 'Consulting']; // Example categories
+  categories: any = [];
+  selectedCategory: any;
 
+  // Cover image
   innerImageUrl: any | null = null;
   innerUploading: boolean = false;
   innerUploadProgress: number = 0;
-
+  cardImageBase64: any;
+  coverImage: any;
 
   // Gallery images
   galleryImages: string[] = [];
   galleryUploading: boolean = false;
   galleryUploadProgress: number = 0;
-  galleryUploaders: { images: string[] }[] = [{ images: [] }];
+  galleryUploaders: { images: string[]; img?: any }[] = [{ images: [] }];
 
+  serverPath: string = 'http://localhost:8300';
+  galleryMultiImage: any[] = [];
 
-  keyIndicator = [];
-  selectedKeyNo: any;
+  isOpen: boolean = true;
+
+  caseStudyData: any = [];
+  album: Array<{ src: string; caption: string; thumb: string }> = [];
+
+  // pagination
+  page = 1;
+  pageSize = 10;
+  collectionSize = 0;
+  paginateData: any = [];
+
   constructor(
-    // public toastr: ToastrService,
-    // public homeService: HomeService,
     public router: Router,
     public formBuilder: UntypedFormBuilder,
-
+    public workfolioService: WorkfolioService,
+    public toastr: ToastrService,
+    private _lightbox: Lightbox,
   ) {
+    this.getAllCaseStudies();
   }
+
   ngOnInit(): void {
     this.breadCrumbItems = [
       { label: 'Home' },
-      { label: 'Generate Tokens', active: true }
+      { label: 'Case Studies', active: true }
     ];
     this.validationForm = this.formBuilder.group({
-      name: ['', [Validators.required]],
-      clientname: ['', [Validators.required]],
-      category: ['', [Validators.required]],
+      title: ['', [Validators.required]],
+      clientname: [null, [Validators.required]],
+      category: [null, [Validators.required]],
       description: ['', [Validators.required]],
-      publishedDate: ['', [Validators.required]],
+      publishdate: ['', [Validators.required]],
     });
   }
 
   get f() { return this.validationForm.controls; }
 
-
-  // uploadImageFile(event: any) {
-  //   const file = event.target.files[0];
-  //   if (file) {
-  //     this.uploading = true;
-  //     const reader = new FileReader();
-
-  //     reader.onload = () => {
-  //       const interval = setInterval(() => {
-  //         if (this.uploadProgress >= 100) {
-  //           clearInterval(interval);
-  //           this.uploading = false;
-  //           this.imageUrl = reader.result as string;
-
-  //           // API upload logic
-  //           const imgBase64Path = reader.result;
-  //           this.cardImageBase64 = imgBase64Path;
-  //           const formdata = new FormData();
-  //           formdata.append('file', file);
-  //           // this.tokensService.uploadTokenImage(formdata).subscribe((response) => {
-  //           //   this.toastr.success('Image Uploaded Successfully', 'Uploaded', { timeOut: 3000, });
-  //           //   this.tokenImage = response;
-  //           // });
-
-  //         } else {
-  //           this.uploadProgress += 10;
-  //         }
-  //       }, 100);
-  //     };
-
-  //     reader.readAsDataURL(file);
-  //   }
-  // }
-
-  // removeUploadedImage(img: any) {
-  //   let data = {
-  //     img: this.tokenImage
-  //   };
-  //   this.homeService.deleteImageFromDb(data).subscribe((res: any) => {
-  //     if (res.success == true) {
-  //       this.toastr.success('Image removed successfully.', 'Deleted', { timeOut: 2000, });
-  //     } else {
-  //       this.toastr.error('Something went wrong try again later', 'Error', { timeOut: 2000, });
-  //     }
-  //   })
-  //   this.tokenImage = null;
-  //   this.imageUrl = null;
-  // }
-  getImagesDataById() {
-    // this.homeService.getBannersImagesById(localStorage.getItem('InstituteId')).subscribe((res: any) => {
-    //   this.imagesData = res;
-    //   this.filterdata = res;
-    //   this.album = this.filterdata.map((s: any) => ({
-    //     src: `http://localhost:8300${s.image}`,
-    //     caption: `${s.purpose}`,
-    //     thumb: `http://localhost:8300${s.image}`
-    //   }));
-    //   for (let i = 0; i < this.imagesData.length; i++) {
-    //     this.imagesData[i].index = i + 1;
-    //   }
-    //   this.collectionSize = this.imagesData.length;
-    //   this.getPagintaion();
-    // })
-  }
-  openImage(globalIndex: number): void {
-    // Only open if the image exists in album
-    // if (this.album[globalIndex] && this.album[globalIndex].src && !this.album[globalIndex].src.endsWith('null')) {
-    //   this._lightbox.open(this.album, globalIndex, {
-    //     showZoom: true,
-    //     centerVertically: true,
-    //     wrapAround: true,
-    //     showImageNumberLabel: true,
-    //     showDownloadButton: true,
-    //     showThumbnails: true
-    //   });
-    // }
-  }
-  getPagintaion() {
-    // this.paginateData = this.imagesData
-    //   .slice((this.page - 1) * this.pageSize, (this.page - 1) * this.pageSize + this.pageSize);
-  }
-  activeBanners(ind: any) {
-    let inde = ind - 1;
-    // this.imagesData[inde].isactive = true;
-    // this.homeService.activeDeavctiveBanners(this.imagesData[inde]).subscribe((req) => {
-    //   this.toastr.success('Images activated Successfully.', 'Activated', {
-    //     timeOut: 3000,
-    //   });
-    // })
-  }
-  deactiveBanners(ind: any) {
-    let inde = ind - 1;
-    // this.imagesData[inde].isactive = false;
-    // this.homeService.activeDeavctiveBanners(this.imagesData[inde]).subscribe((req) => {
-    //   this.toastr.error('Images deactivated Successfully.', 'Deactivated', {
-    //     timeOut: 3000,
-    //   });
-    // })
-  }
-
-  removeBannersImages(id: any) {
-    let data = {
-      id: id,
-      institute_id: localStorage.getItem('InstituteId')
-    }
-    // this.homeService.removeBannersImagesById(data).subscribe((res: any) => {
-    //   this.imagesData = res;
-    //   this.toastr.success('Image Delete Successfully.', 'Deleted', {
-    //     timeOut: 3000,
-    //   });
-    //   this.getImagesDataById();
-    // })
-  }
   addCaseStudy() {
     this.isOpen = false;
+    this.getClients();
+  }
+
+  caseStudyList() {
+    this.isOpen = true;
+  }
+
+  getClients() {
+    this.workfolioService.getAllClients().subscribe((res: any) => {
+      this.clientsData = res;
+    })
   }
 
   uploadInnerImageFile(event: any) {
@@ -200,6 +106,16 @@ export class CaseStudiesComponent {
             clearInterval(interval);
             this.innerUploading = false;
             this.innerImageUrl = reader.result as string;
+            // API upload logic
+            const imgBase64Path = reader.result;
+            this.cardImageBase64 = imgBase64Path;
+            const formdata = new FormData();
+            formdata.append('file', file);
+            this.workfolioService.uploadCaseStudyCover(formdata).subscribe((response) => {
+              this.toastr.success('Image Uploaded Successfully', 'Uploaded', { timeOut: 3000, });
+              this.coverImage = response;
+            });
+
           } else {
             this.innerUploadProgress += 10;
           }
@@ -211,19 +127,45 @@ export class CaseStudiesComponent {
   }
 
   removeUploadedInnerImage() {
-    this.innerImageUrl = null;
-    this.innerUploadProgress = 0;
-    this.innerUploading = false;
+    let data = {
+      img: this.coverImage
+    };
+    this.workfolioService.deleteUploadedImageFromFolder(data).subscribe((res: any) => {
+      if (res.success == true) {
+        this.coverImage = null;
+        this.innerImageUrl = null;
+        this.innerUploadProgress = 0;
+        this.innerUploading = false;
+        this.toastr.success('Image removed successfully.', 'Deleted', { timeOut: 2000, });
+      } else {
+        this.toastr.error('Something went wrong try again later', 'Error', { timeOut: 2000, });
+      }
+    })
   }
-  caseStudyList() {
-    this.isOpen = true;
+
+  onNameChange(event: any) {
+    this.selectedClientName = event
   }
+  addNewName(term: string): any {
+    return { name: term };
+  }
+
+  onCategoryChange(event: any) {
+    this.selectedCategory = event
+  }
+  addNewCategory(term: string): any {
+    return { category: term };
+  }
+
+  // Gallery methods
+  addGalleryUploader() {
+    this.galleryUploaders.push({ images: [] });
+  }
+
   removeGalleryUploader(uploaderIndex: number) {
     this.galleryUploaders.splice(uploaderIndex, 1);
   }
-  removeGalleryImage(uploaderIndex: number, imageIndex: number) {
-    this.galleryUploaders[uploaderIndex].images.splice(imageIndex, 1);
-  }
+
   addGalleryImage(event: any, uploaderIndex: number) {
     const files = event.target.files;
     if (files && files.length > 0) {
@@ -237,6 +179,17 @@ export class CaseStudiesComponent {
           if (loaded === files.length) {
             this.galleryUploading = false;
             this.galleryUploadProgress = 0;
+
+            // API upload logic
+            const imgBase64Path = reader.result;
+            this.cardImageBase64 = imgBase64Path;
+            const formdata = new FormData();
+            formdata.append('file', file);
+            this.workfolioService.uploadCaseStudyMultiImage(formdata).subscribe((response) => {
+              this.toastr.success('Image Uploaded Successfully', 'Uploaded', { timeOut: 3000, });
+              this.galleryMultiImage.push(response);
+              this.galleryUploaders[uploaderIndex].img = response;
+            });
           }
         };
         reader.readAsDataURL(file);
@@ -252,11 +205,133 @@ export class CaseStudiesComponent {
       }, 100);
     }
   }
-  addGalleryUploader() {
-    this.galleryUploaders.push({ images: [] });
+
+  removeGalleryImage(uploaderIndex: number, imageIndex: number) {
+    let data = {
+      img: this.galleryUploaders[uploaderIndex].img
+    };
+    this.workfolioService.deleteUploadedImageFromFolder(data).subscribe((res: any) => {
+      if (res.success == true) {
+        this.toastr.success('Image removed successfully.', 'Deleted', { timeOut: 2000, });
+      } else {
+        this.toastr.error('Something went wrong try again later', 'Error', { timeOut: 2000, });
+      }
+    })
+    this.galleryUploaders[uploaderIndex].images.splice(imageIndex, 1);
   }
+
+  submitCaseStudyDetails() {
+    this.submitted = true;
+    if (this.validationForm.valid) {
+      let data = this.validationForm.value;
+      data.clientname = this.selectedClientName.name;
+      data.category = this.selectedCategory.category;
+      data.coverimage = this.coverImage ? this.coverImage : '';
+      data.galleryMultiImage = this.galleryMultiImage ? this.galleryMultiImage : [];
+debugger
+      this.workfolioService.saveCaseStudyData(data).subscribe((res: any) => {
+        if (res.success == true) {
+          this.validationForm.reset();
+          this.coverImage = null;
+          this.innerImageUrl = null;
+          this.galleryMultiImage = [];
+          this.galleryUploaders = [{ images: [] }];
+          this.submitted = false;
+          this.isOpen = true;
+          this.toastr.success('Case study details saved successfully.', 'Success', { timeOut: 2000, });
+          this.getAllCaseStudies();
+        } else {
+          this.toastr.error('Something went wrong try again later', 'Error', { timeOut: 2000, });
+        }
+      });
+    }
+  }
+
+  getAllCaseStudies() {
+    this.workfolioService.getAllCaseStudyData().subscribe((res: any) => {
+      this.caseStudyData = res;
+      this.album = this.caseStudyData.map((s: any) => ({
+        src: this.serverPath + s.image,
+        caption: `${s.name}`,
+        thumb: this.serverPath + s.image
+      }));
+      for (let i = 0; i < this.caseStudyData.length; i++) {
+        this.caseStudyData[i].index = i + 1;
+      }
+      this.collectionSize = this.caseStudyData.length;
+      this.getPagintaion();
+    })
+  }
+
+  openImage(globalIndex: number): void {
+    if (this.album[globalIndex] && this.album[globalIndex].src && !this.album[globalIndex].src.endsWith('null')) {
+      this._lightbox.open(this.album, globalIndex, {
+        showZoom: true,
+        centerVertically: true,
+        wrapAround: true,
+        showImageNumberLabel: true,
+        showDownloadButton: true,
+        showThumbnails: true
+      });
+    }
+  }
+
+  // pagination
+  getPagintaion() {
+    this.paginateData = this.caseStudyData
+      .slice((this.page - 1) * this.pageSize, (this.page - 1) * this.pageSize + this.pageSize);
+  }
+
+  activeBanners(ind: any) {
+    let inde = ind - 1;
+    this.caseStudyData[inde].isactive = true;
+    this.workfolioService.updateCaseStudyActiveDeactive(this.caseStudyData[inde]).subscribe((req) => {
+      this.toastr.success('Case study activated Successfully.', 'Activated', {
+        timeOut: 3000,
+      });
+    })
+  }
+
+  deactiveBanners(ind: any) {
+    let inde = ind - 1;
+    this.caseStudyData[inde].isactive = false;
+    this.workfolioService.updateCaseStudyActiveDeactive(this.caseStudyData[inde]).subscribe((req) => {
+      this.toastr.error('Case study deactivated Successfully.', 'Deactivated', {
+        timeOut: 3000,
+      });
+    })
+  }
+
+  removeBannersImages(id: any) {
+    this.workfolioService.removeCaseStudyDetailsById(id).subscribe((res: any) => {
+      if (res.success == true) {
+        this.toastr.success('Case study removed successfully.', 'Deleted', { timeOut: 2000, });
+        this.getAllCaseStudies();
+      } else {
+        this.toastr.error('Something went wrong try again later', 'Error', { timeOut: 2000, });
+      }
+    })
+  }
+
+  editCaseStudyById(data: any) {
+    this.isOpen = false;
+    this.validationForm.patchValue({
+      title: data.title,
+      clientname: data.clientname,
+      category: data.category,
+      description: data.description,
+      publishdate: data.publishdate,
+    });
+    this.coverImage = data.image;
+    this.innerImageUrl = this.serverPath + data.image;
+    this.galleryMultiImage = data.galleryImages;
+    this.galleryUploaders = data.galleryImages.map((img: any) => ({ images: [this.serverPath + img], img: img }));
+    this.getClients();
+  }
+
+  // Legacy compatibility methods (can be removed after updating HTML)
   onKeyIndicatorChange(event: any) {
-    this.selectedKeyNo = event.keyno
+    this.selectedClientName = event
   }
   addNewIndicator(term: string): any {
     return { keyno: term };

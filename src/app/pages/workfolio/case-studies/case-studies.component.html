@@ -21,10 +21,10 @@
                                 <div class="form-group mb-3">
                                     <label>Title Name</label>
                                     <input type="text" class="form-control" placeholder="Enter Name"
-                                        formControlName="name"
-                                        [ngClass]="{'is-invalid': f.name.touched && f.name.errors}">
-                                    <div *ngIf="f.name.touched && f.name.errors" class="invalid-feedback">
-                                        <span *ngIf="f.name.errors.required">This Field is
+                                        formControlName="title"
+                                        [ngClass]="{'is-invalid': f.title.touched && f.title.errors}">
+                                    <div *ngIf="f.title.touched && f.title.errors" class="invalid-feedback">
+                                        <span *ngIf="f.title.errors.required">This Field is
                                             required.</span>
                                     </div>
                                 </div>
@@ -34,11 +34,11 @@
                             <div class="col-lg-4 mb-2">
                                 <div class="mb-3">
                                     <label for="choices-single-default" class="form-label">Client Name </label>
-                                    <ng-select [items]="keyIndicator" bindLabel="keyno" bindValue="keyno"
+                                    <ng-select [items]="clientsData" bindLabel="name" bindValue="name"
                                         formControlName="clientname" placeholder="Client Name"
-                                        (change)="onKeyIndicatorChange($event)" [addTag]="addNewIndicator">
+                                        (change)="onNameChange($event)" [addTag]="addNewName">
                                         <ng-template ng-optgroup-tmp let-item="item">
-                                            {{item.keyno}}
+                                            {{item.name}}
                                         </ng-template>
                                     </ng-select>
                                 </div>
@@ -49,11 +49,11 @@
                             <div class="col-lg-4 mb-2">
                                 <div class="mb-3">
                                     <label for="choices-single-default" class="form-label">Select Category </label>
-                                    <ng-select [items]="keyIndicator" bindLabel="keyno" bindValue="keyno"
-                                        formControlName="category" placeholder="Select Category" [multiple]="true"
-                                        (change)="onKeyIndicatorChange($event)" [addTag]="addNewIndicator">
+                                    <ng-select [items]="categories" bindLabel="category" bindValue="category"
+                                        formControlName="category" placeholder="Select Category"
+                                        (change)="onCategoryChange($event)" [addTag]="addNewCategory">
                                         <ng-template ng-optgroup-tmp let-item="item">
-                                            {{item.keyno}}
+                                            {{item.category}}
                                         </ng-template>
                                     </ng-select>
                                     <div *ngIf="f.category.touched && f.category.errors" class="invalid-feedback">
@@ -61,42 +61,14 @@
                                     </div>
                                 </div>
                             </div>
-
-                            <!-- Upload Outer Image -->
-                            <!-- <div class="col-lg-4 mb-2">
-                                <div class="form-group mb-3">
-                                    <label for="name">Upload outer image <span class="text-muted">(Required size:
-                                            800x600px)</span></label>
-
-                                    <div class="custom-avatar-uploader">
-                                        <div class="d-flex justify-content-center">
-                                            <label class="custom-upload-box" *ngIf="!imageUrl" tooltip="Upload Image"
-                                                tooltipPosition="above">
-                                                <input type="file" accept="image/*" (change)="uploadImageFile($event)"
-                                                    hidden />
-                                                <a><i class="mdi mdi-plus-circle"></i></a>
-                                            </label>
-                                            <div class="custom-preview-box" *ngIf="imageUrl">
-                                                <img [src]="serverPath+tokenImage" alt="Avatar" />
-                                                <a class="custom-remove-btn" tooltip="Remove Uploaded Image"
-                                                    tooltipPosition="above" (click)="removeUploadedImage(tokenImage)">
-                                                    <i class="mdi mdi-close-circle"></i></a>
-                                            </div>
-                                        </div>
-                                        <ngb-progressbar [value]="uploadProgress" [type]="progressType"
-                                            *ngIf="uploading"></ngb-progressbar>
-                                    </div>
-                                </div>
-                            </div> -->
-
                             <!-- Published Date -->
                             <div class="col-lg-4 mb-2">
                                 <div class="form-group mb-3">
                                     <label>Published Date</label>
-                                    <input type="date" class="form-control" formControlName="publishedDate">
-                                    <div *ngIf="f.publishedDate.touched && f.publishedDate.errors"
+                                    <input type="date" class="form-control" formControlName="publishdate">
+                                    <div *ngIf="f.publishdate.touched && f.publishdate.errors"
                                         class="invalid-feedback">
-                                        <span *ngIf="f.publishedDate.errors.required">This Field is required.</span>
+                                        <span *ngIf="f.publishdate.errors.required">This Field is required.</span>
                                     </div>
                                 </div>
                             </div>
@@ -188,9 +160,10 @@
                         </div>
                     </form>
                     <div class="d-flex justify-content-end gap-2">
-                        <button type="button" class="btn btn-danger waves-effect">Cancel</button>
+                        <button type="button" class="btn btn-danger waves-effect"
+                            (click)="caseStudyList()">Cancel</button>
                         <button type="button" class="btn btn-primary waves-effect waves-light"
-                            [disabled]="validationForm.invalid">Submit</button>
+                            (click)="submitCaseStudyDetails()" [disabled]="validationForm.invalid">Submit</button>
                     </div>
                 </div>
             </div>
@@ -229,10 +202,10 @@
                         <tbody>
                             <tr *ngFor="let c of paginateData;let i=index">
                                 <td class="text-left">{{c.index}}</td>
-                                <td class="text-center">{{c.name}}</td>
+                                <td class="text-center">{{c.title}}</td>
                                 <td class="text-center">
-                                    <img src="http://localhost:8300{{c.image}}" alt="{{c.keywords}}"
-                                        class="rounded avatar-lg" (click)="openImage(c.index - 1)">
+                                    <img [src]="serverPath+c.image" alt="{{c.title}}" class="rounded avatar-lg"
+                                        (click)="openImage(c.index - 1)">
                                 </td>
                                 <td class="text-center">
                                     <button type="button" class="btn btn-success waves-effect btn-label waves-light"
@@ -244,19 +217,16 @@
                                 </td>
                                 <td class="text-end">
                                     <div class="d-flex justify-content-end gap-1">
+                                        <button type="button" class="btn btn-soft-primary waves-effect waves-light"
+                                            data-bs-toggle="tooltip" data-bs-placement="top" title="Edit Case Study"
+                                            (click)="editCaseStudyById(c)"><i
+                                                class="bx bx-edit font-size-16 align-middle"></i></button>
                                         <button type="button" class="btn btn-soft-danger waves-effect waves-light"
-                                            data-bs-toggle="tooltip" data-bs-placement="top" title="View & Accept"
+                                            data-bs-toggle="tooltip" data-bs-placement="top" title="Delete Case Study"
                                             (click)="removeBannersImages(c.id)"><i
                                                 class="bx bx-trash-alt font-size-16 align-middle"></i></button>
-                                        <!-- <div class="d-flex justify-content-end gap-1">
-                                        <button type="button" class="btn btn-soft-primary waves-effect waves-light"
-                                            data-bs-toggle="tooltip" data-bs-placement="top" title="View & Accept"><i
-                                                class="bx bx-edit font-size-16 align-middle"></i></button>
-                                      
-                                    </div> -->
                                     </div>
                                 </td>
-
                             </tr>
                         </tbody>
                     </table>
