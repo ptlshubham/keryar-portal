@@ -16,7 +16,6 @@ export class AddBlogComponent {
   validationForm!: FormGroup;
 
   // Dropdown arrays
-  clients: string[] = ['Client A', 'Client B', 'Client C'];
   categories: string[] = ['Design', 'Development', 'Marketing'];
 
 
@@ -55,12 +54,14 @@ export class AddBlogComponent {
       { label: 'Client Portfolio', active: true }
     ];
     this.validationForm = this.formBuilder.group({
-      title: ['', [Validators.required]],
-      clientName: ['', [Validators.required]],
+      metatitle: ['', [Validators.required]],
+      keywords: ['', [Validators.required]],
+      metadescription: ['', [Validators.required]],
+      blogtitle: ['', [Validators.required]],
       category: ['', [Validators.required]],
       authorname: ['', [Validators.required]],
       description: ['', [Validators.required]],
-      publishedDate: ['', [Validators.required]],
+      publishDate: ['', [Validators.required]],
     });
   }
 
