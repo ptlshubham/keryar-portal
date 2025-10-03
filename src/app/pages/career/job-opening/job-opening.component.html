@@ -1,0 +1,337 @@
+<div class="row" *ngIf="!isOpen">
+    <div class="col-lg-12">
+        <div class="card">
+            <div class="card-header">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h5 class="card-title">Job Opening</h5>
+                        <p class="card-title-desc"><b>{{ editMode ? 'Update Job Opening Details' : 'Enter Job Opening
+                                Details' }}</b></p>
+                    </div>
+                    <button type="button" class="btn btn-danger waves-effect waves-light" (click)="JobList()">
+                        <i class="bx bx-arrow-back"></i>
+                        Back
+                    </button>
+                </div>
+            </div>
+
+            <div class="card-body">
+                <div class="row">
+                    <form [formGroup]="validationForm">
+                        <div class="row">
+                            <div class="col-lg-4 mb-3">
+                                <div class="form-group mb-3">
+                                    <label>Job Title</label>
+                                    <input type="text" class="form-control" placeholder="Enter Job Title"
+                                        formControlName="jobtitle"
+                                        [ngClass]="{'is-invalid': f.jobtitle.touched && f.jobtitle.errors}">
+                                    <div *ngIf="f.jobtitle.touched && f.jobtitle.errors" class="invalid-feedback">
+                                        <span *ngIf="f.jobtitle.errors.required">This field is required.</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-4 mb-3">
+                                <div class="form-group mb-3">
+                                    <label>Department/Category</label>
+                                    <select class="form-control" formControlName="department"
+                                        [ngClass]="{'is-invalid': f.department.touched && f.department.errors}">
+                                        <option [ngValue]="null" disabled>Select Department</option>
+                                        <option *ngFor="let dept of departments" [ngValue]="dept.name">{{ dept.name }}
+                                        </option>
+                                    </select>
+                                    <div *ngIf="f.department.touched && f.department.errors" class="invalid-feedback">
+                                        <span *ngIf="f.department.errors.required">This field is required.</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-4 mb-3">
+                                <div class="form-group mb-3">
+                                    <label>Job Type</label>
+                                    <select class="form-control" formControlName="jobtype"
+                                        [ngClass]="{'is-invalid': f.jobtype.touched && f.jobtype.errors}">
+                                        <option [ngValue]="null" disabled>Select Job Type</option>
+                                        <option value="Full-time">Full-time</option>
+                                        <option value="Part-time">Part-time</option>
+                                        <option value="Internship">Internship</option>
+                                        <option value="Contract">Contract</option>
+                                        <option value="Remote">Remote</option>
+                                    </select>
+                                    <div *ngIf="f.jobtype.touched && f.jobtype.errors" class="invalid-feedback">
+                                        <span *ngIf="f.jobtype.errors.required">This field is required.</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-4 mb-3">
+                                <div class="form-group mb-3">
+                                    <label>Location</label>
+                                    <input type="text" class="form-control" placeholder="Enter Location"
+                                        formControlName="location"
+                                        [ngClass]="{'is-invalid': f.location.touched && f.location.errors}">
+                                    <div *ngIf="f.location.touched && f.location.errors" class="invalid-feedback">
+                                        <span *ngIf="f.location.errors.required">This field is required.</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-4 mb-3">
+                                <div class="form-group mb-3">
+                                    <label>Experience Required</label>
+                                    <ng-select [items]="experienceOptions" bindLabel="label" bindValue="value"
+                                        [multiple]="true" placeholder="Select Experience" formControlName="experience"
+                                        [ngClass]="{'is-invalid': f.experience.touched && f.experience.errors}">
+                                    </ng-select>
+                                    <div *ngIf="f.experience.touched && f.experience.errors" class="invalid-feedback">
+                                        <span *ngIf="f.experience.errors.required">This field is required.</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-4 mb-3">
+                                <div class="form-group mb-3">
+                                    <label>Question Sets</label>
+                                    <ng-select [items]="questionSets" bindLabel="displayName" bindValue="id"
+                                        [multiple]="true" placeholder="Select Question Sets"
+                                        formControlName="questionSets">
+                                    </ng-select>
+                                </div>
+                            </div>
+                            <div class="col-12 mb-3" *ngIf="f.questionSets.value?.length > 0">
+                                <h5>Selected Question Sets Details</h5>
+                                <div class="table-responsive">
+                                    <table class="table mb-0">
+                                        <thead class="table-light">
+                                            <tr>
+                                                <th>Question Set</th>
+                                                <th>Category</th>
+                                                <th>Subcategory</th>
+                                                <th>Sub-to-Subcategory</th>
+                                                <th>Difficulty</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr *ngFor="let setId of f.questionSets.value || []">
+                                                <td>{{ getQuestionSetDisplayName(setId) }}</td>
+                                                <td>{{ getCategoryName(getQuestionSet(setId)?.categoriesid) }}</td>
+                                                <td>{{ getSubcategoryName(getQuestionSet(setId)?.subcategoriesid) }}
+                                                </td>
+                                                <td>{{
+                                                    getSubToSubcategoryName(getQuestionSet(setId)?.subtosubcategoriesid)
+                                                    }}</td>
+                                                <td>{{ getQuestionSet(setId)?.difficulty || 'N/A' }}</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="col-lg-4 mb-3">
+                                <div class="form-group mb-3">
+                                    <label>Salary Range / CTC</label>
+                                    <input type="text" class="form-control" placeholder="Enter Salary Range (Optional)"
+                                        formControlName="salary">
+                                </div>
+                            </div>
+                            <div class="col-lg-12 mb-3">
+                                <div class="form-group mb-3">
+                                    <label>Job Description</label>
+                                    <textarea class="form-control" rows="5" placeholder="Enter Job Description"
+                                        formControlName="description"
+                                        [ngClass]="{'is-invalid': f.description.touched && f.description.errors}"></textarea>
+                                    <div *ngIf="f.description.touched && f.description.errors" class="invalid-feedback">
+                                        <span *ngIf="f.description.errors.required">This field is required.</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-12 mb-3">
+                                <div class="form-group mb-3">
+                                    <label>Required Skills</label>
+                                    <textarea class="form-control" rows="3" placeholder="Enter Required Skills"
+                                        formControlName="skills"
+                                        [ngClass]="{'is-invalid': f.skills.touched && f.skills.errors}"></textarea>
+                                    <div *ngIf="f.skills.touched && f.skills.errors" class="invalid-feedback">
+                                        <span *ngIf="f.skills.errors.required">This field is required.</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-6 mb-3">
+                                <div class="form-group mb-3">
+                                    <label>Educational Qualification</label>
+                                    <input type="text" class="form-control"
+                                        placeholder="Enter Educational Qualification" formControlName="qualification"
+                                        [ngClass]="{'is-invalid': f.qualification.touched && f.qualification.errors}">
+                                    <div *ngIf="f.qualification.touched && f.qualification.errors"
+                                        class="invalid-feedback">
+                                        <span *ngIf="f.qualification.errors.required">This field is required.</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-6 mb-3">
+                                <div class="form-group mb-3">
+                                    <label>Number of Openings</label>
+                                    <input type="number" class="form-control" placeholder="Enter Number of Openings"
+                                        formControlName="openings"
+                                        [ngClass]="{'is-invalid': f.openings.touched && f.openings.errors}">
+                                    <div *ngIf="f.openings.touched && f.openings.errors" class="invalid-feedback">
+                                        <span *ngIf="f.openings.errors.required">This field is required.</span>
+                                        <span *ngIf="f.openings.errors.min">Number of openings must be at least
+                                            1.</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-6 mb-3">
+                                <label>Active & Deactive</label>
+                                <div class="form-check form-switch form-switch-lg mb-3" dir="ltr">
+                                    <input type="checkbox" class="form-check-input" id="customSwitchsizelg"
+                                        formControlName="isactive" checked>
+                                    <label class="form-check-label" for="customSwitchsizelg"></label>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                    <div class="d-flex justify-content-end gap-2">
+                        <button type="button" class="btn btn-danger waves-effect" (click)="resetForm()">Cancel</button>
+                        <button *ngIf="!editMode" type="button" class="btn btn-primary waves-effect waves-light"
+                            (click)="submitJobOpeningsDetails()" [disabled]="validationForm.invalid">Submit</button>
+                        <button *ngIf="editMode" type="button" class="btn btn-primary waves-effect waves-light"
+                            (click)="updateJobOpeningsDetails()" [disabled]="validationForm.invalid">Update</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Preview Modal -->
+<ng-template #previewModal let-modal>
+    <div class="modal-header">
+        <h5 class="modal-title">Job Opening Preview</h5>
+        <button type="button" class="btn-close" (click)="modal.dismiss('Close click')"></button>
+    </div>
+    <div class="modal-body">
+        <h6><strong>Job Title:</strong> {{ selectedJob?.jobtitle || 'N/A' }}</h6>
+        <p><strong>Department:</strong> {{ selectedJob?.department || 'N/A' }}</p>
+        <p><strong>Job Type:</strong> {{ selectedJob?.jobtype || 'N/A' }}</p>
+        <p><strong>Location:</strong> {{ selectedJob?.location || 'N/A' }}</p>
+        <p><strong>Experience:</strong> {{ selectedJob?.experience || 'N/A' }}</p>
+        <p><strong>Salary Range / CTC:</strong> {{ selectedJob?.salary || 'Not specified' }}</p>
+        <p><strong>Job Description:</strong> {{ selectedJob?.description || 'N/A' }}</p>
+        <p><strong>Required Skills:</strong> {{ selectedJob?.skills || 'N/A' }}</p>
+        <p><strong>Educational Qualification:</strong> {{ selectedJob?.qualification || 'N/A' }}</p>
+        <p><strong>Number of Openings:</strong> {{ selectedJob?.openings || 'N/A' }}</p>
+        <p><strong>Status:</strong> {{ selectedJob?.isactive ? 'Active' : 'Inactive' }}</p>
+        <div *ngIf="selectedJob?.questionsets?.length > 0">
+            <h6><strong>Selected Question Sets:</strong></h6>
+            <div class="table-responsive">
+                <table class="table mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Question Set</th>
+                            <th>Category</th>
+                            <th>Subcategory</th>
+                            <th>Sub-to-Subcategory</th>
+                            <th>Difficulty</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let setId of selectedJob?.questionsets?.split(',') || []">
+                            <td>{{ getQuestionSetDisplayName(setId) }}</td>
+                            <td>{{ getCategoryName(getQuestionSet(setId)?.categoriesid) }}</td>
+                            <td>{{ getSubcategoryName(getQuestionSet(setId)?.subcategoriesid) }}</td>
+                            <td>{{ getSubToSubcategoryName(getQuestionSet(setId)?.subtosubcategoriesid) }}</td>
+                            <td>{{ getQuestionSet(setId)?.difficulty || 'N/A' }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div *ngIf="!(selectedJob?.questionsets?.length > 0)">
+            <p><strong>Selected Question Sets:</strong> None</p>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="modal.close('Close click')">Close</button>
+    </div>
+</ng-template>
+
+<div class="row" *ngIf="isOpen">
+    <div class="col-lg-12">
+        <div class="card">
+            <div class="card-header">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h5 class="card-title">Job Opening List</h5>
+                        <p class="card-title-desc mb-0">List of all Job Openings</p>
+                    </div>
+                    <button type="button" class="btn btn-primary waves-effect waves-light" (click)="addJobOpenings()">
+                        <i class="fas fa-user-plus"></i>
+                        Add New Job Openings
+                    </button>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th class="text-left">#</th>
+                                <th class="text-center">Job Title</th>
+                                <th class="text-center">Department</th>
+                                <th class="text-center">Job Type</th>
+                                <th class="text-center">Location</th>
+                                <th class="text-center">Experience</th>
+                                <th class="text-center">Salary</th>
+                                <th class="text-center">Openings</th>
+                                <th class="text-center">Question Sets Count</th>
+                                <th class="text-center">Active & Deactive</th>
+                                <th class="text-end">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let c of paginateData; let i=index">
+                                <td class="text-left">{{c.index}}</td>
+                                <td class="text-center">{{c.jobtitle}}</td>
+                                <td class="text-center">{{c.department}}</td>
+                                <td class="text-center">{{c.jobtype}}</td>
+                                <td class="text-center">{{c.location}}</td>
+                                <td class="text-center">{{c.experience}}</td>
+                                <td class="text-center">{{c.salary || 'Not specified'}}</td>
+                                <td class="text-center">{{c.openings}}</td>
+                                <td class="text-center">{{c.questionsets ? c.questionsets.split(',').length : 0}}</td>
+                                <td class="text-center">
+                                    <button type="button" class="btn"
+                                        [ngClass]="c.isactive ? 'btn-success' : 'btn-danger'"
+                                        (click)="toggleOpeningStatus(c)">
+                                        <i class="bx" [ngClass]="c.isactive ? 'bx-check-double' : 'bx-block'"></i>
+                                        {{ c.isactive ? 'Active' : 'Deactive' }}
+                                    </button>
+                                </td>
+                                <td class="text-end">
+                                    <div class="d-flex justify-content-end gap-1">
+                                        <button type="button" class="btn btn-soft-info waves-effect waves-light"
+                                            data-bs-toggle="tooltip" data-bs-placement="top" title="Preview"
+                                            (click)="openPreviewModal(previewModal, c)">
+                                            <i class="bx bx-show font-size-16 align-middle"></i>
+                                        </button>
+                                        <button type="button" class="btn btn-soft-danger waves-effect waves-light"
+                                            data-bs-toggle="tooltip" data-bs-placement="top" title="Delete"
+                                            (click)="removeJobOpeningsData(c.id)">
+                                            <i class="bx bx-trash-alt font-size-16 align-middle"></i>
+                                        </button>
+                                        <button type="button" class="btn btn-soft-primary waves-effect waves-light"
+                                            data-bs-toggle="tooltip" data-bs-placement="top" title="Edit"
+                                            (click)="editJobOpening(c.id)">
+                                            <i class="bx bx-edit font-size-16 align-middle"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="row mt-4">
+                    <ngb-pagination [collectionSize]="collectionSize" [pageSize]="pageSize" [(page)]="page"
+                        [maxSize]="5" [rotate]="true" [ellipses]="false" [boundaryLinks]="true"
+                        (pageChange)="getPagintaion();" aria-label="Default pagination"
+                        class="d-flex justify-content-end pagination-rounded-flat pagination-success"></ngb-pagination>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

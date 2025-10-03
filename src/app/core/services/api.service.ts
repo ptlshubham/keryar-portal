@@ -34,4 +34,41 @@ export class ApiService {
   public static getAllPortfolioDataURL: string = ApiService.HOST_URL + '/keryar/GetAllPortfolioDetails';
   public static removePortfolioDetailsByIdURL: string = ApiService.HOST_URL + '/keryar/RemovePortfolioDetailsById/'
 
+  // placement
+  public static savePlacementCategoryURL: string = ApiService.HOST_URL + '/keryar/SavePlacementCategory';
+  public static getAllPlacementCategoryURL: string = ApiService.HOST_URL + '/keryar/GetAllPlacementCategory';
+  public static getAllActivePlacementCategoryURL: string = ApiService.HOST_URL + '/keryar/GetAllActivePlacementCategory';
+  public static updateCategoryStatusURL: string = ApiService.HOST_URL + '/keryar/UpdateCategoryStatus';
+  public static removePlacementCategoryURL: string = ApiService.HOST_URL + '/keryar/RemovePlacementCategory/';
+
+  // sub
+  public static saveSubCategoryURL: string = ApiService.HOST_URL + '/keryar/SaveSubCategory';
+  public static getAllSubCategoryURL: string = ApiService.HOST_URL + '/keryar/GetAllSubCategory';
+  public static getAllActiveSubCategoryURL: string = ApiService.HOST_URL + '/keryar/GetAllActiveSubCategory';
+  public static updateSubCategoryStatusURL: string = ApiService.HOST_URL + '/keryar/UpdateSubCategoryStatus';
+  public static removeSubCategoryURL: string = ApiService.HOST_URL + '/keryar/RemoveSubCategory/';
+
+  // subtosub
+  public static saveSubToSubCategoryURL: string = ApiService.HOST_URL + '/keryar/SaveSubToSubCategory';
+  public static getAllSubToSubCategoryURL: string = ApiService.HOST_URL + '/keryar/GetAllSubToSubCategory';
+  public static getAllActiveSubToSubCategoryURL: string = ApiService.HOST_URL + '/keryar/GetAllActiveSubToSubCategory';
+  public static updateSubToSubCategoryStatusURL: string = ApiService.HOST_URL + '/keryar/UpdateSubToSubCategoryStatus';
+  public static removeSubToSubCategoryURL: string = ApiService.HOST_URL + '/keryar/RemoveSubToSubCategory/';
+
+
+  // quetions
+  public static saveSelfAssessmentQuestionSetURL: string = ApiService.HOST_URL + '/keryar/SaveSelfAssessmentQuestionSet';
+  public static getAllSelfQuestionSetDetailsURL: string = ApiService.HOST_URL + '/keryar/GetAllSelfQuestionSetDetails';
+  public static updateSelfAssessmentQuestionSetURL: string = ApiService.HOST_URL + '/keryar/UpdateSelfAssessmentQuestionSet';
+  public static removeSelfAssessmentQuestionSetURL: string = ApiService.HOST_URL + '/keryar/RemoveSelfAssessmentQuestionSet/';
+
+
+  // job Openings
+  public static saveJobOpeningDetailsURL: string = ApiService.HOST_URL + '/keryar/SaveJobOpeningDetails';
+  public static getAllJobOpeningsURL: string = ApiService.HOST_URL + '/keryar/GetAllJobOpenings';
+  public static updateJobOpeningActiveDeactiveURL: string = ApiService.HOST_URL + '/keryar/UpdateJobOpeningActiveDeactive';
+  public static updateJobOpeningURL: string = ApiService.HOST_URL + '/keryar/UpdateJobOpening';
+  public static deleteJobOpeningURL: string = ApiService.HOST_URL + '/keryar/DeleteJobOpening';
+
+
 }

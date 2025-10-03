@@ -34,12 +34,22 @@
 
                                 </div>
                             </div>
+                            <div class="col-lg-4 mb-2">
+                                <label>Active & Deactive</label>
+
+                                <div class="form-check form-switch form-switch-lg mb-3" dir="ltr">
+                                    <input type="checkbox" class="form-check-input" id="customSwitchsizelg"
+                                        formControlName="isactive" checked>
+                                    <label class="form-check-label" for="customSwitchsizelg"></label>
+                                </div>
+                            </div>
                         </div>
+
                     </form>
                     <div class="d-flex justify-content-end gap-2">
                         <button type="button" class="btn btn-danger waves-effect">Cancel</button>
                         <button type="button" class="btn btn-primary waves-effect waves-light"
-                            [disabled]="validationForm.invalid">Submit</button>
+                            [disabled]="validationForm.invalid" (click)="submitClientDetails()">Submit</button>
                     </div>
                 </div>
             </div>
@@ -72,16 +82,18 @@
                                 <td class="text-center">{{c.name}}</td>
                                 <td class="text-center">{{c.title}}</td>
                                 <td class="text-center">
-                                    <button type="button" class="btn btn-success waves-effect btn-label waves-light"><i
-                                            class="bx bx-check-double label-icon"></i> Active</button>
-                                    <button type="button" class="btn btn-danger waves-effect btn-label waves-light"><i
-                                            class="bx bx-block label-icon"></i> Deactive</button>
+                                    <div class="form-check form-switch form-switch-lg d-flex justify-content-center">
+                                        <input type="checkbox" class="form-check-input" [checked]="c.isactive == 1"
+                                            (change)="activeDeactivestatus(c)">
+                                    </div>
                                 </td>
+
                                 <td class="text-end">
                                     <div class="d-flex justify-content-end gap-1">
                                         <button type="button" class="btn btn-soft-danger waves-effect waves-light"
                                             data-bs-toggle="tooltip" data-bs-placement="top" title="View & Accept"><i
-                                                class="bx bx-trash-alt font-size-16 align-middle"></i></button>
+                                                class="bx bx-trash-alt font-size-16 align-middle"
+                                                (click)="removePlacementCategory(c.id)"></i></button>
                                         <!-- <div class="d-flex justify-content-end gap-1">
                                         <button type="button" class="btn btn-soft-primary waves-effect waves-light"
                                             data-bs-toggle="tooltip" data-bs-placement="top" title="View & Accept"><i
