@@ -59,7 +59,6 @@ export class PortfolioComponent {
     public workfolioService: WorkfolioService,
     public toastr: ToastrService,
     private _lightbox: Lightbox,
-
   ) {
     this.getAllPortfolio();
   }
@@ -81,14 +80,21 @@ export class PortfolioComponent {
 
   get f() { return this.validationForm.controls; }
 
-
   addGalleryUploader() {
     this.galleryUploaders.push({ images: [] });
   }
+
   addPortfolio() {
     this.isOpen = false;
+    this.validationForm.reset();
+    this.coverImage = null;
+    this.coverImageUrl = null;
+    this.galleryMultiImage = [];
+    this.galleryUploaders = [{ images: [] }];
+    this.submitted = false;
     this.getClients();
   }
+
   portfolioList() {
     this.isOpen = true;
   }
@@ -96,7 +102,7 @@ export class PortfolioComponent {
   getClients() {
     this.workfolioService.getAllClients().subscribe((res: any) => {
       this.clientsData = res;
-    })
+    });
   }
 
   uploadInnerImageFile(event: any) {
@@ -117,10 +123,9 @@ export class PortfolioComponent {
             const formdata = new FormData();
             formdata.append('file', file);
             this.workfolioService.uploadPortfolioCover(formdata).subscribe((response) => {
-              this.toastr.success('Image Uploaded Successfully', 'Uploaded', { timeOut: 3000, });
+              this.toastr.success('Image Uploaded Successfully', 'Uploaded', { timeOut: 3000 });
               this.coverImage = response;
             });
-
           } else {
             this.coverUploadProgress += 10;
           }
@@ -141,24 +146,25 @@ export class PortfolioComponent {
         this.coverImageUrl = null;
         this.coverUploadProgress = 0;
         this.coverUploading = false;
-        this.toastr.success('Image removed successfully.', 'Deleted', { timeOut: 2000, });
+        this.toastr.success('Image removed successfully.', 'Deleted', { timeOut: 2000 });
       } else {
-        this.toastr.error('Something went wrong try again later', 'Error', { timeOut: 2000, });
+        this.toastr.error('Something went wrong try again later', 'Error', { timeOut: 2000 });
       }
-    })
-
+    });
   }
 
   onNameChange(event: any) {
-    this.selectedClientName = event.name
+    this.selectedClientName = event.name;
   }
+
   addNewName(term: string): any {
     return { name: term };
   }
 
   onCategoryChange(event: any) {
-    this.selectedCategory = event.category
+    this.selectedCategory = event.category;
   }
+
   addNewCategory(term: string): any {
     return { category: term };
   }
@@ -188,7 +194,7 @@ export class PortfolioComponent {
             const formdata = new FormData();
             formdata.append('file', file);
             this.workfolioService.uploadPortfolioMultiImage(formdata).subscribe((response) => {
-              this.toastr.success('Image Uploaded Successfully', 'Uploaded', { timeOut: 3000, });
+              this.toastr.success('Image Uploaded Successfully', 'Uploaded', { timeOut: 3000 });
               this.galleryMultiImage.push(response);
               this.galleryUploaders[uploaderIndex].img = response;
             });
@@ -214,11 +220,11 @@ export class PortfolioComponent {
     };
     this.workfolioService.deleteUploadedImageFromFolder(data).subscribe((res: any) => {
       if (res.success == true) {
-        this.toastr.success('Image removed successfully.', 'Deleted', { timeOut: 2000, });
+        this.toastr.success('Image removed successfully.', 'Deleted', { timeOut: 2000 });
       } else {
-        this.toastr.error('Something went wrong try again later', 'Error', { timeOut: 2000, });
+        this.toastr.error('Something went wrong try again later', 'Error', { timeOut: 2000 });
       }
-    })
+    });
     this.galleryUploaders[uploaderIndex].images.splice(imageIndex, 1);
   }
 
@@ -240,9 +246,9 @@ export class PortfolioComponent {
           this.galleryUploaders = [{ images: [] }];
           this.submitted = false;
           this.isOpen = true;
-          this.toastr.success('Portfolio details saved successfully.', 'Success', { timeOut: 2000, });
+          this.toastr.success('Portfolio details saved successfully.', 'Success', { timeOut: 2000 });
         } else {
-          this.toastr.error('Something went wrong try again later', 'Error', { timeOut: 2000, });
+          this.toastr.error('Something went wrong try again later', 'Error', { timeOut: 2000 });
         }
       });
     }
@@ -250,7 +256,7 @@ export class PortfolioComponent {
 
   getAllPortfolio() {
     this.workfolioService.getAllPortfolioData().subscribe((res: any) => {
-      debugger
+      console.log('getAllPortfolio - portfolioData:', res);
       this.portfolioData = res;
       this.album = this.portfolioData.map((s: any) => ({
         src: this.serverPath + s.coverimage,
@@ -262,8 +268,9 @@ export class PortfolioComponent {
       }
       this.collectionSize = this.portfolioData.length;
       this.getPagintaion();
-    })
+    });
   }
+
   openImage(globalIndex: number): void {
     if (this.album[globalIndex] && this.album[globalIndex].src && !this.album[globalIndex].src.endsWith('null')) {
       this._lightbox.open(this.album, globalIndex, {
@@ -276,11 +283,13 @@ export class PortfolioComponent {
       });
     }
   }
+
   // pagination
   getPagintaion() {
     this.paginateData = this.portfolioData
       .slice((this.page - 1) * this.pageSize, (this.page - 1) * this.pageSize + this.pageSize);
   }
+
   activeBanners(ind: any) {
     let inde = ind - 1;
     // this.imagesData[inde].isactive = true;
@@ -290,6 +299,7 @@ export class PortfolioComponent {
     //   });
     // })
   }
+
   deactiveBanners(ind: any) {
     let inde = ind - 1;
     // this.imagesData[inde].isactive = false;
@@ -299,32 +309,50 @@ export class PortfolioComponent {
     //   });
     // })
   }
+
   removePortfolioById(id: any) {
     this.workfolioService.removePortfolioDetailsById(id).subscribe((res: any) => {
       if (res.success == true) {
-        this.toastr.success('Portfolio details removed successfully.', 'Deleted', { timeOut: 2000, });
+        this.toastr.success('Portfolio details removed successfully.', 'Deleted', { timeOut: 2000 });
         this.getAllPortfolio();
       } else {
-        this.toastr.error('Something went wrong try again later', 'Error', { timeOut: 2000, });
+        this.toastr.error('Something went wrong try again later', 'Error', { timeOut: 2000 });
       }
-    })
+    });
   }
+
   editPortfolioById(data: any) {
+    console.log('editPortfolioById - Incoming data:', data);
+    console.log('editPortfolioById - Initial galleryUploaders:', this.galleryUploaders); // Debug initial state
     this.isOpen = false;
+    // Format publishdate to YYYY-MM-DD for the date input
+    let formattedPublishDate = '';
+    if (data.publishdate) {
+      const date = new Date(data.publishdate);
+      formattedPublishDate = date.toISOString().split('T')[0]; // Converts to YYYY-MM-DD
+    }
+
     this.validationForm.patchValue({
       title: data.title,
       clientname: data.clientname,
       category: data.category,
       authorname: data.authorname,
       description: data.description,
-      publishdate: data.publishdate,
+      publishdate: formattedPublishDate,
     });
+
     this.coverImage = data.coverimage;
     this.coverImageUrl = this.serverPath + data.coverimage;
-    this.galleryMultiImage = data.galleryImages;
-    this.galleryUploaders = data.galleryImages.map((img: any) => ({ images: [this.serverPath + img], img: img }));
-    debugger
+    console.log('editPortfolioById - galleryImages:', data.galleryImages);
+    // Ensure galleryImages is an array and extract image paths
+    this.galleryMultiImage = Array.isArray(data.galleryImages) ? data.galleryImages.map((img: any) => img.image) : [];
+    console.log('editPortfolioById - galleryMultiImage:', this.galleryMultiImage);
+    // Reset galleryUploaders to a single uploader with existing images only
+    this.galleryUploaders = [{ images: this.galleryMultiImage.map((img: string) => this.serverPath + img), img: this.galleryMultiImage[0] || '' }];
+    console.log('editPortfolioById - Final galleryUploaders:', this.galleryUploaders);
+
+    this.selectedClientName = data.clientname;
+    this.selectedCategory = data.category;
     this.getClients();
   }
-
 }
