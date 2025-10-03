@@ -2,6 +2,9 @@ import { Component } from '@angular/core';
 import { FormGroup, UntypedFormBuilder, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import * as ClassicEditor from '@ckeditor/ckeditor5-build-classic';
+import { Lightbox } from 'ngx-lightbox';
+import { ToastrService } from 'ngx-toastr';
+import { WorkfolioService } from 'src/app/core/services/workfolio.service';
 
 @Component({
   selector: 'app-portfolio',
@@ -16,31 +19,33 @@ export class PortfolioComponent {
   validationForm!: FormGroup;
 
   // Dropdown arrays
-  clients: string[] = ['Client A', 'Client B', 'Client C'];
-  categories: string[] = ['Design', 'Development', 'Marketing'];
+  clientsData: any = [];
+  selectedClientName: any;
 
-
+  categories: any = [];
+  selectedCategory: any;
 
   // Inner image
-  innerImageUrl: any | null = null;
-  innerUploading: boolean = false;
-  innerUploadProgress: number = 0;
+  coverImageUrl: any | null = null;
+  coverUploading: boolean = false;
+  coverUploadProgress: number = 0;
+  cardImageBase64: any;
+
+  coverImage: any;
+  album: Array<{ src: string; caption: string; thumb: string }> = [];
 
   // Gallery images
   galleryImages: string[] = [];
   galleryUploading: boolean = false;
   galleryUploadProgress: number = 0;
-  galleryUploaders: { images: string[] }[] = [{ images: [] }];
+  galleryUploaders: { images: string[]; img?: any }[] = [{ images: [] }];
 
   serverPath: string = 'http://localhost:8300';
-
-
-
-  keyIndicator = [];
-  selectedKeyNo: any;
+  galleryMultiImage: any[] = [];
 
   isOpen: boolean = true;
 
+  portfolioData: any = [];
 
   // pagination
   page = 1;
@@ -51,7 +56,13 @@ export class PortfolioComponent {
   constructor(
     public router: Router,
     public formBuilder: UntypedFormBuilder,
-  ) { }
+    public workfolioService: WorkfolioService,
+    public toastr: ToastrService,
+    private _lightbox: Lightbox,
+
+  ) {
+    this.getAllPortfolio();
+  }
 
   ngOnInit(): void {
     this.breadCrumbItems = [
@@ -60,32 +71,58 @@ export class PortfolioComponent {
     ];
     this.validationForm = this.formBuilder.group({
       title: ['', [Validators.required]],
-      clientname: ['', [Validators.required]],
-      category: ['', [Validators.required]],
+      clientname: [null, [Validators.required]],
+      category: [null, [Validators.required]],
       authorname: ['', [Validators.required]],
       description: ['', [Validators.required]],
-      publishedDate: ['', [Validators.required]],
+      publishdate: ['', [Validators.required]],
     });
   }
 
   get f() { return this.validationForm.controls; }
 
 
+  addGalleryUploader() {
+    this.galleryUploaders.push({ images: [] });
+  }
+  addPortfolio() {
+    this.isOpen = false;
+    this.getClients();
+  }
+  portfolioList() {
+    this.isOpen = true;
+  }
+
+  getClients() {
+    this.workfolioService.getAllClients().subscribe((res: any) => {
+      this.clientsData = res;
+    })
+  }
 
   uploadInnerImageFile(event: any) {
     const file = event.target.files[0];
     if (file) {
-      this.innerUploading = true;
+      this.coverUploading = true;
       const reader = new FileReader();
 
       reader.onload = () => {
         const interval = setInterval(() => {
-          if (this.innerUploadProgress >= 100) {
+          if (this.coverUploadProgress >= 100) {
             clearInterval(interval);
-            this.innerUploading = false;
-            this.innerImageUrl = reader.result as string;
+            this.coverUploading = false;
+            this.coverImageUrl = reader.result as string;
+            // API upload logic
+            const imgBase64Path = reader.result;
+            this.cardImageBase64 = imgBase64Path;
+            const formdata = new FormData();
+            formdata.append('file', file);
+            this.workfolioService.uploadPortfolioCover(formdata).subscribe((response) => {
+              this.toastr.success('Image Uploaded Successfully', 'Uploaded', { timeOut: 3000, });
+              this.coverImage = response;
+            });
+
           } else {
-            this.innerUploadProgress += 10;
+            this.coverUploadProgress += 10;
           }
         }, 100);
       };
@@ -95,18 +132,35 @@ export class PortfolioComponent {
   }
 
   removeUploadedInnerImage() {
-    this.innerImageUrl = null;
-    this.innerUploadProgress = 0;
-    this.innerUploading = false;
+    let data = {
+      img: this.coverImage
+    };
+    this.workfolioService.deleteUploadedImageFromFolder(data).subscribe((res: any) => {
+      if (res.success == true) {
+        this.coverImage = null;
+        this.coverImageUrl = null;
+        this.coverUploadProgress = 0;
+        this.coverUploading = false;
+        this.toastr.success('Image removed successfully.', 'Deleted', { timeOut: 2000, });
+      } else {
+        this.toastr.error('Something went wrong try again later', 'Error', { timeOut: 2000, });
+      }
+    })
+
   }
 
-
-
-  onKeyIndicatorChange(event: any) {
-    this.selectedKeyNo = event.keyno
+  onNameChange(event: any) {
+    this.selectedClientName = event.name
   }
-  addNewIndicator(term: string): any {
-    return { keyno: term };
+  addNewName(term: string): any {
+    return { name: term };
+  }
+
+  onCategoryChange(event: any) {
+    this.selectedCategory = event.category
+  }
+  addNewCategory(term: string): any {
+    return { category: term };
   }
 
   // gallery images
@@ -127,6 +181,17 @@ export class PortfolioComponent {
           if (loaded === files.length) {
             this.galleryUploading = false;
             this.galleryUploadProgress = 0;
+
+            // API upload logic
+            const imgBase64Path = reader.result;
+            this.cardImageBase64 = imgBase64Path;
+            const formdata = new FormData();
+            formdata.append('file', file);
+            this.workfolioService.uploadPortfolioMultiImage(formdata).subscribe((response) => {
+              this.toastr.success('Image Uploaded Successfully', 'Uploaded', { timeOut: 3000, });
+              this.galleryMultiImage.push(response);
+              this.galleryUploaders[uploaderIndex].img = response;
+            });
           }
         };
         reader.readAsDataURL(file);
@@ -144,21 +209,77 @@ export class PortfolioComponent {
   }
 
   removeGalleryImage(uploaderIndex: number, imageIndex: number) {
+    let data = {
+      img: this.galleryUploaders[uploaderIndex].img
+    };
+    this.workfolioService.deleteUploadedImageFromFolder(data).subscribe((res: any) => {
+      if (res.success == true) {
+        this.toastr.success('Image removed successfully.', 'Deleted', { timeOut: 2000, });
+      } else {
+        this.toastr.error('Something went wrong try again later', 'Error', { timeOut: 2000, });
+      }
+    })
     this.galleryUploaders[uploaderIndex].images.splice(imageIndex, 1);
   }
-  addGalleryUploader() {
-    this.galleryUploaders.push({ images: [] });
+
+  submitPortfolioDetails() {
+    this.submitted = true;
+    if (this.validationForm.valid) {
+      let data = this.validationForm.value;
+      data.clientname = this.selectedClientName;
+      data.category = this.selectedCategory;
+      data.coverimage = this.coverImage ? this.coverImage : '';
+      data.galleryMultiImage = this.galleryMultiImage ? this.galleryMultiImage : [];
+
+      this.workfolioService.savePortfolioData(data).subscribe((res: any) => {
+        if (res.success == true) {
+          this.validationForm.reset();
+          this.coverImage = null;
+          this.coverImageUrl = null;
+          this.galleryMultiImage = [];
+          this.galleryUploaders = [{ images: [] }];
+          this.submitted = false;
+          this.isOpen = true;
+          this.toastr.success('Portfolio details saved successfully.', 'Success', { timeOut: 2000, });
+        } else {
+          this.toastr.error('Something went wrong try again later', 'Error', { timeOut: 2000, });
+        }
+      });
+    }
   }
-  addPortfolio() {
-    this.isOpen = false;
+
+  getAllPortfolio() {
+    this.workfolioService.getAllPortfolioData().subscribe((res: any) => {
+      debugger
+      this.portfolioData = res;
+      this.album = this.portfolioData.map((s: any) => ({
+        src: this.serverPath + s.coverimage,
+        caption: `${s.name}`,
+        thumb: this.serverPath + s.coverimage
+      }));
+      for (let i = 0; i < this.portfolioData.length; i++) {
+        this.portfolioData[i].index = i + 1;
+      }
+      this.collectionSize = this.portfolioData.length;
+      this.getPagintaion();
+    })
   }
-  portfolioList() {
-    this.isOpen = true;
+  openImage(globalIndex: number): void {
+    if (this.album[globalIndex] && this.album[globalIndex].src && !this.album[globalIndex].src.endsWith('null')) {
+      this._lightbox.open(this.album, globalIndex, {
+        showZoom: true,
+        centerVertically: true,
+        wrapAround: true,
+        showImageNumberLabel: true,
+        showDownloadButton: true,
+        showThumbnails: true
+      });
+    }
   }
   // pagination
   getPagintaion() {
-    // this.paginateData = this.imagesData
-    //   .slice((this.page - 1) * this.pageSize, (this.page - 1) * this.pageSize + this.pageSize);
+    this.paginateData = this.portfolioData
+      .slice((this.page - 1) * this.pageSize, (this.page - 1) * this.pageSize + this.pageSize);
   }
   activeBanners(ind: any) {
     let inde = ind - 1;
@@ -178,4 +299,32 @@ export class PortfolioComponent {
     //   });
     // })
   }
+  removePortfolioById(id: any) {
+    this.workfolioService.removePortfolioDetailsById(id).subscribe((res: any) => {
+      if (res.success == true) {
+        this.toastr.success('Portfolio details removed successfully.', 'Deleted', { timeOut: 2000, });
+        this.getAllPortfolio();
+      } else {
+        this.toastr.error('Something went wrong try again later', 'Error', { timeOut: 2000, });
+      }
+    })
+  }
+  editPortfolioById(data: any) {
+    this.isOpen = false;
+    this.validationForm.patchValue({
+      title: data.title,
+      clientname: data.clientname,
+      category: data.category,
+      authorname: data.authorname,
+      description: data.description,
+      publishdate: data.publishdate,
+    });
+    this.coverImage = data.coverimage;
+    this.coverImageUrl = this.serverPath + data.coverimage;
+    this.galleryMultiImage = data.galleryImages;
+    this.galleryUploaders = data.galleryImages.map((img: any) => ({ images: [this.serverPath + img], img: img }));
+    debugger
+    this.getClients();
+  }
+
 }

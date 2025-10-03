@@ -110,4 +110,26 @@ export class WorkfolioService {
     deleteUploadedImageFromFolder(data: any) {
         return this.httpClient.post(ApiService.deleteUploadedImageFromFolderURL, data);
     }
+
+
+    // Portfolio Services
+    uploadPortfolioCover(data: any) {
+        return this.httpClient.post(ApiService.uploadPortfolioCoverImagesURL, data);
+    }
+    uploadPortfolioMultiImage(data: any) {
+        return this.httpClient.post(ApiService.uploadPortfolioMultiImageURL, data);
+    }
+    savePortfolioData(data: any) {
+        debugger
+        return this.httpClient.post(ApiService.savePortfolioDetailsURL, data);
+    }
+    getAllPortfolioData() {
+        return this.httpClient.get(ApiService.getAllPortfolioDataURL);
+    }
+    removePortfolioDetailsById(id: any) {
+        return this.httpClient.get(ApiService.removePortfolioDetailsByIdURL + id);
+    }
+
+
+    
 }
