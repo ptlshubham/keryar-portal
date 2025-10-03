@@ -79,6 +79,7 @@ export class ApiService {
   public static updateJobOpeningActiveDeactiveURL: string = ApiService.HOST_URL + '/keryar/UpdateJobOpeningActiveDeactive';
   public static updateJobOpeningURL: string = ApiService.HOST_URL + '/keryar/UpdateJobOpening';
   public static deleteJobOpeningURL: string = ApiService.HOST_URL + '/keryar/DeleteJobOpening';
+  public static uploadJobOpeningImgURL: string = ApiService.HOST_URL + '/keryar/UploadJobOpeningImg';
 
 
   // connect

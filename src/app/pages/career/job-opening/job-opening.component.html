@@ -183,6 +183,31 @@
                                     <label class="form-check-label" for="customSwitchsizelg"></label>
                                 </div>
                             </div>
+
+                            <div class="col-lg-2 mb-2">
+                                <div class="form-group mb-3">
+                                    <label for="name">Upload job Opening Image</label>
+                                    <div class="custom-avatar-uploader">
+                                        <div class="d-flex justify-content-center">
+                                            <label class="custom-upload-box" *ngIf="!imageUrl" tooltip="Upload Image"
+                                                tooltipPosition="above">
+                                                <input type="file" accept="image/*" (change)="uploadImageFile($event)"
+                                                    hidden />
+                                                <a><i class="mdi mdi-plus-circle"></i></a>
+                                            </label>
+                                            <div class="custom-preview-box" *ngIf="imageUrl">
+                                                <img [src]="serverPath+jobopeningimage" alt="Logo" />
+                                                <a class="custom-remove-btn" tooltip="Remove Uploaded Image"
+                                                    tooltipPosition="above"
+                                                    (click)="removeUploadedImage(jobopeningimage)">
+                                                    <i class="mdi mdi-close-circle"></i></a>
+                                            </div>
+                                        </div>
+                                        <ngb-progressbar [value]="uploadProgress" [type]="progressType"
+                                            *ngIf="uploading"></ngb-progressbar>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </form>
                     <div class="d-flex justify-content-end gap-2">
@@ -236,6 +261,8 @@
                             <td>{{ getSubcategoryName(getQuestionSet(setId)?.subcategoriesid) }}</td>
                             <td>{{ getSubToSubcategoryName(getQuestionSet(setId)?.subtosubcategoriesid) }}</td>
                             <td>{{ getQuestionSet(setId)?.difficulty || 'N/A' }}</td>
+
+
                         </tr>
                     </tbody>
                 </table>

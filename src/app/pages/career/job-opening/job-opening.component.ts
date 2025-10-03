@@ -6,6 +6,7 @@ import { CareerService } from 'src/app/core/services/career.service';
 import { PlacementService } from 'src/app/core/services/placement.service';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import Swal from 'sweetalert2';
+import { WorkfolioService } from 'src/app/core/services/workfolio.service';
 
 @Component({
   selector: 'app-job-opening',
@@ -30,6 +31,18 @@ export class JobOpeningComponent {
   questionSets: any[] = [];
   selectedJob: any = null;
 
+
+  imageUrl: any | null = null;
+  cardImageBase64: any;
+  jobopeningimage: any;
+  progressValue: number = 0;
+  progressType: string = 'success';
+  isProgress: boolean = false;
+  uploading: boolean = false;
+  uploadProgress: number = 0;
+  serverPath: string = 'http://localhost:8300';
+
+
   experienceOptions = [
     { label: '0-2 years', value: '0-2 years' },
     { label: '3-5 years', value: '3-5 years' },
@@ -42,7 +55,8 @@ export class JobOpeningComponent {
     public router: Router,
     public formBuilder: UntypedFormBuilder,
     public placementService: PlacementService,
-    private modalService: NgbModal
+    private modalService: NgbModal,
+    public workfolioService: WorkfolioService
   ) { }
 
   ngOnInit(): void {
@@ -63,6 +77,8 @@ export class JobOpeningComponent {
       openings: ['', [Validators.required, Validators.min(1)]],
       questionSets: [[]],
       isactive: [true],
+      jobopeningimage: [null], // <-- NEW
+
     });
 
     this.loadCategories();
@@ -124,6 +140,53 @@ export class JobOpeningComponent {
       }
     );
   }
+  uploadImageFile(event: any) {
+    const file = event.target.files[0];
+    if (file) {
+      this.uploading = true;
+      const reader = new FileReader();
+
+      reader.onload = () => {
+        const interval = setInterval(() => {
+          if (this.uploadProgress >= 100) {
+            clearInterval(interval);
+            this.uploading = false;
+            this.imageUrl = reader.result as string;
+
+            // API upload logic
+            const imgBase64Path = reader.result;
+            this.cardImageBase64 = imgBase64Path;
+            const formdata = new FormData();
+            formdata.append('file', file);
+            this.careerService.uploadJobOpeningImg(formdata).subscribe((response) => {
+              this.toastr.success('Image Uploaded Successfully', 'Uploaded', { timeOut: 3000 });
+              this.jobopeningimage = response; // e.g. '/public/jobopening/xyz.png'
+              this.validationForm.patchValue({ jobopeningimage: response }); // <-- keep form in sync
+            });
+
+
+          } else {
+            this.uploadProgress += 10;
+          }
+        }, 100);
+      };
+
+      reader.readAsDataURL(file);
+    }
+  }
+  removeUploadedImage(img: any) {
+    let data = { img: this.jobopeningimage };
+    this.workfolioService.deleteUploadedImageFromFolder(data).subscribe((res: any) => {
+      if (res.success == true) {
+        this.toastr.success('Image removed successfully.', 'Deleted', { timeOut: 2000 });
+        this.validationForm.patchValue({ jobopeningimage: null }); // <-- clear form
+      } else {
+        this.toastr.error('Something went wrong try again later', 'Error', { timeOut: 2000 });
+      }
+    });
+    this.jobopeningimage = null;
+    this.imageUrl = null;
+  }
 
   getQuestionSet(id: string): any {
     const set = this.questionSets.find(set => set.id === id) || {};
@@ -165,6 +228,8 @@ export class JobOpeningComponent {
     if (this.validationForm.valid) {
       const data = {
         ...this.validationForm.value,
+        jobopeningimage: this.validationForm.value.jobopeningimage || this.jobopeningimage || null, // <-- NEW
+
         experience: this.validationForm.value.experience.join(','),
         questionsets: this.validationForm.value.questionSets.join(','),
         isactive: this.validationForm.value.isactive ? 1 : 0
@@ -189,6 +254,8 @@ export class JobOpeningComponent {
       const data = {
         ...this.validationForm.value,
         id: this.currentJobId,
+        jobopeningimage: this.validationForm.value.jobopeningimage || this.jobopeningimage || null, // <-- NEW
+
         experience: this.validationForm.value.experience.join(','),
         questionsets: this.validationForm.value.questionSets.join(','),
         isactive: this.validationForm.value.isactive ? 1 : 0
@@ -264,15 +331,20 @@ export class JobOpeningComponent {
       this.editMode = true;
       this.currentJobId = id;
       const questionSetsValue = job.questionsets ? job.questionsets.split(',') : [];
-      console.log('Editing job with questionSets:', questionSetsValue);
+
+      this.jobopeningimage = job.jobopeningimage || null; // <-- keep local copy
+      this.imageUrl = job.jobopeningimage ? (this.serverPath + job.jobopeningimage) : null; // preview
+
       this.validationForm.patchValue({
         ...job,
         experience: job.experience ? job.experience.split(',') : [],
         questionSets: questionSetsValue,
-        isactive: job.isactive === 1
+        isactive: job.isactive === 1,
+        jobopeningimage: job.jobopeningimage || null, // <-- form value
       });
     }
   }
+
 
   resetForm() {
     this.submitted = false;
@@ -291,7 +363,9 @@ export class JobOpeningComponent {
     this.careerService.getAllJobOpenings().subscribe((res: any) => {
       this.jobOpeningData = res.map((job: any) => ({
         ...job,
-        questionsets: job.questionsets || ''
+        questionsets: job.questionsets || '',
+        jobopeningimage: job.jobopeningimage || null, // <-- ensure present
+
       }));
       console.log('Job Opening Data:', this.jobOpeningData);
       for (let i = 0; i < this.jobOpeningData.length; i++) {
