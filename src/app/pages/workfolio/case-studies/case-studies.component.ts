@@ -4,7 +4,6 @@ import { Router } from '@angular/router';
 import { Lightbox } from 'ngx-lightbox';
 import { ToastrService } from 'ngx-toastr';
 import { WorkfolioService } from 'src/app/core/services/workfolio.service';
-
 import * as ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 
 @Component({
@@ -81,6 +80,12 @@ export class CaseStudiesComponent {
 
   addCaseStudy() {
     this.isOpen = false;
+    this.validationForm.reset();
+    this.coverImage = null;
+    this.innerImageUrl = null;
+    this.galleryMultiImage = [];
+    this.galleryUploaders = [{ images: [] }];
+    this.submitted = false;
     this.getClients();
   }
 
@@ -91,7 +96,7 @@ export class CaseStudiesComponent {
   getClients() {
     this.workfolioService.getAllClients().subscribe((res: any) => {
       this.clientsData = res;
-    })
+    });
   }
 
   uploadInnerImageFile(event: any) {
@@ -106,16 +111,12 @@ export class CaseStudiesComponent {
             clearInterval(interval);
             this.innerUploading = false;
             this.innerImageUrl = reader.result as string;
-            // API upload logic
-            const imgBase64Path = reader.result;
-            this.cardImageBase64 = imgBase64Path;
             const formdata = new FormData();
             formdata.append('file', file);
             this.workfolioService.uploadCaseStudyCover(formdata).subscribe((response) => {
-              this.toastr.success('Image Uploaded Successfully', 'Uploaded', { timeOut: 3000, });
+              this.toastr.success('Image Uploaded Successfully', 'Uploaded', { timeOut: 3000 });
               this.coverImage = response;
             });
-
           } else {
             this.innerUploadProgress += 10;
           }
@@ -127,32 +128,32 @@ export class CaseStudiesComponent {
   }
 
   removeUploadedInnerImage() {
-    let data = {
-      img: this.coverImage
-    };
+    let data = { img: this.coverImage };
     this.workfolioService.deleteUploadedImageFromFolder(data).subscribe((res: any) => {
-      if (res.success == true) {
+      if (res.success === true) {
         this.coverImage = null;
         this.innerImageUrl = null;
         this.innerUploadProgress = 0;
         this.innerUploading = false;
-        this.toastr.success('Image removed successfully.', 'Deleted', { timeOut: 2000, });
+        this.toastr.success('Image removed successfully.', 'Deleted', { timeOut: 2000 });
       } else {
-        this.toastr.error('Something went wrong try again later', 'Error', { timeOut: 2000, });
+        this.toastr.error('Something went wrong try again later', 'Error', { timeOut: 2000 });
       }
-    })
+    });
   }
 
   onNameChange(event: any) {
-    this.selectedClientName = event
+    this.selectedClientName = event;
   }
+
   addNewName(term: string): any {
     return { name: term };
   }
 
   onCategoryChange(event: any) {
-    this.selectedCategory = event
+    this.selectedCategory = event;
   }
+
   addNewCategory(term: string): any {
     return { category: term };
   }
@@ -171,7 +172,7 @@ export class CaseStudiesComponent {
     if (files && files.length > 0) {
       this.galleryUploading = true;
       let loaded = 0;
-      Array.from(files).forEach((file: any, idx: any) => {
+      Array.from(files).forEach((file: any) => {
         const reader = new FileReader();
         reader.onload = () => {
           this.galleryUploaders[uploaderIndex].images.push(reader.result as string);
@@ -179,14 +180,10 @@ export class CaseStudiesComponent {
           if (loaded === files.length) {
             this.galleryUploading = false;
             this.galleryUploadProgress = 0;
-
-            // API upload logic
-            const imgBase64Path = reader.result;
-            this.cardImageBase64 = imgBase64Path;
             const formdata = new FormData();
             formdata.append('file', file);
             this.workfolioService.uploadCaseStudyMultiImage(formdata).subscribe((response) => {
-              this.toastr.success('Image Uploaded Successfully', 'Uploaded', { timeOut: 3000, });
+              this.toastr.success('Image Uploaded Successfully', 'Uploaded', { timeOut: 3000 });
               this.galleryMultiImage.push(response);
               this.galleryUploaders[uploaderIndex].img = response;
             });
@@ -194,7 +191,6 @@ export class CaseStudiesComponent {
         };
         reader.readAsDataURL(file);
       });
-      // Simulate progress
       this.galleryUploadProgress = 0;
       const interval = setInterval(() => {
         if (this.galleryUploadProgress >= 100) {
@@ -207,17 +203,16 @@ export class CaseStudiesComponent {
   }
 
   removeGalleryImage(uploaderIndex: number, imageIndex: number) {
-    let data = {
-      img: this.galleryUploaders[uploaderIndex].img
-    };
+    let data = { img: this.galleryUploaders[uploaderIndex].img };
     this.workfolioService.deleteUploadedImageFromFolder(data).subscribe((res: any) => {
-      if (res.success == true) {
-        this.toastr.success('Image removed successfully.', 'Deleted', { timeOut: 2000, });
+      if (res.success === true) {
+        this.toastr.success('Image removed successfully.', 'Deleted', { timeOut: 2000 });
       } else {
-        this.toastr.error('Something went wrong try again later', 'Error', { timeOut: 2000, });
+        this.toastr.error('Something went wrong try again later', 'Error', { timeOut: 2000 });
       }
-    })
+    });
     this.galleryUploaders[uploaderIndex].images.splice(imageIndex, 1);
+    this.galleryMultiImage = this.galleryUploaders.flatMap(u => u.img ? [u.img] : []);
   }
 
   submitCaseStudyDetails() {
@@ -228,9 +223,9 @@ export class CaseStudiesComponent {
       data.category = this.selectedCategory.category;
       data.coverimage = this.coverImage ? this.coverImage : '';
       data.galleryMultiImage = this.galleryMultiImage ? this.galleryMultiImage : [];
-debugger
+
       this.workfolioService.saveCaseStudyData(data).subscribe((res: any) => {
-        if (res.success == true) {
+        if (res.success === true) {
           this.validationForm.reset();
           this.coverImage = null;
           this.innerImageUrl = null;
@@ -238,10 +233,10 @@ debugger
           this.galleryUploaders = [{ images: [] }];
           this.submitted = false;
           this.isOpen = true;
-          this.toastr.success('Case study details saved successfully.', 'Success', { timeOut: 2000, });
+          this.toastr.success('Case study details saved successfully.', 'Success', { timeOut: 2000 });
           this.getAllCaseStudies();
         } else {
-          this.toastr.error('Something went wrong try again later', 'Error', { timeOut: 2000, });
+          this.toastr.error('Something went wrong try again later', 'Error', { timeOut: 2000 });
         }
       });
     }
@@ -252,7 +247,7 @@ debugger
       this.caseStudyData = res;
       this.album = this.caseStudyData.map((s: any) => ({
         src: this.serverPath + s.image,
-        caption: `${s.name}`,
+        caption: `${s.title}`, // Changed from s.name to s.title for consistency
         thumb: this.serverPath + s.image
       }));
       for (let i = 0; i < this.caseStudyData.length; i++) {
@@ -260,12 +255,14 @@ debugger
       }
       this.collectionSize = this.caseStudyData.length;
       this.getPagintaion();
-    })
+    });
   }
 
-  openImage(globalIndex: number): void {
-    if (this.album[globalIndex] && this.album[globalIndex].src && !this.album[globalIndex].src.endsWith('null')) {
-      this._lightbox.open(this.album, globalIndex, {
+  openImage(globalIndex: number, type: string = 'image'): void {
+    const imageData = this.caseStudyData[globalIndex];
+    let src = type === 'cover' ? (imageData.coverimage ? this.serverPath + imageData.coverimage : '') : this.serverPath + imageData.image;
+    if (src && !src.endsWith('null')) {
+      this._lightbox.open([{ src: src, caption: `${imageData.title} ${type === 'cover' ? 'Cover' : ''}`, thumb: src }], 0, {
         showZoom: true,
         centerVertically: true,
         wrapAround: true,
@@ -289,7 +286,7 @@ debugger
       this.toastr.success('Case study activated Successfully.', 'Activated', {
         timeOut: 3000,
       });
-    })
+    });
   }
 
   deactiveBanners(ind: any) {
@@ -299,39 +296,52 @@ debugger
       this.toastr.error('Case study deactivated Successfully.', 'Deactivated', {
         timeOut: 3000,
       });
-    })
+    });
   }
 
   removeBannersImages(id: any) {
     this.workfolioService.removeCaseStudyDetailsById(id).subscribe((res: any) => {
-      if (res.success == true) {
-        this.toastr.success('Case study removed successfully.', 'Deleted', { timeOut: 2000, });
+      if (res.success === true) {
+        this.toastr.success('Case study removed successfully.', 'Deleted', { timeOut: 2000 });
         this.getAllCaseStudies();
       } else {
-        this.toastr.error('Something went wrong try again later', 'Error', { timeOut: 2000, });
+        this.toastr.error('Something went wrong try again later', 'Error', { timeOut: 2000 });
       }
-    })
+    });
   }
-
   editCaseStudyById(data: any) {
     this.isOpen = false;
+    // Format publishdate to YYYY-MM-DD for the date input
+    let formattedPublishDate = '';
+    if (data.publishdate) {
+      const date = new Date(data.publishdate);
+      formattedPublishDate = date.toISOString().split('T')[0]; // e.g., "2025-10-03"
+      console.log('editCaseStudyById - Formatted publishdate:', formattedPublishDate);
+    } else {
+      console.log('editCaseStudyById - No publishdate found in data');
+    }
+
     this.validationForm.patchValue({
       title: data.title,
       clientname: data.clientname,
       category: data.category,
       description: data.description,
-      publishdate: data.publishdate,
+      publishdate: formattedPublishDate,
     });
-    this.coverImage = data.image;
-    this.innerImageUrl = this.serverPath + data.image;
-    this.galleryMultiImage = data.galleryImages;
-    this.galleryUploaders = data.galleryImages.map((img: any) => ({ images: [this.serverPath + img], img: img }));
+
+    // Set cover image
+    this.coverImage = data.coverimage || data.image || '';
+    this.innerImageUrl = this.coverImage ? this.serverPath + this.coverImage : null;
+
+    // Set gallery images - Consolidate all images into a single uploader
+    this.galleryMultiImage = Array.isArray(data.galleryImages) ? data.galleryImages.map((item: any) => item.image) : [];
+    this.galleryUploaders = [{ images: this.galleryMultiImage.map(img => this.serverPath + img), img: this.galleryMultiImage }];
+
     this.getClients();
   }
-
   // Legacy compatibility methods (can be removed after updating HTML)
   onKeyIndicatorChange(event: any) {
-    this.selectedClientName = event
+    this.selectedClientName = event;
   }
   addNewIndicator(term: string): any {
     return { keyno: term };

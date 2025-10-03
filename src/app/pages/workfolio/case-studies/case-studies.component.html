@@ -5,11 +5,11 @@
                 <div class="d-flex justify-content-between">
                     <div>
                         <h5 class="card-title">Case study</h5>
-                        <p class="card-title-desc"><b>Enter Case study Details</b> </p>
+                        <p class="card-title-desc"><b>Enter Case study Details</b></p>
                     </div>
                     <button type="button" class="btn btn-danger waves-effect waves-light" (click)="caseStudyList()">
-                        <i class="bx bx-arrow-back  "></i>
-                        Back</button>
+                        <i class="bx bx-arrow-back"></i> Back
+                    </button>
                 </div>
             </div>
             <div class="card-body">
@@ -24,8 +24,7 @@
                                         formControlName="title"
                                         [ngClass]="{'is-invalid': f.title.touched && f.title.errors}">
                                     <div *ngIf="f.title.touched && f.title.errors" class="invalid-feedback">
-                                        <span *ngIf="f.title.errors.required">This Field is
-                                            required.</span>
+                                        <span *ngIf="f.title.errors.required">This Field is required.</span>
                                     </div>
                                 </div>
                             </div>
@@ -33,7 +32,7 @@
                             <!-- Client Name Dropdown -->
                             <div class="col-lg-4 mb-2">
                                 <div class="mb-3">
-                                    <label for="choices-single-default" class="form-label">Client Name </label>
+                                    <label for="choices-single-default" class="form-label">Client Name</label>
                                     <ng-select [items]="clientsData" bindLabel="name" bindValue="name"
                                         formControlName="clientname" placeholder="Client Name"
                                         (change)="onNameChange($event)" [addTag]="addNewName">
@@ -44,11 +43,10 @@
                                 </div>
                             </div>
 
-
                             <!-- Category Dropdown -->
                             <div class="col-lg-4 mb-2">
                                 <div class="mb-3">
-                                    <label for="choices-single-default" class="form-label">Select Category </label>
+                                    <label for="choices-single-default" class="form-label">Select Category</label>
                                     <ng-select [items]="categories" bindLabel="category" bindValue="category"
                                         formControlName="category" placeholder="Select Category"
                                         (change)="onCategoryChange($event)" [addTag]="addNewCategory">
@@ -66,8 +64,7 @@
                                 <div class="form-group mb-3">
                                     <label>Published Date</label>
                                     <input type="date" class="form-control" formControlName="publishdate">
-                                    <div *ngIf="f.publishdate.touched && f.publishdate.errors"
-                                        class="invalid-feedback">
+                                    <div *ngIf="f.publishdate.touched && f.publishdate.errors" class="invalid-feedback">
                                         <span *ngIf="f.publishdate.errors.required">This Field is required.</span>
                                     </div>
                                 </div>
@@ -102,19 +99,12 @@
                             <div class="col-lg-4 mb-2">
                                 <div class="form-group mb-3">
                                     <label>Case Study Gallery <span class="text-muted">(You can add multiple
-                                            images)</span>
-                                    </label>
+                                            images)</span></label>
                                     <div class="d-flex flex-row flex-wrap gap-3 align-items-center">
                                         <ng-container
                                             *ngFor="let uploader of galleryUploaders; let uploaderIndex = index">
                                             <div
                                                 class="custom-avatar-uploader d-flex flex-wrap gap-2 align-items-center position-relative">
-                                                <!-- Show close button only if more than one uploader -->
-                                                <button *ngIf="galleryUploaders.length > 1" type="button"
-                                                    class="btn btn-sm btn-danger position-absolute top-0 end-0"
-                                                    style="z-index:2;" (click)="removeGalleryUploader(uploaderIndex)">
-                                                    <i class="mdi mdi-close"></i>
-                                                </button>
                                                 <ng-container *ngFor="let img of uploader.images; let i = index">
                                                     <div class="custom-preview-box">
                                                         <img [src]="img" alt="Gallery Image" />
@@ -135,18 +125,12 @@
                                                 </label>
                                             </div>
                                         </ng-container>
-                                        <!-- Plus button to add another uploader, always at the end -->
-                                        <button type="button" class="btn btn-success ms-2"
-                                            (click)="addGalleryUploader()">
-                                            <i class="bx bx-plus"></i>
-                                        </button>
                                     </div>
                                     <div class="custom-progress" *ngIf="galleryUploading">
                                         Uploading... {{galleryUploadProgress}}%
                                     </div>
                                 </div>
                             </div>
-
 
                             <div class="col-lg-12 mb-2">
                                 <div class="form-group mb-3">
@@ -177,16 +161,14 @@
             <div class="card-header">
                 <div class="d-flex justify-content-between">
                     <div>
-                        <h5 class="card-title">Case study </h5>
+                        <h5 class="card-title">Case study</h5>
                         <p class="card-title-desc">List of all Case study</p>
                     </div>
                     <button type="button" class="btn btn-primary waves-effect waves-light" (click)="addCaseStudy()">
-                        <i class="fas fa-user-plus "></i>
-                        Add New Case Study</button>
+                        <i class="fas fa-user-plus"></i> Add New Case Study
+                    </button>
                 </div>
-
             </div>
-
             <div class="card-body">
                 <div class="table-responsive">
                     <table class="table mb-0">
@@ -194,17 +176,23 @@
                             <tr>
                                 <th class="text-left">#</th>
                                 <th class="text-center">Title</th>
+                                <th class="text-center">Cover Image</th> <!-- New column for inner image -->
                                 <th class="text-center">Image</th>
                                 <th class="text-center">Active & Deactive</th>
                                 <th class="text-end">Action</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <tr *ngFor="let c of paginateData;let i=index">
+                            <tr *ngFor="let c of paginateData; let i=index">
                                 <td class="text-left">{{c.index}}</td>
                                 <td class="text-center">{{c.title}}</td>
                                 <td class="text-center">
-                                    <img [src]="serverPath+c.image" alt="{{c.title}}" class="rounded avatar-lg"
+                                    <img [src]="c.coverimage ? (serverPath + c.coverimage) : 'default-cover-image.jpg'"
+                                        alt="{{c.title}} Cover" class="rounded avatar-lg"
+                                        (click)="openImage(c.index - 1, 'cover')">
+                                </td>
+                                <td class="text-center">
+                                    <img [src]="serverPath + c.image" alt="{{c.title}}" class="rounded avatar-lg"
                                         (click)="openImage(c.index - 1)">
                                 </td>
                                 <td class="text-center">
@@ -238,9 +226,6 @@
                         class="d-flex justify-content-end pagination-rounded-flat pagination-success"></ngb-pagination>
                 </div>
             </div>
-            <!-- end card body -->
         </div>
-        <!-- end card -->
     </div>
-    <!-- end col -->
 </div>
