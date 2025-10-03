@@ -91,5 +91,18 @@ export const MENU: MenuItem[] = [
             },
         ]
     },
+    {
+        id: 7,
+        label: 'Connect',
+        icon: 'mdi mdi-briefcase-outline',
+        subItems: [
+            {
+                id: 11,
+                label: 'internship Form List',
+                link: '/connect/internship',
+                parentId: 11
+            },
+        ]
+    },
 ];
 

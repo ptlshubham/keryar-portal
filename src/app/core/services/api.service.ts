@@ -81,4 +81,9 @@ export class ApiService {
   public static deleteJobOpeningURL: string = ApiService.HOST_URL + '/keryar/DeleteJobOpening';
 
 
+  // connect
+  public static getInternshipFormDetailsURL: string = ApiService.HOST_URL + '/keryar/GetinternshipFormDetails';
+  public static removeInternshipDetailsURL: string = ApiService.HOST_URL + '/keryar/RemoveInternshipdetails/';
+
+
 }

@@ -20,6 +20,9 @@ const routes: Routes = [
   {
     path: 'career', loadChildren: () => import('./career/career.module').then(m => m.CareerModule)
   },
+  {
+    path: 'connect', loadChildren: () => import('./connect/connect.module').then(m => m.ConnectModule)
+  },
   // {
   //   path: 'pages', loadChildren: () => import('./extraspages/extraspages.module').then(m => m.ExtraspagesModule)
   // },
