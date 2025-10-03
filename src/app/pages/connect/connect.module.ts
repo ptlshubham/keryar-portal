@@ -12,11 +12,13 @@ import { DropzoneModule } from 'ngx-dropzone-wrapper';
 import { LightboxModule } from 'ngx-lightbox';
 import { CoreModule } from 'src/app/core/core.module';
 import { SharedModule } from 'src/app/shared/shared.module';
+import { ContactUsComponent } from './contact-us/contact-us.component';
 
 
 @NgModule({
   declarations: [
-    InternshipComponent
+    InternshipComponent,
+    ContactUsComponent,
   ],
   imports: [
     CommonModule,

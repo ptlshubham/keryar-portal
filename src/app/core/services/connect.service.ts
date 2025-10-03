@@ -17,5 +17,12 @@ export class ConnectService {
         return this.httpClient.get(ApiService.removeInternshipDetailsURL + id);
     }
 
+    getContactusFormDetails() {
+        return this.httpClient.get(ApiService.getContactusFormDetailsURL);
+    }
+    removeContactusFormDetails(id: any) {
+        return this.httpClient.get(ApiService.removeContactusFormDetailsURL + id);
+    }
+
 
 }

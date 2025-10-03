@@ -102,6 +102,12 @@ export const MENU: MenuItem[] = [
                 link: '/connect/internship',
                 parentId: 11
             },
+            {
+                id: 12,
+                label: 'Contact us',
+                link: '/connect/contact-us',
+                parentId: 12
+            },
         ]
     },
 ];

@@ -2,20 +2,20 @@ import { Component, OnInit } from '@angular/core';
 import { ConnectService } from 'src/app/core/services/connect.service';
 import { ToastrService } from 'ngx-toastr';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap'; // ⬅️ add this
-import Swal from 'sweetalert2';
+import Swal from 'sweetalert2'; // Import SweetAlert2
 
 @Component({
-  selector: 'app-internship',
-  templateUrl: './internship.component.html',
-  styleUrls: ['./internship.component.scss']
+  selector: 'app-contact-us',
+  templateUrl: './contact-us.component.html',
+  styleUrl: './contact-us.component.scss'
 })
-export class InternshipComponent implements OnInit {
+export class ContactUsComponent {
   page = 1;
   pageSize = 10;
   collectionSize = 0;
   paginateData: any = [];
   internshipFormDetails: any = [];
-  selectedClient: any = null;
+  selectedData: any = null;
 
   constructor(
     public connectService: ConnectService,
@@ -34,7 +34,7 @@ export class InternshipComponent implements OnInit {
 
   // ⬇️ New: open preview
   openPreview(client: any, modalTpl: any) {
-    this.selectedClient = client;
+    this.selectedData = client;
     this.modalService.open(modalTpl, {
       size: 'lg',
       backdrop: 'static',
@@ -43,10 +43,10 @@ export class InternshipComponent implements OnInit {
     });
   }
 
-  removeClientsData(id: any) {
+  removeContactusDetails(id: any) {
     Swal.fire({
       title: 'Are you sure?',
-      text: 'Do you want to delete this client entry? This action cannot be undone.',
+      text: 'Do you want to delete this contact entry? This action cannot be undone.',
       icon: 'warning',
       showCancelButton: true,
       confirmButtonColor: '#3085d6',
@@ -55,32 +55,24 @@ export class InternshipComponent implements OnInit {
       cancelButtonText: 'Cancel'
     }).then((result) => {
       if (result.isConfirmed) {
-        Swal.fire({
-          title: 'Deleting...',
-          text: 'Please wait.',
-          allowOutsideClick: false,
-          didOpen: () => {
-            Swal.showLoading();
-          }
-        });
-        this.connectService.removeInternshipDetails(id).subscribe({
+        this.connectService.removeContactusFormDetails(id).subscribe({
           next: (res: any) => {
             this.internshipFormDetails = res;
             Swal.fire({
               icon: 'success',
               title: 'Deleted',
-              text: 'Client details deleted successfully.',
+              text: 'Contact details deleted successfully.',
               timer: 3000,
               showConfirmButton: false
             });
-            this.getInternshipDetails(); // Refresh data
+            this.getInternshipDetails(); // Refresh data after deletion
           },
           error: (err) => {
             console.error('Delete API Error:', err);
             Swal.fire({
               icon: 'error',
               title: 'Error',
-              text: err.error?.message || 'Failed to delete client details. Please try again.',
+              text: 'Failed to delete contact details. Please try again.',
               timer: 3000,
               showConfirmButton: false
             });
@@ -90,8 +82,9 @@ export class InternshipComponent implements OnInit {
     });
   }
 
+
   getInternshipDetails() {
-    this.connectService.getInternshipFormDetails().subscribe((res: any) => {
+    this.connectService.getContactusFormDetails().subscribe((res: any) => {
       this.internshipFormDetails = res;
       for (let i = 0; i < this.internshipFormDetails.length; i++) {
         this.internshipFormDetails[i].index = i + 1;
