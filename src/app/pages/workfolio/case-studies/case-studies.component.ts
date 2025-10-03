@@ -5,6 +5,7 @@ import { Lightbox } from 'ngx-lightbox';
 import { ToastrService } from 'ngx-toastr';
 import { WorkfolioService } from 'src/app/core/services/workfolio.service';
 import * as ClassicEditor from '@ckeditor/ckeditor5-build-classic';
+import * as moment from 'moment';
 
 @Component({
   selector: 'app-case-studies',
@@ -348,8 +349,7 @@ export class CaseStudiesComponent {
 
     let formattedPublishDate = '';
     if (data.publishdate) {
-      const date = new Date(data.publishdate);
-      formattedPublishDate = date.toISOString().split('T')[0];
+      formattedPublishDate = moment(data.publishdate).format('YYYY-MM-DD');
     }
 
     this.validationForm.patchValue({

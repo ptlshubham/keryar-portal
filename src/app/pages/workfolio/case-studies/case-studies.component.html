@@ -185,9 +185,12 @@
                         <thead class="table-light">
                             <tr>
                                 <th class="text-left">#</th>
-                                <th class="text-center">Title</th>
-                                <th class="text-center">Cover Image</th>
-                                <th class="text-center">Active/Deactive</th>
+                                <th class="text-center">Case study Title</th>
+                                <th class="text-center">Client Name</th>
+                                <th class="text-center">Category</th>
+                                <th class="text-center">Image</th>
+                                <th class="text-center">Publish Date</th>
+                                <th class="text-center">Active & Deactive</th>
                                 <th class="text-end">Action</th>
                             </tr>
                         </thead>
@@ -195,11 +198,14 @@
                             <tr *ngFor="let c of paginateData; let i=index">
                                 <td class="text-left">{{c.index}}</td>
                                 <td class="text-center">{{c.title}}</td>
+                                <td class="text-center">{{c.clientname}}</td>
+                                <td class="text-center">{{c.category}}</td>
+
                                 <td class="text-center">
-                                    <img [src]="c.coverimage ? (serverPath + c.coverimage) : 'assets/images/default-cover-image.jpg'"
-                                        alt="{{c.title}} Cover" class="rounded avatar-lg"
-                                        (click)="openImage(c.index - 1, 'cover')">
+                                    <img [src]="serverPath+c.coverimage" alt="{{c.coverimage}}"
+                                        class="rounded avatar-lg" (click)="openImage(c.index - 1)">
                                 </td>
+                                <td class="text-center">{{c.publishdate | date:'shortDate'}}</td>
                                 <td class="text-center">
                                     <button type="button" class="btn btn-success waves-effect btn-label waves-light"
                                         *ngIf="c.isactive" (click)="deactiveBanners(c.index)">
