@@ -5,7 +5,7 @@ import * as ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 import { Lightbox } from 'ngx-lightbox';
 import { ToastrService } from 'ngx-toastr';
 import { WorkfolioService } from 'src/app/core/services/workfolio.service';
-
+import * as moment from 'moment';
 @Component({
   selector: 'app-portfolio',
   templateUrl: './portfolio.component.html',
@@ -347,16 +347,14 @@ export class PortfolioComponent {
   }
 
   editPortfolioById(data: any) {
-    console.log('editPortfolioById - Incoming data:', data);
-    console.log('editPortfolioById - Initial galleryUploaders:', this.galleryUploaders);
     this.isOpen = false;
     this.isEditing = true;
     this.currentPortfolioId = data.id;
-    // Format publishdate to YYYY-MM-DD for the date input
+
+    // Format publishdate to YYYY-MM-DD in local timezone
     let formattedPublishDate = '';
     if (data.publishdate) {
-      const date = new Date(data.publishdate);
-      formattedPublishDate = date.toISOString().split('T')[0];
+      formattedPublishDate = moment(data.publishdate).format('YYYY-MM-DD');
     }
 
     this.validationForm.patchValue({
@@ -367,15 +365,10 @@ export class PortfolioComponent {
       description: data.description,
       publishdate: formattedPublishDate,
     });
-
     this.coverImage = data.coverimage;
     this.coverImageUrl = this.serverPath + data.coverimage;
-    console.log('editPortfolioById - galleryImages:', data.galleryImages);
     this.galleryMultiImage = Array.isArray(data.galleryImages) ? data.galleryImages.map((img: any) => img.image) : [];
-    console.log('editPortfolioById - galleryMultiImage:', this.galleryMultiImage);
     this.galleryUploaders = [{ images: this.galleryMultiImage.map((img: string) => this.serverPath + img), img: this.galleryMultiImage[0] || '' }];
-    console.log('editPortfolioById - Final galleryUploaders:', this.galleryUploaders);
-
     this.selectedClientName = data.clientname;
     this.selectedCategory = data.category;
     this.getClients();
