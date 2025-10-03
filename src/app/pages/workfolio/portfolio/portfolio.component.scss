@@ -1,5 +1,5 @@
-
 .custom-avatar-uploader {
+    /* Container for uploader controls */
     .custom-upload-box {
         width: 100px;
         height: 100px;
@@ -12,9 +12,10 @@
     }
 
     .custom-remove-btn {
+        /* General styling for remove button */
         position: absolute;
         top: 6%;
-        right: 24%;
+        right: 10%; /* Adjusted for better spacing */
         font-size: 22px;
         transform: translate(50%, -50%);
         background: #fff;
@@ -29,6 +30,7 @@
     }
 
     .custom-preview-box {
+        /* Container for image preview */
         position: relative;
         width: 100px;
         height: 100px;
@@ -41,10 +43,11 @@
         }
 
         .custom-remove-btn {
+            /* Remove button specific to preview box */
             position: absolute;
             top: 10%;
+            right: 10%; /* Adjusted for better spacing */
             font-size: 22px;
-            right: 8%;
             transform: translate(50%, -50%);
             background: #fff;
             height: 30px;
@@ -59,27 +62,33 @@
     }
 
     .custom-progress {
+        /* Progress indicator styling */
         font-size: 12px;
     }
 }
 
 .custom-form-group {
+    /* General form group styling */
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
 }
+
 .custom-form-group .custom-margin-top {
+    /* Margin top for form elements */
     margin-top: 24px;
 }
 
-/* Media queries for all screen sizes */
+/* Media queries for responsive design */
+
+/* Max width 767px (e.g., mobile devices) */
 @media only screen and (max-width: 767px) {
     .custom-avatar-uploader {
         .custom-remove-btn {
             position: absolute;
             top: 6%;
-            right: 36%;
+            right: 20%; /* Adjusted for smaller screens */
             font-size: 20px;
             background: #fff;
             height: 28px;
@@ -97,12 +106,13 @@
     }
 }
 
+/* Min width 768px to Max width 1024px (e.g., tablets) */
 @media only screen and (min-width: 768px) and (max-width: 1024px) {
     .custom-avatar-uploader {
         .custom-remove-btn {
             position: absolute;
             top: 5%;
-            right: 43%;
+            right: 43%; /* Adjusted for tablet screens */
             font-size: 22px;
             background: #fff;
             height: 30px;
@@ -120,12 +130,13 @@
     }
 }
 
+/* Min width 1025px to Max width 1199px (e.g., small desktops) */
 @media only screen and (min-width: 1025px) and (max-width: 1199px) {
     .custom-avatar-uploader {
         .custom-remove-btn {
             position: absolute;
             top: 6%;
-            right: 25%; /* Adjusted for better alignment on larger screens */
+            right: 25%; /* Adjusted for better alignment */
             font-size: 22px;
             background: #fff;
             height: 30px;
@@ -140,13 +151,13 @@
     }
 }
 
-/* Min width 1200px to Max width 1399px */
+/* Min width 1200px to Max width 1399px (e.g., medium desktops) */
 @media only screen and (min-width: 1200px) and (max-width: 1399px) {
     .custom-avatar-uploader {
         .custom-remove-btn {
             position: absolute;
             top: 6%;
-            right: 25%; /* Adjusted for better alignment on larger screens */
+            right: 25%; /* Adjusted for better alignment */
             font-size: 22px;
             background: #fff;
             height: 30px;
@@ -161,7 +172,7 @@
     }
 }
 
-/* Min width 1600px */
+/* Min width 1600px (e.g., large desktops) */
 @media only screen and (min-width: 1600px) {
     .custom-avatar-uploader {
         .custom-remove-btn {

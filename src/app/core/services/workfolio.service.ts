@@ -9,7 +9,7 @@ export class WorkfolioService {
     constructor(
         private httpClient: HttpClient
     ) { }
- 
+
     saveClientDetails(data: any) {
         return this.httpClient.post(ApiService.saveClientDetailsURL, data);
     }
@@ -49,7 +49,10 @@ export class WorkfolioService {
     removePortfolioDetailsById(id: any) {
         return this.httpClient.get(ApiService.removePortfolioDetailsByIdURL + id);
     }
-
+    updatePortfolioDetails(data: any) {
+        return this.httpClient.post(ApiService.updatePortfolioDetailsURL, data);
+    }
+    
     // Case Study Services
     uploadCaseStudyCover(data: any) {
         return this.httpClient.post(ApiService.uploadCaseStudyCoverImagesURL, data);
@@ -71,5 +74,6 @@ export class WorkfolioService {
     }
 
 
-    
+
+
 }

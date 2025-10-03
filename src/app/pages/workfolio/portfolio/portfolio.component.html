@@ -2,15 +2,14 @@
     <div class="col-lg-12">
         <div class="card">
             <div class="card-header">
-
                 <div class="d-flex justify-content-between">
                     <div>
                         <h5 class="card-title">Client Portfolio</h5>
-                        <p class="card-title-desc"><b>Enter Client Portfolio Details</b> </p>
+                        <p class="card-title-desc"><b>Enter Client Portfolio Details</b></p>
                     </div>
                     <button type="button" class="btn btn-danger waves-effect waves-light" (click)="portfolioList()">
-                        <i class="bx bx-arrow-back  "></i>
-                        Back</button>
+                        <i class="bx bx-arrow-back"></i> Back
+                    </button>
                 </div>
             </div>
             <div class="card-body">
@@ -31,10 +30,9 @@
                             </div>
 
                             <!-- Client Name Dropdown -->
-
                             <div class="col-lg-4 mb-2">
                                 <div class="mb-3">
-                                    <label for="choices-single-default" class="form-label">Client Name </label>
+                                    <label for="choices-single-default" class="form-label">Client Name</label>
                                     <ng-select [items]="clientsData" bindLabel="name" bindValue="name"
                                         formControlName="clientname" placeholder="Client Name"
                                         (change)="onNameChange($event)" [addTag]="addNewName">
@@ -48,7 +46,7 @@
                             <!-- Category Dropdown -->
                             <div class="col-lg-4 mb-2">
                                 <div class="mb-3">
-                                    <label for="choices-single-default" class="form-label">Select Category </label>
+                                    <label for="choices-single-default" class="form-label">Select Category</label>
                                     <ng-select [items]="categories" bindLabel="category" bindValue="category"
                                         formControlName="category" placeholder="Select Category"
                                         (change)="onCategoryChange($event)" [addTag]="addNewCategory">
@@ -87,8 +85,8 @@
                             <!-- Inner Image Uploader -->
                             <div class="col-lg-4 mb-2">
                                 <div class="form-group mb-3">
-                                    <label>Upload Cover Image <span class="text-muted">(Required size: 800x600px)</span>
-                                    </label>
+                                    <label>Upload Cover Image <span class="text-muted">(Required size:
+                                            800x600px)</span></label>
                                     <div class="custom-avatar-uploader">
                                         <div class="d-flex justify-content-center">
                                             <label class="custom-upload-box" *ngIf="!coverImageUrl"
@@ -111,12 +109,10 @@
                                 </div>
                             </div>
                             <!-- Portfolio Gallery Uploader -->
-
                             <div class="col-lg-4 mb-2">
                                 <div class="form-group mb-3">
                                     <label>Portfolio Gallery <span class="text-muted">(You can add multiple
-                                            images)</span>
-                                    </label>
+                                            images)</span></label>
                                     <div class="d-flex flex-row flex-wrap gap-3 align-items-center">
                                         <ng-container
                                             *ngFor="let uploader of galleryUploaders; let uploaderIndex = index">
@@ -159,6 +155,7 @@
                                     </div>
                                 </div>
                             </div>
+
                             <!-- Description CKEditor -->
                             <div class="col-lg-12 mb-2">
                                 <div class="form-group mb-3">
@@ -169,20 +166,20 @@
                                     </div>
                                 </div>
                             </div>
-
                         </div>
                     </form>
                     <div class="d-flex justify-content-end gap-2">
                         <button type="button" class="btn btn-danger waves-effect">Cancel</button>
                         <button type="button" class="btn btn-primary waves-effect waves-light"
-                            (click)="submitPortfolioDetails()" [disabled]="validationForm.invalid">Submit</button>
+                            (click)="submitPortfolioDetails()" [disabled]="validationForm.invalid">
+                            {{ isEditing ? 'Update' : 'Submit' }}
+                        </button>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
-
 
 <div class="row" *ngIf="isOpen">
     <div class="col-lg-12">
@@ -194,12 +191,10 @@
                         <p class="card-title-desc">List of all Portfolio</p>
                     </div>
                     <button type="button" class="btn btn-primary waves-effect waves-light" (click)="addPortfolio()">
-                        <i class="fas fa-user-plus "></i>
-                        Add New Portfolio </button>
+                        <i class="fas fa-user-plus"></i> Add New Portfolio
+                    </button>
                 </div>
-
             </div>
-
             <div class="card-body">
                 <div class="table-responsive">
                     <table class="table mb-0">
@@ -216,7 +211,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr *ngFor="let c of paginateData;let i=index">
+                            <tr *ngFor="let c of paginateData; let i=index">
                                 <td class="text-left">{{c.index}}</td>
                                 <td class="text-center">{{c.title}}</td>
                                 <td class="text-center">{{c.clientname}}</td>
@@ -226,26 +221,28 @@
                                         class="rounded avatar-lg" (click)="openImage(c.index - 1)">
                                 </td>
                                 <td class="text-center">{{c.publishdate | date:'shortDate'}}</td>
-
                                 <td class="text-center">
                                     <button type="button" class="btn btn-success waves-effect btn-label waves-light"
-                                        *ngIf="c.isactive" (click)="deactiveBanners(c.index)"><i
-                                            class="bx bx-check-double label-icon"></i> Active</button>
+                                        *ngIf="c.isactive" (click)="deactiveBanners(c.index)">
+                                        <i class="bx bx-check-double label-icon"></i> Active
+                                    </button>
                                     <button type="button" class="btn btn-danger waves-effect btn-label waves-light"
-                                        *ngIf="!c.isactive" (click)="activeBanners(c.index)"><i
-                                            class="bx bx-block label-icon"></i> Deactive</button>
+                                        *ngIf="!c.isactive" (click)="activeBanners(c.index)">
+                                        <i class="bx bx-block label-icon"></i> Deactive
+                                    </button>
                                 </td>
                                 <td class="text-end">
-
                                     <div class="d-flex justify-content-end gap-1">
                                         <button type="button" class="btn btn-soft-primary waves-effect waves-light"
                                             data-bs-toggle="tooltip" data-bs-placement="top" title="View & Accept"
-                                            (click)="editPortfolioById(c)"><i
-                                                class="bx bx-edit font-size-16 align-middle"></i></button>
+                                            (click)="editPortfolioById(c)">
+                                            <i class="bx bx-edit font-size-16 align-middle"></i>
+                                        </button>
                                         <button type="button" class="btn btn-soft-danger waves-effect waves-light"
                                             data-bs-toggle="tooltip" data-bs-placement="top" title="View & Accept"
-                                            (click)="removePortfolioById(c.id)"><i
-                                                class="bx bx-trash-alt font-size-16 align-middle"></i></button>
+                                            (click)="removePortfolioById(c.id)">
+                                            <i class="bx bx-trash-alt font-size-16 align-middle"></i>
+                                        </button>
                                     </div>
                                 </td>
                             </tr>
@@ -259,9 +256,6 @@
                         class="d-flex justify-content-end pagination-rounded-flat pagination-success"></ngb-pagination>
                 </div>
             </div>
-            <!-- end card body -->
         </div>
-        <!-- end card -->
     </div>
-    <!-- end col -->
 </div>
