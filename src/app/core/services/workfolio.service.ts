@@ -52,7 +52,7 @@ export class WorkfolioService {
     updatePortfolioDetails(data: any) {
         return this.httpClient.post(ApiService.updatePortfolioDetailsURL, data);
     }
-    
+
     // Case Study Services
     uploadCaseStudyCover(data: any) {
         return this.httpClient.post(ApiService.uploadCaseStudyCoverImagesURL, data);
@@ -72,7 +72,9 @@ export class WorkfolioService {
     updateCaseStudyActiveDeactive(data: any) {
         return this.httpClient.post(ApiService.updateCaseStudyActiveDeactiveURL, data);
     }
-
+    updateCaseStudyData(data: any) {
+        return this.httpClient.post(ApiService.updateCaseStudyDetailsURL, data);
+    }
 
 
 

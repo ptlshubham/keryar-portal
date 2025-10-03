@@ -4,8 +4,9 @@
             <div class="card-header">
                 <div class="d-flex justify-content-between">
                     <div>
-                        <h5 class="card-title">Case study</h5>
-                        <p class="card-title-desc"><b>Enter Case study Details</b></p>
+                        <h5 class="card-title">Case Study</h5>
+                        <p class="card-title-desc"><b>{{ isEditMode ? 'Edit Case Study Details' : 'Enter Case Study
+                                Details' }}</b></p>
                     </div>
                     <button type="button" class="btn btn-danger waves-effect waves-light" (click)="caseStudyList()">
                         <i class="bx bx-arrow-back"></i> Back
@@ -24,7 +25,7 @@
                                         formControlName="title"
                                         [ngClass]="{'is-invalid': f.title.touched && f.title.errors}">
                                     <div *ngIf="f.title.touched && f.title.errors" class="invalid-feedback">
-                                        <span *ngIf="f.title.errors.required">This Field is required.</span>
+                                        <span *ngIf="f.title.errors.required">This field is required.</span>
                                     </div>
                                 </div>
                             </div>
@@ -40,6 +41,9 @@
                                             {{item.name}}
                                         </ng-template>
                                     </ng-select>
+                                    <div *ngIf="f.clientname.touched && f.clientname.errors" class="invalid-feedback">
+                                        <span *ngIf="f.clientname.errors.required">This field is required.</span>
+                                    </div>
                                 </div>
                             </div>
 
@@ -55,17 +59,19 @@
                                         </ng-template>
                                     </ng-select>
                                     <div *ngIf="f.category.touched && f.category.errors" class="invalid-feedback">
-                                        <span *ngIf="f.category.errors.required">This Field is required.</span>
+                                        <span *ngIf="f.category.errors.required">This field is required.</span>
                                     </div>
                                 </div>
                             </div>
+
                             <!-- Published Date -->
                             <div class="col-lg-4 mb-2">
                                 <div class="form-group mb-3">
                                     <label>Published Date</label>
-                                    <input type="date" class="form-control" formControlName="publishdate">
+                                    <input type="date" class="form-control" formControlName="publishdate"
+                                        [ngClass]="{'is-invalid': f.publishdate.touched && f.publishdate.errors}">
                                     <div *ngIf="f.publishdate.touched && f.publishdate.errors" class="invalid-feedback">
-                                        <span *ngIf="f.publishdate.errors.required">This Field is required.</span>
+                                        <span *ngIf="f.publishdate.errors.required">This field is required.</span>
                                     </div>
                                 </div>
                             </div>
@@ -73,7 +79,7 @@
                             <!-- Inner Image Uploader -->
                             <div class="col-lg-4 mb-2">
                                 <div class="form-group mb-3">
-                                    <label for="innerImage">Upload inner image <span class="text-muted">(Required size:
+                                    <label for="innerImage">Upload cover image <span class="text-muted">(Required size:
                                             800x600px)</span></label>
                                     <div class="custom-avatar-uploader">
                                         <div class="d-flex justify-content-center">
@@ -84,7 +90,7 @@
                                                 <a><i class="mdi mdi-plus-circle"></i></a>
                                             </label>
                                             <div class="custom-preview-box" *ngIf="innerImageUrl">
-                                                <img [src]="innerImageUrl" alt="Inner Avatar" />
+                                                <img [src]="innerImageUrl" alt="Cover Image" />
                                                 <a class="custom-remove-btn" tooltip="Remove Uploaded Image"
                                                     tooltipPosition="above" (click)="removeUploadedInnerImage()">
                                                     <i class="mdi mdi-close-circle"></i></a>
@@ -96,6 +102,8 @@
                                     </div>
                                 </div>
                             </div>
+
+                            <!-- Gallery Images -->
                             <div class="col-lg-4 mb-2">
                                 <div class="form-group mb-3">
                                     <label>Case Study Gallery <span class="text-muted">(You can add multiple
@@ -115,7 +123,6 @@
                                                         </a>
                                                     </div>
                                                 </ng-container>
-                                                <!-- Add Image Button for this uploader -->
                                                 <label class="custom-upload-box" tooltip="Add Image"
                                                     tooltipPosition="above">
                                                     <input type="file" accept="image/*"
@@ -132,12 +139,13 @@
                                 </div>
                             </div>
 
+                            <!-- Description -->
                             <div class="col-lg-12 mb-2">
                                 <div class="form-group mb-3">
                                     <label>Description</label>
                                     <ckeditor [editor]="Editor" formControlName="description"></ckeditor>
                                     <div *ngIf="f.description.touched && f.description.errors" class="invalid-feedback">
-                                        <span *ngIf="f.description.errors.required">This Field is required.</span>
+                                        <span *ngIf="f.description.errors.required">This field is required.</span>
                                     </div>
                                 </div>
                             </div>
@@ -147,7 +155,9 @@
                         <button type="button" class="btn btn-danger waves-effect"
                             (click)="caseStudyList()">Cancel</button>
                         <button type="button" class="btn btn-primary waves-effect waves-light"
-                            (click)="submitCaseStudyDetails()" [disabled]="validationForm.invalid">Submit</button>
+                            (click)="submitCaseStudyDetails()" [disabled]="validationForm.invalid">
+                            {{ isEditMode ? 'Update' : 'Submit' }}
+                        </button>
                     </div>
                 </div>
             </div>
@@ -161,8 +171,8 @@
             <div class="card-header">
                 <div class="d-flex justify-content-between">
                     <div>
-                        <h5 class="card-title">Case study</h5>
-                        <p class="card-title-desc">List of all Case study</p>
+                        <h5 class="card-title">Case Studies</h5>
+                        <p class="card-title-desc">List of all Case Studies</p>
                     </div>
                     <button type="button" class="btn btn-primary waves-effect waves-light" (click)="addCaseStudy()">
                         <i class="fas fa-user-plus"></i> Add New Case Study
@@ -176,9 +186,8 @@
                             <tr>
                                 <th class="text-left">#</th>
                                 <th class="text-center">Title</th>
-                                <th class="text-center">Cover Image</th> <!-- New column for inner image -->
-                                <th class="text-center">Image</th>
-                                <th class="text-center">Active & Deactive</th>
+                                <th class="text-center">Cover Image</th>
+                                <th class="text-center">Active/Deactive</th>
                                 <th class="text-end">Action</th>
                             </tr>
                         </thead>
@@ -187,32 +196,32 @@
                                 <td class="text-left">{{c.index}}</td>
                                 <td class="text-center">{{c.title}}</td>
                                 <td class="text-center">
-                                    <img [src]="c.coverimage ? (serverPath + c.coverimage) : 'default-cover-image.jpg'"
+                                    <img [src]="c.coverimage ? (serverPath + c.coverimage) : 'assets/images/default-cover-image.jpg'"
                                         alt="{{c.title}} Cover" class="rounded avatar-lg"
                                         (click)="openImage(c.index - 1, 'cover')">
                                 </td>
                                 <td class="text-center">
-                                    <img [src]="serverPath + c.image" alt="{{c.title}}" class="rounded avatar-lg"
-                                        (click)="openImage(c.index - 1)">
-                                </td>
-                                <td class="text-center">
                                     <button type="button" class="btn btn-success waves-effect btn-label waves-light"
-                                        *ngIf="c.isactive" (click)="deactiveBanners(c.index)"><i
-                                            class="bx bx-check-double label-icon"></i> Active</button>
+                                        *ngIf="c.isactive" (click)="deactiveBanners(c.index)">
+                                        <i class="bx bx-check-double label-icon"></i> Active
+                                    </button>
                                     <button type="button" class="btn btn-danger waves-effect btn-label waves-light"
-                                        *ngIf="!c.isactive" (click)="activeBanners(c.index)"><i
-                                            class="bx bx-block label-icon"></i> Deactive</button>
+                                        *ngIf="!c.isactive" (click)="activeBanners(c.index)">
+                                        <i class="bx bx-block label-icon"></i> Deactive
+                                    </button>
                                 </td>
                                 <td class="text-end">
                                     <div class="d-flex justify-content-end gap-1">
                                         <button type="button" class="btn btn-soft-primary waves-effect waves-light"
                                             data-bs-toggle="tooltip" data-bs-placement="top" title="Edit Case Study"
-                                            (click)="editCaseStudyById(c)"><i
-                                                class="bx bx-edit font-size-16 align-middle"></i></button>
+                                            (click)="editCaseStudyById(c)">
+                                            <i class="bx bx-edit font-size-16 align-middle"></i>
+                                        </button>
                                         <button type="button" class="btn btn-soft-danger waves-effect waves-light"
                                             data-bs-toggle="tooltip" data-bs-placement="top" title="Delete Case Study"
-                                            (click)="removeBannersImages(c.id)"><i
-                                                class="bx bx-trash-alt font-size-16 align-middle"></i></button>
+                                            (click)="removeBannersImages(c.id)">
+                                            <i class="bx bx-trash-alt font-size-16 align-middle"></i>
+                                        </button>
                                     </div>
                                 </td>
                             </tr>

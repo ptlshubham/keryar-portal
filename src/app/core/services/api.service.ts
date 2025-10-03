@@ -43,7 +43,7 @@ export class ApiService {
   public static getAllCaseStudyDataURL: string = ApiService.HOST_URL + '/keryar/GetAllCaseStudyDetails';
   public static removeCaseStudyDetailsByIdURL: string = ApiService.HOST_URL + '/keryar/RemoveCaseStudyDetailsById/';
   public static updateCaseStudyActiveDeactiveURL: string = ApiService.HOST_URL + '/keryar/UpdateCaseStudyActiveDeactive';
-
+  public static updateCaseStudyDetailsURL: string = ApiService.HOST_URL + '/keryar/UpdateCaseStudyDetails';
   // placement
   public static savePlacementCategoryURL: string = ApiService.HOST_URL + '/keryar/SavePlacementCategory';
   public static getAllPlacementCategoryURL: string = ApiService.HOST_URL + '/keryar/GetAllPlacementCategory';
