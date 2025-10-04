@@ -5,6 +5,7 @@ import { ToastrService } from 'ngx-toastr';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { PlacementService } from 'src/app/core/services/placement.service';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-student-list',
@@ -143,25 +144,36 @@ export class StudentListComponent implements OnInit {
   }
 
   deletePlacementForm(id: string): void {
-    if (confirm('Are you sure you want to delete this placement form?')) {
-      this.placementService.removePlacementFormById(id).subscribe({
-        next: (response) => {
-          if (response.success) {
-            this.toastr.success('Placement form deleted successfully');
-            this.clientsData = this.clientsData.filter((item) => item.id !== id);
-            this.collectionSize = this.clientsData.length;
-            this.getPagination();
-          } else {
-            this.toastr.error('Failed to delete placement form');
+    Swal.fire({
+      title: 'Are you sure?',
+      text: 'You will not be able to recover this placement form!',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, delete it!',
+      cancelButtonText: 'Cancel',
+      reverseButtons: true
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.placementService.removePlacementFormById(id).subscribe({
+          next: (response) => {
+            if (response.success) {
+              Swal.fire('Deleted!', 'Placement form has been deleted.', 'success');
+              this.clientsData = this.clientsData.filter((item) => item.id !== id);
+              this.collectionSize = this.clientsData.length;
+              this.getPagination();
+            } else {
+              Swal.fire('Failed!', 'Failed to delete placement form.', 'error');
+            }
+          },
+          error: (err) => {
+            console.error('Error deleting placement form:', err);
+            Swal.fire('Error!', 'Something went wrong while deleting.', 'error');
           }
-        },
-        error: (err) => {
-          console.error('Error deleting placement form:', err);
-          this.toastr.error('Error deleting placement form');
-        }
-      });
-    }
+        });
+      }
+    });
   }
+
 
   // Optional: better *ngFor performance
   trackById(_: number, item: any) { return item.id; }
