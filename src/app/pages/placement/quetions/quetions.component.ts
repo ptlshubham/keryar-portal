@@ -20,7 +20,14 @@ export class QuetionsComponent implements OnInit {
   collectionSize = 0;
   paginateData: any = [];
 
-  questionData: any[] = [{ question_text: null, option_type: '', weight: null, optionsArr: [{ options: '', value: null, isCorrect: false }], correctAnswer: null }];
+  questionData: any[] = [{
+    question_text: null,
+    option_type: '',
+    weight: null,
+    time: null, // Time in minutes
+    optionsArr: [{ options: '', value: null, isCorrect: false }],
+    correctAnswer: null
+  }];
   questionModel: any = {};
   viewQuestions: any = {};
 
@@ -59,6 +66,7 @@ export class QuetionsComponent implements OnInit {
     if (enteredQuestions.length === 0) return false;
     return enteredQuestions.every(q =>
       q.weight !== null && q.weight !== undefined && q.weight.toString().trim().length > 0 &&
+      q.time !== null && q.time !== undefined && q.time.toString().trim().length > 0 && q.time >= 0 && // Validate time in minutes
       (q.option_type === 'Checkbox' || q.option_type === 'Radio' ? q.optionsArr.length > 0 : true) &&
       (q.option_type === 'Radio' ? q.correctAnswer !== null && q.correctAnswer !== undefined : true) &&
       (q.option_type === 'Input' || q.option_type === 'Textarea' ? q.correctAnswer !== null && q.correctAnswer?.trim().length > 0 : true)
@@ -198,7 +206,14 @@ export class QuetionsComponent implements OnInit {
   }
 
   addQuestion() {
-    this.questionData.push({ question_text: null, option_type: '', weight: null, optionsArr: [{ options: '', value: null, isCorrect: false }], correctAnswer: null });
+    this.questionData.push({
+      question_text: null,
+      option_type: '',
+      weight: null,
+      time: null, // Time in minutes
+      optionsArr: [{ options: '', value: null, isCorrect: false }],
+      correctAnswer: null
+    });
   }
 
   removeQuestion(index: number) {
@@ -232,6 +247,7 @@ export class QuetionsComponent implements OnInit {
           question_text: q.question_text,
           option_type: q.option_type,
           weight: q.weight,
+          time: q.time, // Time in minutes
           optionsArr: q.optionsArr?.map((opt: any) => ({
             options: opt.options,
             value: opt.value,
@@ -251,8 +267,7 @@ export class QuetionsComponent implements OnInit {
           this.toastr.success('Question set saved successfully.');
         },
         error: (err) => {
-          this.toastr.error('Error saving question set.', 'Error');
-          console.error('Error saving question set:', err);
+          this.toastr.error('Error saving question set: ' + (err.error?.message || err.message), 'Error');
         }
       });
     } else {
@@ -261,7 +276,7 @@ export class QuetionsComponent implements OnInit {
         msg += 'Please fill all required fields (Type, Year, Difficulty, Category, Subcategory, Sub-to-subcategory). ';
       }
       if (!this.isQuestionValid) {
-        msg += 'Please enter at least one question with a valid weight and correct answer.';
+        msg += 'Please enter at least one question with valid weight, time (in minutes), and correct answer.';
       }
       this.toastr.error(msg || 'Please complete the form correctly.', 'Validation Error');
     }
@@ -282,6 +297,7 @@ export class QuetionsComponent implements OnInit {
       question_text: null,
       option_type: '',
       weight: null,
+      time: null, // Time in minutes
       optionsArr: [{ options: '', value: null, isCorrect: false }],
       correctAnswer: null
     }];
@@ -300,8 +316,7 @@ export class QuetionsComponent implements OnInit {
         this.getPagintaion();
       },
       error: (err) => {
-        this.toastr.error('Error fetching question sets.', 'Error');
-        console.error('Error fetching question sets:', err);
+        this.toastr.error('Error fetching question sets: ' + (err.error?.message || err.message), 'Error');
       }
     });
   }
@@ -316,11 +331,10 @@ export class QuetionsComponent implements OnInit {
     this.modalService.open(exlargeModal, { size: 'lg', windowClass: 'modal-holder', centered: true });
   }
 
-
   removeSelfAssessmentQuestionSet(id: string) {
     Swal.fire({
       title: 'Are you sure?',
-      text: 'Do you want to delete this job opening?',
+      text: 'Do you want to delete this question set?',
       icon: 'warning',
       showCancelButton: true,
       confirmButtonColor: '#3085d6',
@@ -336,8 +350,7 @@ export class QuetionsComponent implements OnInit {
             this.toastr.success('Question set removed successfully.');
           },
           error: (err) => {
-            this.toastr.error('Error removing question set.', 'Error');
-            console.error('Error removing question set:', err);
+            this.toastr.error('Error removing question set: ' + (err.error?.message || err.message), 'Error');
           }
         });
       }
@@ -359,6 +372,7 @@ export class QuetionsComponent implements OnInit {
       question_text: q.question_text,
       option_type: q.option_type,
       weight: q.weight,
+      time: q.time, // Time in minutes
       optionsArr: q.optionsArr?.map((opt: any) => ({
         id: opt.id,
         options: opt.options,
@@ -396,14 +410,12 @@ export class QuetionsComponent implements OnInit {
               },
               error: (err) => {
                 this.toastr.error('Failed to fetch sub-to-sub categories', 'Error');
-                console.error('Error fetching sub-to-sub categories:', err);
               }
             });
           }
         },
         error: (err) => {
           this.toastr.error('Failed to fetch subcategories', 'Error');
-          console.error('Error fetching subcategories:', err);
         }
       });
     }
@@ -424,6 +436,7 @@ export class QuetionsComponent implements OnInit {
           question_text: q.question_text,
           option_type: q.option_type,
           weight: q.weight,
+          time: q.time, // Time in minutes
           optionsArr: q.optionsArr?.map((opt: any) => ({
             id: opt.id,
             options: opt.options,
@@ -444,8 +457,7 @@ export class QuetionsComponent implements OnInit {
         this.isUpdate = false;
       },
       error: (err) => {
-        this.toastr.error('Error updating question set.', 'Error');
-        console.error('Error updating question set:', err);
+        this.toastr.error('Error updating question set: ' + (err.error?.message || err.message), 'Error');
       }
     });
   }
