@@ -97,4 +97,16 @@ export class PlacementService {
     removeSelfAssessmentQuestionSet(id: string): Observable<any> {
         return this.httpClient.get(`${ApiService.removeSelfAssessmentQuestionSetURL}${id}`);
     }
+
+    // form
+    getAllPlacementForms(): Observable<any> {
+        return this.httpClient.get(ApiService.getAllPlacementFormsURL);
+    }
+
+    getPlacementFormById(id: string): Observable<any> {
+        return this.httpClient.get(ApiService.getPlacementFormByIdURL + id);
+    }
+    removePlacementFormById(id: string): Observable<any> {
+        return this.httpClient.delete(ApiService.removePlacementFormByIdURL + id);
+    }
 }

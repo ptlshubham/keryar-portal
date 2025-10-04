@@ -90,4 +90,9 @@ export class ApiService {
   public static removeContactusFormDetailsURL: string = ApiService.HOST_URL + '/keryar/RemoveContactusFormdetails/';
 
 
+  // placement - form
+  public static getAllPlacementFormsURL: string = ApiService.HOST_URL + '/keryar/GetAllPlacementForms';
+  public static getPlacementFormByIdURL: string = ApiService.HOST_URL + '/keryar/GetPlacementFormById/';
+  public static removePlacementFormByIdURL: string = ApiService.HOST_URL + '/keryar/RemovePlacementFormById/';
+
 }

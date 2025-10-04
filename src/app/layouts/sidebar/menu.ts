@@ -60,6 +60,12 @@ export const MENU: MenuItem[] = [
                 link: '/placement/quetions',
                 parentId: 8
             },
+            {
+                id: 10,
+                label: 'student-list',
+                link: '/placement/student-list',
+                parentId: 10
+            },
 
         ]
     },

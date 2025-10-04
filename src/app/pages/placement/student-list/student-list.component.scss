@@ -1,0 +1,36 @@
+.table-responsive {
+    .table {
+        th,
+        td {
+            vertical-align: middle;
+        }
+        .btn {
+            padding: 5px 10px;
+            i {
+                margin: 0;
+            }
+        }
+    }
+}
+
+.modal {
+    .modal-content {
+        border-radius: 8px;
+        .modal-header {
+            background-color: #f8f9fa;
+            border-bottom: 1px solid #dee2e6;
+        }
+        .modal-body {
+            padding: 20px;
+            p {
+                margin-bottom: 10px;
+            }
+            a {
+                color: #007bff;
+                &:hover {
+                    text-decoration: underline;
+                }
+            }
+        }
+    }
+}
