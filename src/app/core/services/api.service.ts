@@ -115,4 +115,13 @@ export class ApiService {
   public static getAllCollegesDataURL: string = ApiService.HOST_URL + '/keryar/GetAllColleges';
   public static removeCollegeDetailsByIdURL: string = ApiService.HOST_URL + '/keryar/RemoveCollegeDetailsById/';
   public static updateCollegeActiveDeactiveURL: string = ApiService.HOST_URL + '/keryar/UpdateCollegeActiveDeactive';
+
+
+  public static saveCollegeJobMappingURL: string = ApiService.HOST_URL + '/keryar/SaveCollegeJobMapping';
+  public static getAllCollegeJobMappingsURL: string = ApiService.HOST_URL + '/keryar/GetAllCollegeJobMappings';
+  public static updateCollegeJobLinkStatusURL: string = ApiService.HOST_URL + '/keryar/UpdateCollegeJobLinkStatus';
+  public static deleteCollegeJobMappingURL: string = ApiService.HOST_URL + '/keryar/DeleteCollegeJobMapping';
+  public static getJobOpeningsByCollegeURL: string = ApiService.HOST_URL + '/keryar/GetJobOpeningsByCollege/';
+  public static getCollegeByLinkTokenURL: string = ApiService.HOST_URL + '/keryar/GetCollegeByLinkToken/';
+
 }

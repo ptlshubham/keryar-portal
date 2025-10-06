@@ -1,0 +1,113 @@
+<div class="row">
+    <div class="col-lg-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title">Map College to Job Opening</h5>
+                <p class="card-title-desc"><b>Create a new college-job mapping and manage placement form links</b></p>
+            </div>
+            <div class="card-body">
+                <form [formGroup]="mappingForm">
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">College</label>
+                            <select class="form-select" formControlName="college_id">
+                                <option value="" disabled selected>Select a college</option>
+                                <option *ngFor="let college of colleges" [value]="college.id">{{ college.name }}
+                                </option>
+                            </select>
+                            <div class="invalid-feedback d-block"
+                                *ngIf="f['college_id'].touched && f['college_id'].invalid">
+                                Please select a college.
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Job Opening</label>
+                            <select class="form-select" formControlName="jobopening_id">
+                                <option value="" disabled selected>Select a job opening</option>
+                                <option *ngFor="let job of jobOpenings" [value]="job.id">{{ job.jobtitle }}</option>
+                            </select>
+                            <div class="invalid-feedback d-block"
+                                *ngIf="f['jobopening_id'].touched && f['jobopening_id'].invalid">
+                                Please select a job opening.
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Link Active</label>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" formControlName="link_active"
+                                    id="linkActive">
+                                <label class="form-check-label" for="linkActive">Active</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-end gap-2">
+                        <button type="button" class="btn btn-danger waves-effect">Cancel</button>
+                        <button type="button" class="btn btn-primary waves-effect waves-light" (click)="submitMapping()"
+                            [disabled]="mappingForm.invalid">Submit</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title">College-Job Mappings</h5>
+                <p class="card-title-desc mb-0">List of all college-job mappings with placement form links</p>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th class="text-left">#</th>
+                                <th class="text-center">College Name</th>
+                                <th class="text-center">Job Title</th>
+                                <th class="text-center">Placement Form Link</th>
+                                <th class="text-center">Link Status</th>
+                                <th class="text-end">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let mapping of paginateData; let i=index">
+                                <td class="text-left">{{ (page - 1) * pageSize + i + 1 }}</td>
+                                <td class="text-center">{{ mapping.college_name }}</td>
+                                <td class="text-center">{{ mapping.jobtitle }}</td>
+                                <td class="text-center">
+                                    <a [href]="getPlacementFormLink(mapping.college_id)" target="_blank">{{
+                                        getPlacementFormLink(mapping.college_id) }}</a>
+                                </td>
+                                <td class="text-center">
+                                    <button type="button" class="btn btn-success waves-effect btn-label waves-light"
+                                        *ngIf="mapping.link_active" (click)="toggleLinkStatus(mapping, false)">
+                                        <i class="bx bx-check-double label-icon"></i> Active
+                                    </button>
+                                    <button type="button" class="btn btn-danger waves-effect btn-label waves-light"
+                                        *ngIf="!mapping.link_active" (click)="toggleLinkStatus(mapping, true)">
+                                        <i class="bx bx-block label-icon"></i> Deactive
+                                    </button>
+                                </td>
+                                <td class="text-end">
+                                    <button type="button" class="btn btn-soft-danger waves-effect waves-light"
+                                        data-bs-toggle="tooltip" data-bs-placement="top" title="Delete"
+                                        (click)="deleteMapping(mapping.id)">
+                                        <i class="bx bx-trash-alt font-size-16 align-middle"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="row mt-4">
+                    <ngb-pagination [collectionSize]="collectionSize" [pageSize]="pageSize" [(page)]="page"
+                        [maxSize]="5" [rotate]="true" [ellipses]="false" [boundaryLinks]="true"
+                        (pageChange)="getPagination()" aria-label="Default pagination"
+                        class="d-flex justify-content-end pagination-rounded-flat pagination-success"></ngb-pagination>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

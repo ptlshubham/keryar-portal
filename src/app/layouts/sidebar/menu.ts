@@ -78,6 +78,13 @@ export const MENU: MenuItem[] = [
                 link: '/placement/college',
                 parentId: 11
             },
+            {
+                id: 11,
+                label: 'college-mapping',
+                link: '/placement/college-mapping',
+                parentId: 11
+            },
+
 
         ]
     },

@@ -141,4 +141,29 @@ export class PlacementService {
     updateCollegeActiveDeactive(data: any): Observable<any> {
         return this.httpClient.post(ApiService.updateCollegeActiveDeactiveURL, data);
     }
+
+
+    saveCollegeJobMapping(data: any): Observable<any> {
+        return this.httpClient.post(ApiService.saveCollegeJobMappingURL, data);
+    }
+
+    getAllCollegeJobMappings(): Observable<any> {
+        return this.httpClient.get(ApiService.getAllCollegeJobMappingsURL);
+    }
+
+    updateCollegeJobLinkStatus(data: any): Observable<any> {
+        return this.httpClient.post(ApiService.updateCollegeJobLinkStatusURL, data);
+    }
+
+    deleteCollegeJobMapping(id: string): Observable<any> {
+        return this.httpClient.post(ApiService.deleteCollegeJobMappingURL, { id });
+    }
+
+    getJobOpeningsByCollege(collegeId: string): Observable<any> {
+        return this.httpClient.get(`${ApiService.getJobOpeningsByCollegeURL}${collegeId}`);
+    }
+
+    getCollegeByLinkToken(collegeId: string): Observable<any> {
+        return this.httpClient.get(`${ApiService.getCollegeByLinkTokenURL}${collegeId}`);
+    }
 }
