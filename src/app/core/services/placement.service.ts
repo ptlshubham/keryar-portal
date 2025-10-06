@@ -109,4 +109,21 @@ export class PlacementService {
     removePlacementFormById(id: string): Observable<any> {
         return this.httpClient.delete(ApiService.removePlacementFormByIdURL + id);
     }
+
+    getAllStudentAssessments(status?: string): Observable<any> {
+        const params = status ? `?status=${status}` : '';
+        return this.httpClient.get(`${ApiService.getAllStudentAssessmentsURL}${params}`);
+    }
+
+    // Approve or reject an assessment
+    approveRejectAssessment(assessmentId: string, status: 'approved' | 'rejected'): Observable<any> {
+        return this.httpClient.post(ApiService.approveRejectAssessmentURL, { assessmentId, status });
+    }
+
+    // Get assessment preview (for admin)
+    getAssessmentPreview(assessmentId: string): Observable<any> {
+        return this.httpClient.get(`${ApiService.getAssessmentPreviewURL}/${assessmentId}`);
+    }
+
+
 }

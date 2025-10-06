@@ -95,4 +95,10 @@ export class ApiService {
   public static getPlacementFormByIdURL: string = ApiService.HOST_URL + '/keryar/GetPlacementFormById/';
   public static removePlacementFormByIdURL: string = ApiService.HOST_URL + '/keryar/RemovePlacementFormById/';
 
+
+  public static getAllStudentAssessmentsURL: string = ApiService.HOST_URL + '/keryar/GetAllStudentAssessments';
+  public static approveRejectAssessmentURL: string = ApiService.HOST_URL + '/keryar/ApproveRejectAssessment';
+  public static getAssessmentPreviewURL: string = ApiService.HOST_URL + '/keryar/GetAssessmentPreview';
+
+
 }
