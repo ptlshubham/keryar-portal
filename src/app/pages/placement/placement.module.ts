@@ -19,6 +19,7 @@ import { SubToSubCategoryComponent } from './sub-to-sub-category/sub-to-sub-cate
 import { QuetionsComponent } from './quetions/quetions.component';
 import { StudentListComponent } from './student-list/student-list.component';
 import { AssessmentReviewComponent } from './assessment-review/assessment-review.component';
+import { CollegeListComponent } from './college-list/college-list.component';
 
 
 @NgModule({
@@ -30,6 +31,7 @@ import { AssessmentReviewComponent } from './assessment-review/assessment-review
     QuetionsComponent,
     StudentListComponent,
     AssessmentReviewComponent,
+    CollegeListComponent,
   ],
   imports: [
     CommonModule,

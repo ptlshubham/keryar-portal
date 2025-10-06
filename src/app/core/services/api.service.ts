@@ -100,5 +100,9 @@ export class ApiService {
   public static approveRejectAssessmentURL: string = ApiService.HOST_URL + '/keryar/ApproveRejectAssessment';
   public static getAssessmentPreviewURL: string = ApiService.HOST_URL + '/keryar/GetAssessmentPreview';
 
-
+  // college
+  public static saveCollegeDetailsURL: string = ApiService.HOST_URL + '/keryar/SaveCollegeDetails';
+  public static getAllCollegesDataURL: string = ApiService.HOST_URL + '/keryar/GetAllColleges';
+  public static removeCollegeDetailsByIdURL: string = ApiService.HOST_URL + '/keryar/RemoveCollegeDetailsById/';
+  public static updateCollegeActiveDeactiveURL: string = ApiService.HOST_URL + '/keryar/UpdateCollegeActiveDeactive';
 }

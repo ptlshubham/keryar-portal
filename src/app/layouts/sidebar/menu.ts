@@ -72,6 +72,12 @@ export const MENU: MenuItem[] = [
                 link: '/placement/assessment-review',
                 parentId: 11
             },
+            {
+                id: 11,
+                label: 'college',
+                link: '/placement/college',
+                parentId: 11
+            },
 
         ]
     },

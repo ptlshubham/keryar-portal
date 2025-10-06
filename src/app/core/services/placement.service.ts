@@ -125,5 +125,20 @@ export class PlacementService {
         return this.httpClient.get(`${ApiService.getAssessmentPreviewURL}/${assessmentId}`);
     }
 
+    // college
+    saveCollegeDetails(data: any): Observable<any> {
+        return this.httpClient.post(ApiService.saveCollegeDetailsURL, data);
+    }
 
+    getAllColleges(): Observable<any> {
+        return this.httpClient.get(ApiService.getAllCollegesDataURL);
+    }
+
+    removeCollegeDetailsById(id: any): Observable<any> {
+        return this.httpClient.get(ApiService.removeCollegeDetailsByIdURL + id);
+    }
+
+    updateCollegeActiveDeactive(data: any): Observable<any> {
+        return this.httpClient.post(ApiService.updateCollegeActiveDeactiveURL, data);
+    }
 }
