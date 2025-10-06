@@ -100,4 +100,19 @@ export class ApiService {
   public static removeContactusFormDetailsURL: string = ApiService.HOST_URL + '/keryar/RemoveContactusFormdetails/';
 
 
+  // placement - form
+  public static getAllPlacementFormsURL: string = ApiService.HOST_URL + '/keryar/GetAllPlacementForms';
+  public static getPlacementFormByIdURL: string = ApiService.HOST_URL + '/keryar/GetPlacementFormById/';
+  public static removePlacementFormByIdURL: string = ApiService.HOST_URL + '/keryar/RemovePlacementFormById/';
+
+
+  public static getAllStudentAssessmentsURL: string = ApiService.HOST_URL + '/keryar/GetAllStudentAssessments';
+  public static approveRejectAssessmentURL: string = ApiService.HOST_URL + '/keryar/ApproveRejectAssessment';
+  public static getAssessmentPreviewURL: string = ApiService.HOST_URL + '/keryar/GetAssessmentPreview';
+
+  // college
+  public static saveCollegeDetailsURL: string = ApiService.HOST_URL + '/keryar/SaveCollegeDetails';
+  public static getAllCollegesDataURL: string = ApiService.HOST_URL + '/keryar/GetAllColleges';
+  public static removeCollegeDetailsByIdURL: string = ApiService.HOST_URL + '/keryar/RemoveCollegeDetailsById/';
+  public static updateCollegeActiveDeactiveURL: string = ApiService.HOST_URL + '/keryar/UpdateCollegeActiveDeactive';
 }

@@ -97,4 +97,48 @@ export class PlacementService {
     removeSelfAssessmentQuestionSet(id: string): Observable<any> {
         return this.httpClient.get(`${ApiService.removeSelfAssessmentQuestionSetURL}${id}`);
     }
+
+    // form
+    getAllPlacementForms(): Observable<any> {
+        return this.httpClient.get(ApiService.getAllPlacementFormsURL);
+    }
+
+    getPlacementFormById(id: string): Observable<any> {
+        return this.httpClient.get(ApiService.getPlacementFormByIdURL + id);
+    }
+    removePlacementFormById(id: string): Observable<any> {
+        return this.httpClient.delete(ApiService.removePlacementFormByIdURL + id);
+    }
+
+    getAllStudentAssessments(status?: string): Observable<any> {
+        const params = status ? `?status=${status}` : '';
+        return this.httpClient.get(`${ApiService.getAllStudentAssessmentsURL}${params}`);
+    }
+
+    // Approve or reject an assessment
+    approveRejectAssessment(assessmentId: string, status: 'approved' | 'rejected'): Observable<any> {
+        return this.httpClient.post(ApiService.approveRejectAssessmentURL, { assessmentId, status });
+    }
+
+    // Get assessment preview (for admin)
+    getAssessmentPreview(assessmentId: string): Observable<any> {
+        return this.httpClient.get(`${ApiService.getAssessmentPreviewURL}/${assessmentId}`);
+    }
+
+    // college
+    saveCollegeDetails(data: any): Observable<any> {
+        return this.httpClient.post(ApiService.saveCollegeDetailsURL, data);
+    }
+
+    getAllColleges(): Observable<any> {
+        return this.httpClient.get(ApiService.getAllCollegesDataURL);
+    }
+
+    removeCollegeDetailsById(id: any): Observable<any> {
+        return this.httpClient.get(ApiService.removeCollegeDetailsByIdURL + id);
+    }
+
+    updateCollegeActiveDeactive(data: any): Observable<any> {
+        return this.httpClient.post(ApiService.updateCollegeActiveDeactiveURL, data);
+    }
 }
