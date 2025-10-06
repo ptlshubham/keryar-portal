@@ -2,22 +2,21 @@
     <div class="col-lg-12">
         <div class="card">
             <div class="card-header">
-
                 <div class="d-flex justify-content-between">
                     <div>
                         <h5 class="card-title">Add Blog</h5>
-                        <p class="card-title-desc"><b>Enter Blog Details</b> </p>
+                        <p class="card-title-desc"><b>{{ isEditing ? 'Edit Blog Details' : 'Enter Blog Details' }}</b></p>
                     </div>
                     <button type="button" class="btn btn-danger waves-effect waves-light" (click)="BlogList()">
-                        <i class="bx bx-arrow-back  "></i>
-                        Back</button>
+                        <i class="bx bx-arrow-back"></i> Back
+                    </button>
                 </div>
             </div>
             <div class="card-body">
                 <div class="row">
                     <form [formGroup]="validationForm">
                         <div class="row">
-                            <!-- Title -->
+                            <!-- Meta Title -->
                             <div class="col-lg-12 mb-2">
                                 <div class="form-group mb-3">
                                     <label>Meta Title</label>
@@ -25,10 +24,12 @@
                                         formControlName="metatitle"
                                         [ngClass]="{'is-invalid': f.metatitle.touched && f.metatitle.errors}">
                                     <div *ngIf="f.metatitle.touched && f.metatitle.errors" class="invalid-feedback">
-                                        <span *ngIf="f.metatitle.errors.required">This Field is required.</span>
+                                        <span *ngIf="f.metatitle.errors.required">This field is required.</span>
                                     </div>
                                 </div>
                             </div>
+
+                            <!-- Meta Keywords -->
                             <div class="col-lg-6 mb-2">
                                 <div class="form-group mb-3">
                                     <label>Meta Keywords (Separate with commas)</label>
@@ -36,10 +37,12 @@
                                         formControlName="keywords"
                                         [ngClass]="{'is-invalid': f.keywords.touched && f.keywords.errors}"></textarea>
                                     <div *ngIf="f.keywords.touched && f.keywords.errors" class="invalid-feedback">
-                                        <span *ngIf="f.keywords.errors.required">This Field is required.</span>
+                                        <span *ngIf="f.keywords.errors.required">This field is required.</span>
                                     </div>
                                 </div>
                             </div>
+
+                            <!-- Meta Description -->
                             <div class="col-lg-6 mb-2">
                                 <div class="form-group mb-3">
                                     <label>Meta Description</label>
@@ -48,10 +51,12 @@
                                         [ngClass]="{'is-invalid': f.metadescription.touched && f.metadescription.errors}"></textarea>
                                     <div *ngIf="f.metadescription.touched && f.metadescription.errors"
                                         class="invalid-feedback">
-                                        <span *ngIf="f.metadescription.errors.required">This Field is required.</span>
+                                        <span *ngIf="f.metadescription.errors.required">This field is required.</span>
                                     </div>
                                 </div>
                             </div>
+
+                            <!-- Blog Title -->
                             <div class="col-lg-12 mb-2">
                                 <div class="form-group mb-3">
                                     <label>Blog Title</label>
@@ -59,35 +64,29 @@
                                         formControlName="blogtitle"
                                         [ngClass]="{'is-invalid': f.blogtitle.touched && f.blogtitle.errors}">
                                     <div *ngIf="f.blogtitle.touched && f.blogtitle.errors" class="invalid-feedback">
-                                        <span *ngIf="f.blogtitle.errors.required">This Field is required.</span>
+                                        <span *ngIf="f.blogtitle.errors.required">This field is required.</span>
                                     </div>
                                 </div>
                             </div>
-                            <!-- Description CKEditor -->
-                            <div class="col-lg-12 mb-2">
-                                <div class="form-group mb-3">
-                                    <label>Description</label>
-                                    <ckeditor [editor]="Editor" formControlName="description"></ckeditor>
-                                    <div *ngIf="f.description.touched && f.description.errors" class="invalid-feedback">
-                                        <span *ngIf="f.description.errors.required">This Field is required.</span>
-                                    </div>
-                                </div>
-                            </div>
+
+                            <!-- Category Dropdown -->
                             <div class="col-lg-4 mb-2">
                                 <div class="mb-3">
-                                    <label for="choices-single-default" class="form-label">Select Category </label>
-                                    <ng-select [items]="keyIndicator" bindLabel="keyno" bindValue="keyno"
-                                        formControlName="category" placeholder="Select Category" [multiple]="true"
-                                        (change)="onKeyIndicatorChange($event)" [addTag]="addNewIndicator">
+                                    <label for="choices-single-default" class="form-label">Select Category</label>
+                                    <ng-select [items]="categories" bindLabel="category" bindValue="category"
+                                        formControlName="category" placeholder="Select Category"
+                                        (change)="onCategoryChange($event)" [addTag]="addNewCategory">
                                         <ng-template ng-optgroup-tmp let-item="item">
-                                            {{item.keyno}}
+                                            {{item.category}}
                                         </ng-template>
                                     </ng-select>
                                     <div *ngIf="f.category.touched && f.category.errors" class="invalid-feedback">
-                                        <span *ngIf="f.category.errors.required">This Field is required.</span>
+                                        <span *ngIf="f.category.errors.required">This field is required.</span>
                                     </div>
                                 </div>
                             </div>
+
+                            <!-- Author Name -->
                             <div class="col-lg-4 mb-2">
                                 <div class="form-group mb-3">
                                     <label>Author Name</label>
@@ -95,18 +94,19 @@
                                         formControlName="authorname"
                                         [ngClass]="{'is-invalid': f.authorname.touched && f.authorname.errors}">
                                     <div *ngIf="f.authorname.touched && f.authorname.errors" class="invalid-feedback">
-                                        <span *ngIf="f.authorname.errors.required">This Field is required.</span>
+                                        <span *ngIf="f.authorname.errors.required">This field is required.</span>
                                     </div>
                                 </div>
                             </div>
+
                             <!-- Published Date -->
                             <div class="col-lg-4 mb-2">
                                 <div class="form-group mb-3">
                                     <label>Published Date</label>
-                                    <input type="date" class="form-control" formControlName="publishDate">
-                                    <div *ngIf="f.publishDate.touched && f.publishDate.errors"
-                                        class="invalid-feedback">
-                                        <span *ngIf="f.publishDate.errors.required">This Field is required.</span>
+                                    <input type="date" class="form-control" formControlName="publishdate"
+                                        [ngClass]="{'is-invalid': f.publishdate.touched && f.publishdate.errors}">
+                                    <div *ngIf="f.publishdate.touched && f.publishdate.errors" class="invalid-feedback">
+                                        <span *ngIf="f.publishdate.errors.required">This field is required.</span>
                                     </div>
                                 </div>
                             </div>
@@ -114,8 +114,8 @@
                             <!-- Inner Image Uploader -->
                             <div class="col-lg-4 mb-2">
                                 <div class="form-group mb-3">
-                                    <label>Upload Inner Image <span class="text-muted">(Required size: 800x600px)</span>
-                                    </label>
+                                    <label>Upload Cover Image <span class="text-muted">(Required size:
+                                            800x600px)</span></label>
                                     <div class="custom-avatar-uploader">
                                         <div class="d-flex justify-content-center">
                                             <label class="custom-upload-box" *ngIf="!innerImageUrl"
@@ -125,7 +125,7 @@
                                                 <a><i class="mdi mdi-plus-circle"></i></a>
                                             </label>
                                             <div class="custom-preview-box" *ngIf="innerImageUrl">
-                                                <img [src]="innerImageUrl" alt="Inner Avatar" />
+                                                <img [src]="innerImageUrl" alt="Cover Image" />
                                                 <a class="custom-remove-btn" tooltip="Remove Uploaded Image"
                                                     tooltipPosition="above" (click)="removeUploadedInnerImage()">
                                                     <i class="mdi mdi-close-circle"></i></a>
@@ -137,11 +137,12 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-lg-4 mb-2">
+
+                            <!-- Blog Gallery Uploader -->
+                            <div class="col-lg-8 mb-2">
                                 <div class="form-group mb-3">
                                     <label>Blog Gallery <span class="text-muted">(You can add multiple
-                                            images)</span>
-                                    </label>
+                                            images)</span></label>
                                     <div class="d-flex flex-row flex-wrap gap-3 align-items-center">
                                         <ng-container
                                             *ngFor="let uploader of galleryUploaders; let uploaderIndex = index">
@@ -185,14 +186,25 @@
                                 </div>
                             </div>
 
-                            <!-- Portfolio Gallery Uploader -->
-
+                            <!-- Description CKEditor -->
+                            <div class="col-lg-12 mb-2">
+                                <div class="form-group mb-3">
+                                    <label>Blog Details</label>
+                                    <ckeditor [editor]="Editor" formControlName="description"></ckeditor>
+                                    <div *ngIf="f.description.touched && f.description.errors" class="invalid-feedback">
+                                        <span *ngIf="f.description.errors.required">This field is required.</span>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </form>
                     <div class="d-flex justify-content-end gap-2">
-                        <button type="button" class="btn btn-danger waves-effect">Cancel</button>
+                        <button type="button" class="btn btn-danger waves-effect"
+                            (click)="BlogList()">Cancel</button>
                         <button type="button" class="btn btn-primary waves-effect waves-light"
-                            [disabled]="validationForm.invalid">Submit</button>
+                            (click)="submitBlogDetails()" [disabled]="validationForm.invalid">
+                            {{ isEditing ? 'Update' : 'Submit' }}
+                        </button>
                     </div>
                 </div>
             </div>
@@ -200,52 +212,70 @@
     </div>
 </div>
 
-
 <div class="row" *ngIf="isOpen">
     <div class="col-lg-12">
         <div class="card">
             <div class="card-header">
                 <div class="d-flex justify-content-between">
                     <div>
-                        <h5 class="card-title">Blogs </h5>
-                        <p class="card-title-desc">List of all blog</p>
+                        <h5 class="card-title">Blogs</h5>
+                        <p class="card-title-desc">List of all Blogs</p>
                     </div>
                     <button type="button" class="btn btn-primary waves-effect waves-light" (click)="AddBlog()">
-                        <i class="fas fa-user-plus "></i>
-                        Add New Blog </button>
+                        <i class="fas fa-user-plus"></i> Add New Blog
+                    </button>
                 </div>
-
             </div>
-
             <div class="card-body">
                 <div class="table-responsive">
                     <table class="table mb-0">
                         <thead class="table-light">
                             <tr>
                                 <th class="text-left">#</th>
-                                <th class="text-center">Blog Name</th>
-                                <th class="text-center">Client Name</th>
+                                <th class="text-center">Blog Title</th>
+                                <th class="text-center">Author Name</th>
                                 <th class="text-center">Category</th>
-                                <th class="text-center">Published Date</th>
+                                <th class="text-center">Image</th>
+                                <th class="text-center">Publish Date</th>
                                 <th class="text-center">Active & Deactive</th>
                                 <th class="text-end">Action</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <tr *ngFor="let c of paginateData;let i=index">
+                            <tr *ngFor="let c of paginateData; let i=index">
                                 <td class="text-left">{{c.index}}</td>
-                                <td class="text-center">{{c.name}}</td>
-
+                                <td class="text-center">{{c.blogtitle}}</td>
+                                <td class="text-center">{{c.authorname}}</td>
+                                <td class="text-center">{{c.category}}</td>
+                                <td class="text-center">
+                                    <img [src]="serverPath+c.coverimage" alt="{{c.blogtitle}}"
+                                        class="rounded avatar-lg" (click)="openImage(c.index - 1)">
+                                </td>
+                                <td class="text-center">{{c.publishdate | date:'shortDate'}}</td>
                                 <td class="text-center">
                                     <button type="button" class="btn btn-success waves-effect btn-label waves-light"
-                                        *ngIf="c.isactive" (click)="deactiveBanners(c.index)"><i
-                                            class="bx bx-check-double label-icon"></i> Active</button>
+                                        *ngIf="c.isactive" (click)="deactiveBanners(c.index)">
+                                        <i class="bx bx-check-double label-icon"></i> Active
+                                    </button>
                                     <button type="button" class="btn btn-danger waves-effect btn-label waves-light"
-                                        *ngIf="!c.isactive" (click)="activeBanners(c.index)"><i
-                                            class="bx bx-block label-icon"></i> Deactive</button>
+                                        *ngIf="!c.isactive" (click)="activeBanners(c.index)">
+                                        <i class="bx bx-block label-icon"></i> Deactive
+                                    </button>
                                 </td>
-
-
+                                <td class="text-end">
+                                    <div class="d-flex justify-content-end gap-1">
+                                        <button type="button" class="btn btn-soft-primary waves-effect waves-light"
+                                            data-bs-toggle="tooltip" data-bs-placement="top" title="Edit Blog"
+                                            (click)="editBlogById(c)">
+                                            <i class="bx bx-edit font-size-16 align-middle"></i>
+                                        </button>
+                                        <button type="button" class="btn btn-soft-danger waves-effect waves-light"
+                                            data-bs-toggle="tooltip" data-bs-placement="top" title="Delete Blog"
+                                            (click)="removeBlogById(c.id)">
+                                            <i class="bx bx-trash-alt font-size-16 align-middle"></i>
+                                        </button>
+                                    </div>
+                                </td>
                             </tr>
                         </tbody>
                     </table>
@@ -257,9 +287,6 @@
                         class="d-flex justify-content-end pagination-rounded-flat pagination-success"></ngb-pagination>
                 </div>
             </div>
-            <!-- end card body -->
         </div>
-        <!-- end card -->
     </div>
-    <!-- end col -->
 </div>

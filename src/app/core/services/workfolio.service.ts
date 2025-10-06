@@ -76,6 +76,29 @@ export class WorkfolioService {
         return this.httpClient.post(ApiService.updateCaseStudyDetailsURL, data);
     }
 
+    // Blog Services
+    uploadBlogCover(data: any) {
+        return this.httpClient.post(ApiService.uploadBlogCoverImagesURL, data);
+    }
+    uploadBlogMultiImage(data: any) {
+        return this.httpClient.post(ApiService.uploadBlogMultiImageURL, data);
+    }
+    saveBlogData(data: any) {
+        return this.httpClient.post(ApiService.saveBlogDetailsURL, data);
+    }
+    getAllBlogData() {
+        return this.httpClient.get(ApiService.getAllBlogDataURL);
+    }
+    removeBlogDetailsById(id: any) {
+        return this.httpClient.get(ApiService.removeBlogDetailsByIdURL + id);
+    }
+    updateBlogActiveDeactive(data: any) {
+        return this.httpClient.post(ApiService.updateBlogActiveDeactiveURL, data);
+    }
+    updateBlogData(data: any) {
+        return this.httpClient.post(ApiService.updateBlogDetailsURL, data);
+    }
+
 
 
 }

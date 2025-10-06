@@ -44,6 +44,16 @@ export class ApiService {
   public static removeCaseStudyDetailsByIdURL: string = ApiService.HOST_URL + '/keryar/RemoveCaseStudyDetailsById/';
   public static updateCaseStudyActiveDeactiveURL: string = ApiService.HOST_URL + '/keryar/UpdateCaseStudyActiveDeactive';
   public static updateCaseStudyDetailsURL: string = ApiService.HOST_URL + '/keryar/UpdateCaseStudyDetails';
+
+  // Blog Details APIs
+  public static uploadBlogCoverImagesURL: string = ApiService.HOST_URL + '/keryar/UploadBlogCoverImages';
+  public static uploadBlogMultiImageURL: string = ApiService.HOST_URL + '/keryar/UploadBlogMultiImage';
+  public static saveBlogDetailsURL: string = ApiService.HOST_URL + '/keryar/SaveBlogDetails';
+  public static getAllBlogDataURL: string = ApiService.HOST_URL + '/keryar/GetAllBlogDetails';
+  public static removeBlogDetailsByIdURL: string = ApiService.HOST_URL + '/keryar/RemoveBlogDetailsById/';
+  public static updateBlogActiveDeactiveURL: string = ApiService.HOST_URL + '/keryar/UpdateBlogActiveDeactive';
+  public static updateBlogDetailsURL: string = ApiService.HOST_URL + '/keryar/UpdateBlogDetails';
+
   // placement
   public static savePlacementCategoryURL: string = ApiService.HOST_URL + '/keryar/SavePlacementCategory';
   public static getAllPlacementCategoryURL: string = ApiService.HOST_URL + '/keryar/GetAllPlacementCategory';
