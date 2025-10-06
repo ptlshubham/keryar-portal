@@ -20,7 +20,7 @@ export class CollegeJobMappingComponent implements OnInit {
   pageSize = 10;
   collectionSize = 0;
   paginateData: any[] = [];
-  serverPath: any = "http://localhost:4200/"; // e.g., http://localhost:8300
+  serverPath: any = "http://localhost:4200/";
 
   constructor(
     private fb: FormBuilder,
@@ -35,9 +35,10 @@ export class CollegeJobMappingComponent implements OnInit {
       { label: 'Manage College-Job Mappings', active: true }
     ];
 
+    // Initialize form with jobopening_ids as an array
     this.mappingForm = this.fb.group({
       college_id: ['', Validators.required],
-      jobopening_id: ['', Validators.required],
+      jobopening_ids: [[], Validators.required], // Array for multiple job openings
       link_active: [true]
     });
 
@@ -111,22 +112,22 @@ export class CollegeJobMappingComponent implements OnInit {
 
     const mappingData = {
       college_id: this.mappingForm.value.college_id,
-      jobopening_id: this.mappingForm.value.jobopening_id,
+      jobopening_ids: this.mappingForm.value.jobopening_ids,
       link_active: this.mappingForm.value.link_active
     };
 
     this.placementService.saveCollegeJobMapping(mappingData).subscribe({
       next: (res: any) => {
         if (res.success) {
-          this.toastr.success('Mapping saved successfully');
-          this.mappingForm.reset({ link_active: true });
+          this.toastr.success('Mappings saved successfully');
+          this.mappingForm.reset({ link_active: true, jobopening_ids: [] });
           this.loadMappings();
         } else {
-          this.toastr.error(res.message || 'Failed to save mapping');
+          this.toastr.error(res.message || 'Failed to save mappings');
         }
       },
       error: (err) => {
-        this.toastr.error('Error saving mapping: ' + (err.error?.message || err.message));
+        this.toastr.error('Error saving mappings: ' + (err.error?.message || err.message));
       }
     });
   }

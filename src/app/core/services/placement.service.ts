@@ -163,7 +163,8 @@ export class PlacementService {
         return this.httpClient.get(`${ApiService.getJobOpeningsByCollegeURL}${collegeId}`);
     }
 
-    getCollegeByLinkToken(collegeId: string): Observable<any> {
+    getCollegeByLinkToken(collegeId: any): Observable<any> {
         return this.httpClient.get(`${ApiService.getCollegeByLinkTokenURL}${collegeId}`);
     }
+
 }
