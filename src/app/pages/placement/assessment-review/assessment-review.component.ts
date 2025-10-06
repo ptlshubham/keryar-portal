@@ -3,6 +3,7 @@ import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { ToastrService } from 'ngx-toastr';
 import { PlacementService } from 'src/app/core/services/placement.service';
 import Swal from 'sweetalert2';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 
 enum AssessmentStatus {
   Pending = 'pending',
@@ -32,11 +33,13 @@ export class AssessmentReviewComponent implements OnInit {
   isRejecting = false;
   private modalRef?: NgbModalRef;
   assessmentStatus = AssessmentStatus;
+  safeResumeUrl?: SafeResourceUrl;
 
   constructor(
     private modalService: NgbModal,
     private toastr: ToastrService,
-    private placementService: PlacementService
+    private placementService: PlacementService,
+    private sanitizer: DomSanitizer
   ) { }
 
   ngOnInit() {
@@ -127,12 +130,35 @@ export class AssessmentReviewComponent implements OnInit {
   openPreviewModal(modal: any, assessment: any) {
     this.isLoadingPreview = true;
     this.selectedAssessment = null;
+    this.safeResumeUrl = undefined;
 
     this.placementService.getAssessmentPreview(assessment.assessment_id).subscribe({
       next: (response) => {
         if (response.success) {
           this.selectedAssessment = response.data;
-          console.log('Preview data:', response.data);
+
+          // Build a safe URL for the resume (works for absolute URLs or your served file path)
+          const resumeUrl: string | null =
+            this.selectedAssessment?.student?.resume && typeof this.selectedAssessment.student.resume === 'string'
+              ? this.selectedAssessment.student.resume
+              : null;
+
+          if (resumeUrl) {
+            let fullResumeUrl: string;
+
+            // Case 1: If backend already gives something like "/images/keryar/studentresume/xyz.pdf"
+            if (resumeUrl.startsWith('/')) {
+              fullResumeUrl = `http://localhost:8300${resumeUrl}`;
+            }
+            // Case 2: If backend only gives the filename
+            else {
+              fullResumeUrl = `http://localhost:8300${resumeUrl}`;
+            }
+
+            this.safeResumeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(fullResumeUrl);
+            this.selectedAssessment.student.resume = fullResumeUrl; // update for download/open
+          }
+
           this.modalRef = this.modalService.open(modal, {
             size: 'xl',
             centered: true,
@@ -155,6 +181,7 @@ export class AssessmentReviewComponent implements OnInit {
     this.modalRef?.close();
     this.selectedAssessment = null;
     this.isLoadingPreview = false;
+    this.safeResumeUrl = undefined;
   }
 
   approveAssessment(assessmentId: string) {

@@ -134,149 +134,196 @@
                     <span class="visually-hidden">Loading...</span>
                 </div>
             </div>
-            <div *ngIf="selectedAssessment">
+            <div *ngIf="selectedAssessment" class="row g-4">
                 <!-- Student Details -->
-                <h6 class="mb-3">Student Details</h6>
-                <div class="card mb-3">
-                    <div class="card-body">
-                        <p><strong>Name:</strong> {{ selectedAssessment.student.name || 'N/A' }}</p>
-                        <p><strong>Student ID:</strong> {{ selectedAssessment.student.studentid || 'N/A' }}</p>
-                        <p><strong>Email:</strong> {{ selectedAssessment.student.email || 'N/A' }}</p>
-                        <p><strong>Institute:</strong> {{ selectedAssessment.student.institute || 'N/A' }}</p>
-                        <p><strong>Applied Role:</strong> {{ selectedAssessment.student.appliedrole || 'N/A' }}</p>
-                        <p><strong>Question Set:</strong> {{ selectedAssessment.questionset.type }} - {{
-                            selectedAssessment.questionset.category || 'N/A' }}</p>
-                        <p><strong>Difficulty:</strong> {{ selectedAssessment.questionset.difficulty || 'N/A' }}</p>
-                        <p><strong>Year:</strong> {{ selectedAssessment.questionset.year || 'N/A' }}</p>
-                        <p><strong>Status:</strong>
-                            <span class="badge" [ngClass]="{
-                                'badge-warning': selectedAssessment.status === assessmentStatus.Pending,
-                                'badge-success': selectedAssessment.status === assessmentStatus.Approved,
-                                'badge-danger': selectedAssessment.status === assessmentStatus.Rejected,
-                                'badge-secondary': selectedAssessment.status !== assessmentStatus.Pending && selectedAssessment.status !== assessmentStatus.Approved && selectedAssessment.status !== assessmentStatus.Rejected
-                            }">{{ selectedAssessment.status | titlecase }}</span>
-                        </p>
-                        <p><strong>Total Time:</strong> {{ selectedAssessment.total_time ?
-                            (selectedAssessment.total_time | number:'1.0-0') + ' min' : 'N/A' }}</p> <!-- New field -->
-                        <p><strong>Remaining Time:</strong> {{ selectedAssessment.remaining_time ?
-                            (selectedAssessment.remaining_time / 60 | number:'1.0-0') + ' min' : 'N/A' }}</p>
-                        <p><strong>Created Date:</strong> {{ selectedAssessment.createddate | date:'medium' || 'N/A' }}
-                        </p>
+                <div class="col-12 col-xl-5">
+                    <h6 class="mb-3">Student Details</h6>
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <p><strong>Name:</strong> {{ selectedAssessment.student.name || 'N/A' }}</p>
+                            <p><strong>Student ID:</strong> {{ selectedAssessment.student.studentid || 'N/A' }}</p>
+                            <p><strong>Email:</strong> {{ selectedAssessment.student.email || 'N/A' }}</p>
+                            <p><strong>Institute:</strong> {{ selectedAssessment.student.institute || 'N/A' }}</p>
+                            <p><strong>Applied Role:</strong> {{ selectedAssessment.student.appliedrole || 'N/A' }}</p>
+                            <p><strong>Question Set:</strong> {{ selectedAssessment.questionset.type }} - {{
+                                selectedAssessment.questionset.category || 'N/A' }}</p>
+                            <p><strong>Difficulty:</strong> {{ selectedAssessment.questionset.difficulty || 'N/A' }}</p>
+                            <p><strong>Year:</strong> {{ selectedAssessment.questionset.year || 'N/A' }}</p>
+                            <p><strong>Status:</strong>
+                                <span class="badge" [ngClass]="{
+                                    'badge-warning': selectedAssessment.status === assessmentStatus.Pending,
+                                    'badge-success': selectedAssessment.status === assessmentStatus.Approved,
+                                    'badge-danger': selectedAssessment.status === assessmentStatus.Rejected,
+                                    'badge-secondary': selectedAssessment.status !== assessmentStatus.Pending && selectedAssessment.status !== assessmentStatus.Approved && selectedAssessment.status !== assessmentStatus.Rejected
+                                }">{{ selectedAssessment.status | titlecase }}</span>
+                            </p>
+                            <p><strong>Total Time:</strong> {{ selectedAssessment.total_time ?
+                                (selectedAssessment.total_time | number:'1.0-0') + ' min' : 'N/A' }}</p>
+                            <!-- New field -->
+                            <p><strong>Remaining Time:</strong> {{ selectedAssessment.remaining_time ?
+                                (selectedAssessment.remaining_time / 60 | number:'1.0-0') + ' min' : 'N/A' }}</p>
+                            <p><strong>Created Date:</strong> {{ selectedAssessment.createddate | date:'medium' || 'N/A'
+                                }}
+                            </p>
+
+                            <div class="d-flex gap-2 mt-3" *ngIf="selectedAssessment.student.resume">
+                                <a class="btn btn-primary btn-sm" [href]="selectedAssessment.student.resume"
+                                    target="_blank" rel="noopener">
+                                    Open Resume in New Tab
+                                </a>
+                                <a class="btn btn-outline-primary btn-sm" [href]="selectedAssessment.student.resume"
+                                    download>
+                                    Download Resume
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Resume Preview -->
+                <div class="col-12 col-xl-7">
+                    <h6 class="mb-3">Resume Preview</h6>
+                    <div class="border rounded" style="height:70vh; overflow:hidden;">
+                        <ng-container *ngIf="safeResumeUrl; else noResume">
+                            <!-- Try object first (often best for PDFs) -->
+                            <object [data]="safeResumeUrl" type="application/pdf" width="100%" height="100%">
+                                <!-- Fallback: iframe -->
+                                <iframe [src]="safeResumeUrl" width="100%" height="100%" style="border:0;"></iframe>
+                            </object>
+                        </ng-container>
+                        <ng-template #noResume>
+                            <div class="h-100 d-flex align-items-center justify-content-center text-muted">
+                                No resume available to preview.
+                            </div>
+                        </ng-template>
+                    </div>
+                    <div class="small text-muted mt-2">
+                        If the preview doesn’t load, click “Open Resume in New Tab.”
                     </div>
                 </div>
 
                 <!-- Question Set Preview -->
-                <div class="d-flex justify-content-between align-items-center">
-                    <h5 class="modal-title mt-0">Form Type: {{ selectedAssessment.questionset.type || 'N/A' }}</h5>
-                    <h5 class="modal-title mt-0">Year: {{ selectedAssessment.questionset.year || 'N/A' }}</h5>
-                    <h5 class="modal-title mt-0">Difficulty: {{ selectedAssessment.questionset.difficulty || 'N/A' }}
-                    </h5>
-                </div>
-                <h5 class="title text-center mb-3">Question List</h5>
-                <div class="row">
-                    <div class="col-12">
-                        <div class="card" *ngFor="let data of selectedAssessment.answers; let i = index">
-                            <div class="card-body overflow-hidden position-relative">
-                                <div class="faq-count">
-                                    <div class="d-flex justify-content-between align-items-center gap-2">
-                                        <h5>{{ i + 1 }}. {{ data.question_text }}</h5>
-                                        <div>
-                                            <h5 class="badge bg-primary" style="font-size:medium;">Weight: {{
-                                                data.weight }}</h5>
-                                            <h5 class="badge bg-secondary" style="font-size:medium;">Time: {{ data.time
-                                                }} min</h5>
+                <div class="col-12">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="modal-title mt-0">Form Type: {{ selectedAssessment.questionset.type || 'N/A' }}</h5>
+                        <h5 class="modal-title mt-0">Year: {{ selectedAssessment.questionset.year || 'N/A' }}</h5>
+                        <h5 class="modal-title mt-0">Difficulty: {{ selectedAssessment.questionset.difficulty || 'N/A'
+                            }}
+                        </h5>
+                    </div>
+                    <h5 class="title text-center mb-3">Question List</h5>
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="card" *ngFor="let data of selectedAssessment.answers; let i = index">
+                                <div class="card-body overflow-hidden position-relative">
+                                    <div class="faq-count">
+                                        <div class="d-flex justify-content-between align-items-center gap-2">
+                                            <h5>{{ i + 1 }}. {{ data.question_text }}</h5>
+                                            <div>
+                                                <h5 class="badge bg-primary" style="font-size:medium;">Weight: {{
+                                                    data.weight }}</h5>
+                                                <h5 class="badge bg-secondary" style="font-size:medium;">Time: {{
+                                                    data.time
+                                                    }} min</h5>
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div *ngIf="data.option_type === 'Checkbox' || data.option_type === 'Radio'">
-                                        <div class="options-table mt-3">
-                                            <table class="table table-bordered mb-0" style="background: #f9f9f9;">
-                                                <thead class="table-light">
-                                                    <tr>
-                                                        <th style="width: 50%">Option</th>
-                                                        <th style="width: 20%">Select</th>
-                                                        <th style="width: 20%">Value</th>
-                                                        <th style="width: 10%">Correct</th>
-                                                        <th style="width: 10%">Student's Answer</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    <ng-container *ngIf="data.option_type === 'Checkbox'">
-                                                        <tr *ngFor="let opt of data.optionsArr; let optInd = index">
-                                                            <td class="fw-bold" style="font-size: 1rem;">{{ opt.options
-                                                                }}</td>
-                                                            <td>
-                                                                <input class="form-check-input" type="checkbox" disabled
-                                                                    [checked]="data.answer?.includes(opt.value)" />
-                                                            </td>
-                                                            <td class="fw-bold" style="font-size: 1rem;">{{ opt.value }}
-                                                            </td>
-                                                            <td>
-                                                                <i class="bx bx-check text-success font-size-18"
-                                                                    *ngIf="opt.isCorrect"></i>
-                                                            </td>
-                                                            <td>
-                                                                <i class="bx bx-check text-primary font-size-18"
-                                                                    *ngIf="data.answer?.includes(opt.value)"></i>
-                                                            </td>
+                                        <div *ngIf="data.option_type === 'Checkbox' || data.option_type === 'Radio'">
+                                            <div class="options-table mt-3">
+                                                <table class="table table-bordered mb-0" style="background: #f9f9f9;">
+                                                    <thead class="table-light">
+                                                        <tr>
+                                                            <th style="width: 50%">Option</th>
+                                                            <th style="width: 20%">Select</th>
+                                                            <th style="width: 20%">Value</th>
+                                                            <th style="width: 10%">Correct</th>
+                                                            <th style="width: 10%">Student's Answer</th>
                                                         </tr>
-                                                    </ng-container>
-                                                    <ng-container *ngIf="data.option_type === 'Radio'">
-                                                        <tr *ngFor="let opt of data.optionsArr; let optInd = index">
-                                                            <td class="fw-bold" style="font-size: 1rem;">{{ opt.options
-                                                                }}</td>
-                                                            <td>
-                                                                <input class="form-check-input" type="radio"
-                                                                    [name]="'radio'+i" disabled
-                                                                    [checked]="data.answer === opt.value" />
-                                                            </td>
-                                                            <td class="fw-bold" style="font-size: 1rem;">{{ opt.value }}
-                                                            </td>
-                                                            <td>
-                                                                <i class="bx bx-check text-success font-size-18"
-                                                                    *ngIf="optInd === data.correctAnswer || opt.isCorrect"></i>
-                                                            </td>
-                                                            <td>
-                                                                <i class="bx bx-check text-primary font-size-18"
-                                                                    *ngIf="data.answer === opt.value"></i>
-                                                            </td>
-                                                        </tr>
-                                                    </ng-container>
-                                                </tbody>
-                                            </table>
+                                                    </thead>
+                                                    <tbody>
+                                                        <ng-container *ngIf="data.option_type === 'Checkbox'">
+                                                            <tr *ngFor="let opt of data.optionsArr; let optInd = index">
+                                                                <td class="fw-bold" style="font-size: 1rem;">{{
+                                                                    opt.options
+                                                                    }}</td>
+                                                                <td>
+                                                                    <input class="form-check-input" type="checkbox"
+                                                                        disabled
+                                                                        [checked]="data.answer?.includes(opt.value)" />
+                                                                </td>
+                                                                <td class="fw-bold" style="font-size: 1rem;">{{
+                                                                    opt.value }}
+                                                                </td>
+                                                                <td>
+                                                                    <i class="bx bx-check text-success font-size-18"
+                                                                        *ngIf="opt.isCorrect"></i>
+                                                                </td>
+                                                                <td>
+                                                                    <i class="bx bx-check text-primary font-size-18"
+                                                                        *ngIf="data.answer?.includes(opt.value)"></i>
+                                                                </td>
+                                                            </tr>
+                                                        </ng-container>
+                                                        <ng-container *ngIf="data.option_type === 'Radio'">
+                                                            <tr *ngFor="let opt of data.optionsArr; let optInd = index">
+                                                                <td class="fw-bold" style="font-size: 1rem;">{{
+                                                                    opt.options
+                                                                    }}</td>
+                                                                <td>
+                                                                    <input class="form-check-input" type="radio"
+                                                                        [name]="'radio'+i" disabled
+                                                                        [checked]="data.answer === opt.value" />
+                                                                </td>
+                                                                <td class="fw-bold" style="font-size: 1rem;">{{
+                                                                    opt.value }}
+                                                                </td>
+                                                                <td>
+                                                                    <i class="bx bx-check text-success font-size-18"
+                                                                        *ngIf="optInd === data.correctAnswer || opt.isCorrect"></i>
+                                                                </td>
+                                                                <td>
+                                                                    <i class="bx bx-check text-primary font-size-18"
+                                                                        *ngIf="data.answer === opt.value"></i>
+                                                                </td>
+                                                            </tr>
+                                                        </ng-container>
+                                                    </tbody>
+                                                </table>
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div *ngIf="data.option_type === 'Input' || data.option_type === 'Textarea'">
-                                        <div class="form-group mt-3">
-                                            <label>Correct Answer</label>
-                                            <input *ngIf="data.option_type === 'Input'" type="text" class="form-control"
-                                                [value]="data.correctAnswer || ''" readonly>
-                                            <textarea *ngIf="data.option_type === 'Textarea'" class="form-control"
-                                                rows="4" [value]="data.correctAnswer || ''" readonly></textarea>
-                                        </div>
-                                        <div class="form-group mt-3">
-                                            <label>Student's Answer</label>
-                                            <input *ngIf="data.option_type === 'Input'" type="text" class="form-control"
-                                                [value]="data.answer || 'No answer provided'" readonly>
-                                            <textarea *ngIf="data.option_type === 'Textarea'" class="form-control"
-                                                rows="4" [value]="data.answer || 'No answer provided'"
-                                                readonly></textarea>
-                                        </div>
-                                        <div class="form-group mt-3">
-                                            <label>Correctness</label>
-                                            <p>
-                                                <i class="bx bx-check text-success font-size-18"
-                                                    *ngIf="data.is_correct === 1"></i>
-                                                <i class="bx bx-x text-danger font-size-18"
-                                                    *ngIf="data.is_correct === 0"></i>
-                                                {{ data.is_correct === 1 ? 'Correct' : 'Incorrect' }}
-                                            </p>
+                                        <div *ngIf="data.option_type === 'Input' || data.option_type === 'Textarea'">
+                                            <div class="form-group mt-3">
+                                                <label>Correct Answer</label>
+                                                <input *ngIf="data.option_type === 'Input'" type="text"
+                                                    class="form-control" [value]="data.correctAnswer || ''" readonly>
+                                                <textarea *ngIf="data.option_type === 'Textarea'" class="form-control"
+                                                    rows="4" [value]="data.correctAnswer || ''" readonly></textarea>
+                                            </div>
+                                            <div class="form-group mt-3">
+                                                <label>Student's Answer</label>
+                                                <input *ngIf="data.option_type === 'Input'" type="text"
+                                                    class="form-control" [value]="data.answer || 'No answer provided'"
+                                                    readonly>
+                                                <textarea *ngIf="data.option_type === 'Textarea'" class="form-control"
+                                                    rows="4" [value]="data.answer || 'No answer provided'"
+                                                    readonly></textarea>
+                                            </div>
+                                            <div class="form-group mt-3">
+                                                <label>Correctness</label>
+                                                <p>
+                                                    <i class="bx bx-check text-success font-size-18"
+                                                        *ngIf="data.is_correct === 1"></i>
+                                                    <i class="bx bx-x text-danger font-size-18"
+                                                        *ngIf="data.is_correct === 0"></i>
+                                                    {{ data.is_correct === 1 ? 'Correct' : 'Incorrect' }}
+                                                </p>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                        <div *ngIf="!selectedAssessment.answers?.length" class="alert alert-info">
-                            No answers submitted for this assessment.
+                            <div *ngIf="!selectedAssessment.answers?.length" class="alert alert-info">
+                                No answers submitted for this assessment.
+                            </div>
                         </div>
                     </div>
                 </div>

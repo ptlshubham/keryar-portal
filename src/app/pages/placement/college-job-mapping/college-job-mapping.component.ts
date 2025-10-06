@@ -16,11 +16,12 @@ export class CollegeJobMappingComponent implements OnInit {
   colleges: any[] = [];
   jobOpenings: any[] = [];
   mappings: any[] = [];
+  groupedMappings: any[] = []; // Store grouped mappings
   page = 1;
   pageSize = 10;
   collectionSize = 0;
   paginateData: any[] = [];
-  serverPath: any = "http://localhost:4200/";
+  serverPath: string = "http://localhost:4500/";
 
   constructor(
     private fb: FormBuilder,
@@ -38,7 +39,7 @@ export class CollegeJobMappingComponent implements OnInit {
     // Initialize form with jobopening_ids as an array
     this.mappingForm = this.fb.group({
       college_id: ['', Validators.required],
-      jobopening_ids: [[], Validators.required], // Array for multiple job openings
+      jobopening_ids: [[], Validators.required],
       link_active: [true]
     });
 
@@ -84,7 +85,9 @@ export class CollegeJobMappingComponent implements OnInit {
       next: (res: any) => {
         if (res.success && Array.isArray(res.data)) {
           this.mappings = res.data;
-          this.collectionSize = this.mappings.length;
+          // Group mappings by college_id
+          this.groupedMappings = this.groupMappingsByCollege(this.mappings);
+          this.collectionSize = this.groupedMappings.length;
           this.getPagination();
         } else {
           this.toastr.error(res.message || 'Failed to load mappings');
@@ -96,8 +99,36 @@ export class CollegeJobMappingComponent implements OnInit {
     });
   }
 
+  groupMappingsByCollege(mappings: any[]): any[] {
+    const grouped = new Map<string, any>();
+    mappings.forEach(mapping => {
+      const collegeId = mapping.college_id;
+      if (!grouped.has(collegeId)) {
+        grouped.set(collegeId, {
+          college_id: mapping.college_id,
+          college_name: mapping.college_name,
+          jobtitles: [mapping.jobtitle],
+          link_active: mapping.link_active,
+          ids: [mapping.id] // Store all mapping IDs for this college
+        });
+      } else {
+        const existing = grouped.get(collegeId)!;
+        existing.jobtitles.push(mapping.jobtitle);
+        existing.ids.push(mapping.id);
+        // Set link_active to true if any mapping for this college is active
+        existing.link_active = existing.link_active || mapping.link_active;
+      }
+    });
+
+    // Convert jobtitles array to a comma-separated string
+    return Array.from(grouped.values()).map(group => ({
+      ...group,
+      jobtitle: group.jobtitles.join(', ')
+    }));
+  }
+
   getPagination() {
-    this.paginateData = this.mappings.slice(
+    this.paginateData = this.groupedMappings.slice(
       (this.page - 1) * this.pageSize,
       (this.page - 1) * this.pageSize + this.pageSize
     );
@@ -133,35 +164,43 @@ export class CollegeJobMappingComponent implements OnInit {
   }
 
   toggleLinkStatus(mapping: any, link_active: boolean) {
-    const updateData = { id: mapping.id, link_active };
-    this.placementService.updateCollegeJobLinkStatus(updateData).subscribe({
-      next: (res: any) => {
-        if (res.success) {
-          this.toastr.success(`Link ${link_active ? 'activated' : 'deactivated'} successfully`);
-          this.loadMappings();
-        } else {
-          this.toastr.error(res.message || 'Failed to update link status');
-        }
-      },
-      error: (err) => {
-        this.toastr.error('Error updating link status: ' + (err.error?.message || err.message));
+    // Update all mappings for this college_id
+    const updateData = mapping.ids.map((id: string) => ({ id, link_active }));
+    // Send multiple update requests
+    Promise.all(
+      updateData.map((data: any) =>
+        this.placementService.updateCollegeJobLinkStatus(data).toPromise()
+      )
+    ).then(results => {
+      const allSuccess = results.every((res: any) => res.success);
+      if (allSuccess) {
+        this.toastr.success(`Link ${link_active ? 'activated' : 'deactivated'} successfully`);
+        this.loadMappings();
+      } else {
+        this.toastr.error('Failed to update some link statuses');
       }
+    }).catch(err => {
+      this.toastr.error('Error updating link status: ' + (err.error?.message || err.message));
     });
   }
 
-  deleteMapping(id: string) {
-    this.placementService.deleteCollegeJobMapping(id).subscribe({
-      next: (res: any) => {
-        if (res.success) {
-          this.toastr.success('Mapping deleted successfully');
-          this.loadMappings();
-        } else {
-          this.toastr.error(res.message || 'Failed to delete mapping');
-        }
-      },
-      error: (err) => {
-        this.toastr.error('Error deleting mapping: ' + (err.error?.message || err.message));
+  deleteMapping(collegeId: string) {
+    // Delete all mappings for this college_id
+    const mappingIds = this.groupedMappings.find(m => m.college_id === collegeId)?.ids || [];
+    Promise.all(
+      mappingIds.map((id: string) =>
+        this.placementService.deleteCollegeJobMapping(id).toPromise()
+      )
+    ).then(results => {
+      const allSuccess = results.every((res: any) => res.success);
+      if (allSuccess) {
+        this.toastr.success('Mappings deleted successfully');
+        this.loadMappings();
+      } else {
+        this.toastr.error('Failed to delete some mappings');
       }
+    }).catch(err => {
+      this.toastr.error('Error deleting mappings: ' + (err.error?.message || err.message));
     });
   }
 
