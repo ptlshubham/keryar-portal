@@ -327,7 +327,7 @@ export class AssessmentReviewComponent implements OnInit {
   private getFiltersText(): string {
     const filters: string[] = [];
     if (this.searchTerm) filters.push(`Search: ${this.searchTerm}`);
-    if (this.filterCollege) filters.push(`College: ${this.filterCollege}`);
+    if (this.filterCollege) filters.push(`Institute: ${this.filterCollege}`);
     if (this.selectedDate) filters.push(`Date: ${this.selectedDate}`);
     if (this.filterStatus) filters.push(`Status: ${this.filterStatus}`);
     return filters.length > 0 ? `${filters.join(', ')}` : 'No filters applied';
