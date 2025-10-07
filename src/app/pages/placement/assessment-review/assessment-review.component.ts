@@ -330,7 +330,7 @@ export class AssessmentReviewComponent implements OnInit {
     if (this.filterCollege) filters.push(`College: ${this.filterCollege}`);
     if (this.selectedDate) filters.push(`Date: ${this.selectedDate}`);
     if (this.filterStatus) filters.push(`Status: ${this.filterStatus}`);
-    return filters.length > 0 ? `Filters: ${filters.join(', ')}` : 'No filters applied';
+    return filters.length > 0 ? `${filters.join(', ')}` : 'No filters applied';
   }
 
   private getCurrentDateString(): string {
