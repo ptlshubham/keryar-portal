@@ -3,12 +3,12 @@
         <div class="card">
             <div class="card-header">
                 <h5 class="card-title">Map College to Job Openings</h5>
-                <p class="card-title-desc"><b>Create a new college-job mapping and manage placement form links</b></p>
+                <p class="card-title-desc"><b>Create a new college-job mapping with a unique link name</b></p>
             </div>
             <div class="card-body">
                 <form [formGroup]="mappingForm">
                     <div class="row">
-                        <div class="col-md-4 mb-3">
+                        <div class="col-md-3 mb-3">
                             <label class="form-label">College</label>
                             <ng-select [items]="colleges" bindLabel="name" bindValue="id" formControlName="college_id"
                                 placeholder="Select or add a college" [addTag]="addNewCollege"
@@ -21,7 +21,15 @@
                                 Please select or add a college.
                             </div>
                         </div>
-                        <div class="col-md-4 mb-3">
+                        <div class="col-md-3 mb-3">
+                            <label class="form-label">Link Name</label>
+                            <input type="text" class="form-control" formControlName="link_name"
+                                placeholder="Enter link name">
+                            <div class="text-danger mt-1" *ngIf="f['link_name'].touched && f['link_name'].invalid">
+                                Link name is required.
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
                             <label class="form-label">Job Openings</label>
                             <ng-select [items]="jobOpenings" bindLabel="jobtitle" bindValue="id"
                                 formControlName="jobopening_ids" [multiple]="true" placeholder="Select job openings">
@@ -31,7 +39,7 @@
                                 Please select at least one job opening.
                             </div>
                         </div>
-                        <div class="col-md-4 mb-3">
+                        <div class="col-md-3 mb-3">
                             <label class="form-label">Link Active</label>
                             <div class="form-check">
                                 <input class="form-check-input" type="checkbox" formControlName="link_active"
@@ -42,7 +50,7 @@
                     </div>
                     <div class="d-flex justify-content-end gap-2">
                         <button type="button" class="btn btn-danger waves-effect"
-                            (click)="mappingForm.reset({ link_active: true, jobopening_ids: [] })">Cancel</button>
+                            (click)="mappingForm.reset({ link_active: true, jobopening_ids: [], link_name: '' })">Cancel</button>
                         <button type="button" class="btn btn-primary waves-effect waves-light" (click)="submitMapping()"
                             [disabled]="mappingForm.invalid || addingCollege">Submit</button>
                     </div>
@@ -66,6 +74,7 @@
                             <tr>
                                 <th class="text-left">#</th>
                                 <th class="text-center">College Name</th>
+                                <th class="text-center">Link Name</th>
                                 <th class="text-center">Job Title</th>
                                 <th class="text-center">Placement Form Link</th>
                                 <th class="text-center">Link Status</th>
@@ -76,10 +85,12 @@
                             <tr *ngFor="let mapping of paginateData; let i=index">
                                 <td class="text-left">{{ (page - 1) * pageSize + i + 1 }}</td>
                                 <td class="text-center">{{ mapping.college_name }}</td>
+                                <td class="text-center">{{ mapping.link_name }}</td>
                                 <td class="text-center">{{ mapping.jobtitle }}</td>
                                 <td class="text-center">
-                                    <a [href]="getPlacementFormLink(mapping.college_id)" target="_blank">{{
-                                        getPlacementFormLink(mapping.college_id) }}</a>
+                                    <a [href]="getPlacementFormLink(mapping.college_id, mapping.link_name)"
+                                        target="_blank">{{ getPlacementFormLink(mapping.college_id, mapping.link_name)
+                                        }}</a>
                                 </td>
                                 <td class="text-center">
                                     <button type="button" class="btn btn-success waves-effect btn-label waves-light"
@@ -94,7 +105,7 @@
                                 <td class="text-end">
                                     <button type="button" class="btn btn-soft-danger waves-effect waves-light"
                                         data-bs-toggle="tooltip" data-bs-placement="top" title="Delete"
-                                        (click)="deleteMapping(mapping.college_id)">
+                                        (click)="deleteMapping(mapping.ids)">
                                         <i class="bx bx-trash-alt font-size-16 align-middle"></i>
                                     </button>
                                 </td>

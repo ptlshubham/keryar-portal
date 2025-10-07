@@ -3,7 +3,6 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
 import { CareerService } from 'src/app/core/services/career.service';
 import { PlacementService } from 'src/app/core/services/placement.service';
-import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-college-job-mapping',
@@ -21,8 +20,8 @@ export class CollegeJobMappingComponent implements OnInit {
   pageSize = 10;
   collectionSize = 0;
   paginateData: any[] = [];
-  serverPath: string = "http://localhost:4500/";
-  addingCollege = false; // Track college addition state
+  serverPath: string = 'http://localhost:4500/'; // Updated to match backend port
+  addingCollege = false;
 
   constructor(
     private fb: FormBuilder,
@@ -37,11 +36,11 @@ export class CollegeJobMappingComponent implements OnInit {
       { label: 'Manage College-Job Mappings', active: true }
     ];
 
-    // Initialize mapping form
     this.mappingForm = this.fb.group({
       college_id: ['', Validators.required],
       jobopening_ids: [[], Validators.required],
-      link_active: [true]
+      link_active: [true],
+      link_name: ['', [Validators.required, Validators.maxLength(255)]]
     });
 
     this.loadColleges();
@@ -102,17 +101,18 @@ export class CollegeJobMappingComponent implements OnInit {
   groupMappingsByCollege(mappings: any[]): any[] {
     const grouped = new Map<string, any>();
     mappings.forEach(mapping => {
-      const collegeId = mapping.college_id;
-      if (!grouped.has(collegeId)) {
-        grouped.set(collegeId, {
+      const key = `${mapping.college_id}|${mapping.link_name}`;
+      if (!grouped.has(key)) {
+        grouped.set(key, {
           college_id: mapping.college_id,
           college_name: mapping.college_name,
+          link_name: mapping.link_name,
           jobtitles: [mapping.jobtitle],
           link_active: mapping.link_active,
           ids: [mapping.id]
         });
       } else {
-        const existing = grouped.get(collegeId)!;
+        const existing = grouped.get(key)!;
         existing.jobtitles.push(mapping.jobtitle);
         existing.ids.push(mapping.id);
         existing.link_active = existing.link_active || mapping.link_active;
@@ -142,14 +142,15 @@ export class CollegeJobMappingComponent implements OnInit {
     const mappingData = {
       college_id: this.mappingForm.value.college_id,
       jobopening_ids: this.mappingForm.value.jobopening_ids,
-      link_active: this.mappingForm.value.link_active
+      link_active: this.mappingForm.value.link_active,
+      link_name: this.mappingForm.value.link_name
     };
 
     this.placementService.saveCollegeJobMapping(mappingData).subscribe({
       next: (res: any) => {
         if (res.success) {
           this.toastr.success('Mappings saved successfully');
-          this.mappingForm.reset({ link_active: true, jobopening_ids: [] });
+          this.mappingForm.reset({ link_active: true, jobopening_ids: [], link_name: '' });
           this.loadMappings();
         } else {
           this.toastr.error(res.message || 'Failed to save mappings');
@@ -162,7 +163,7 @@ export class CollegeJobMappingComponent implements OnInit {
   }
 
   addNewCollege = (term: string): Promise<any> => {
-    this.addingCollege = true; // Show loading spinner
+    this.addingCollege = true;
     const newCollege = { name: term, isactive: true };
     return new Promise((resolve, reject) => {
       this.placementService.saveCollegeDetails(newCollege).subscribe({
@@ -170,9 +171,9 @@ export class CollegeJobMappingComponent implements OnInit {
           this.addingCollege = false;
           if (res.success && res.data && res.data.id) {
             this.toastr.success(`College "${term}" added successfully`);
-            this.colleges = [...this.colleges, res.data]; // Update colleges list
-            this.mappingForm.patchValue({ college_id: res.data.id }); // Set new college ID
-            resolve(res.data); // Resolve with the new college object
+            this.colleges = [...this.colleges, res.data];
+            this.mappingForm.patchValue({ college_id: res.data.id });
+            resolve(res.data);
           } else {
             this.toastr.error(res.message || 'Failed to add college');
             reject(new Error(res.message || 'Failed to add college'));
@@ -206,8 +207,7 @@ export class CollegeJobMappingComponent implements OnInit {
     });
   }
 
-  deleteMapping(collegeId: string) {
-    const mappingIds = this.groupedMappings.find(m => m.college_id === collegeId)?.ids || [];
+  deleteMapping(mappingIds: string[]) {
     Promise.all(
       mappingIds.map((id: string) =>
         this.placementService.deleteCollegeJobMapping(id).toPromise()
@@ -225,7 +225,7 @@ export class CollegeJobMappingComponent implements OnInit {
     });
   }
 
-  getPlacementFormLink(collegeId: string): string {
-    return `${this.serverPath}/placement/placement-form/${collegeId}`;
+  getPlacementFormLink(collegeId: string, linkName: string): string {
+    return `${this.serverPath}placement/placement-form/${collegeId}/${encodeURIComponent(linkName)}`;
   }
 }
