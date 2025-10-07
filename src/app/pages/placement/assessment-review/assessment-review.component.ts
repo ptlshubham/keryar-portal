@@ -4,11 +4,26 @@ import { ToastrService } from 'ngx-toastr';
 import { PlacementService } from 'src/app/core/services/placement.service';
 import Swal from 'sweetalert2';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
+import * as XLSX from 'xlsx';
 
 enum AssessmentStatus {
   Pending = 'pending',
   Approved = 'approved',
   Rejected = 'rejected'
+}
+
+// Interface for Excel worksheet data
+interface WorksheetRow {
+  '#': number;
+  'Student Name': string;
+  'Student ID': string;
+  Email: string;
+  'Applied Role': string;
+  Status: string;
+  'Total Marks': number;
+  'Obtained Marks': number;
 }
 
 @Component({
@@ -20,11 +35,13 @@ export class AssessmentReviewComponent implements OnInit {
   breadCrumbItems: Array<{}> = [];
   assessments: any[] = [];
   paginateData: any[] = [];
+  filteredAssessments: any[] = [];
   selectedAssessment: any | null = null;
   filterStatus: string = '';
   searchTerm: string = '';
-  startDate: string = '';
-  endDate: string = '';
+  filterCollege: string = '';
+  colleges: string[] = [];
+  selectedDate: string = '';
   page = 1;
   pageSize = 10;
   collectionSize = 0;
@@ -58,6 +75,7 @@ export class AssessmentReviewComponent implements OnInit {
             ...item,
             index: index + 1
           }));
+          this.colleges = [...new Set(this.assessments.map(assessment => assessment.student.institute).filter(institute => institute))].sort();
           this.applyFilters();
         } else {
           this.toastr.error(response.message || 'Failed to fetch assessments');
@@ -72,7 +90,6 @@ export class AssessmentReviewComponent implements OnInit {
   applyFilters() {
     let filteredAssessments = [...this.assessments];
 
-    // Filter by search term (student name, email, or student ID)
     if (this.searchTerm) {
       const searchLower = this.searchTerm.toLowerCase();
       filteredAssessments = filteredAssessments.filter(assessment =>
@@ -82,29 +99,34 @@ export class AssessmentReviewComponent implements OnInit {
       );
     }
 
-    // Filter by date range
-    if (this.startDate || this.endDate) {
-      filteredAssessments = filteredAssessments.filter(assessment => {
-        const assessmentDate = new Date(assessment.createddate).getTime();
-        const start = this.startDate ? new Date(this.startDate).getTime() : null;
-        const end = this.endDate ? new Date(this.endDate).getTime() : null;
+    if (this.filterCollege) {
+      filteredAssessments = filteredAssessments.filter(assessment =>
+        assessment.student.institute.toLowerCase() === this.filterCollege.toLowerCase()
+      );
+    }
 
-        if (start && end) {
-          return assessmentDate >= start && assessmentDate <= end;
-        } else if (start) {
-          return assessmentDate >= start;
-        } else if (end) {
-          return assessmentDate <= end;
-        }
-        return true;
+    if (this.selectedDate) {
+      const selected = new Date(this.selectedDate);
+      const selectedDateStr = selected.toISOString().split('T')[0];
+      filteredAssessments = filteredAssessments.filter(assessment => {
+        const assessmentDate = new Date(assessment.createddate);
+        const assessmentDateStr = assessmentDate.toISOString().split('T')[0];
+        return assessmentDateStr === selectedDateStr;
       });
     }
 
+    if (this.filterStatus) {
+      filteredAssessments = filteredAssessments.filter(assessment =>
+        assessment.status === this.filterStatus
+      );
+    }
+
+    this.filteredAssessments = filteredAssessments;
     this.collectionSize = filteredAssessments.length;
     this.getPagination(filteredAssessments);
   }
 
-  getPagination(filteredAssessments: any[] = this.assessments) {
+  getPagination(filteredAssessments: any[] = this.filteredAssessments) {
     this.paginateData = filteredAssessments.slice(
       (this.page - 1) * this.pageSize,
       this.page * this.pageSize
@@ -114,7 +136,7 @@ export class AssessmentReviewComponent implements OnInit {
   filterByStatus(status: string) {
     this.filterStatus = status;
     this.page = 1;
-    this.loadAssessments();
+    this.applyFilters();
   }
 
   onSearchChange() {
@@ -122,9 +144,198 @@ export class AssessmentReviewComponent implements OnInit {
     this.applyFilters();
   }
 
+  onCollegeChange() {
+    this.page = 1;
+    this.applyFilters();
+  }
+
   onDateChange() {
     this.page = 1;
     this.applyFilters();
+  }
+
+  downloadPdf() {
+    if (this.filteredAssessments.length === 0) {
+      this.toastr.warning('No data available to download.');
+      return;
+    }
+
+    const doc = new jsPDF('l', 'mm', 'a4');
+    const pageWidth = doc.internal.pageSize.width;
+    const pageHeight = doc.internal.pageSize.height;
+    const today = new Date('2025-10-07T15:47:00+05:30'); // 03:47 PM IST, October 07, 2025
+    const instituteName = this.filterCollege || 'All Institutes';
+
+    // Cover Page
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(24);
+    doc.text('Student Assessment Report', pageWidth / 2, 50, { align: 'center' });
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(14);
+    doc.text(`Prepared for: ${instituteName}`, pageWidth / 2, 70, { align: 'center' });
+    doc.setFontSize(12);
+    doc.text(`Generated on: ${today.toLocaleString('en-GB', { timeZone: 'Asia/Kolkata', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true })}`, pageWidth / 2, 90, { align: 'center' });
+    const filtersText = this.getFiltersText();
+    doc.setFontSize(10);
+    doc.text(filtersText, pageWidth / 2, 110, { align: 'center', maxWidth: pageWidth - 40 });
+
+    doc.addPage();
+
+    // Header on subsequent pages
+    const addHeader = () => {
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(14);
+      doc.text('Student Assessment Report', 14, 20);
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(10);
+      doc.text(`Institute: ${instituteName}`, 14, 28);
+      doc.text(`Date: ${today.toLocaleDateString('en-GB', { timeZone: 'Asia/Kolkata' })}`, pageWidth - 14, 20, { align: 'right' });
+    };
+
+    // Footer with page number
+    const addFooter = () => {
+      const pageCount = doc.getNumberOfPages();
+      for (let i = 2; i <= pageCount; i++) {
+        doc.setPage(i);
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(8);
+        doc.text(`Page ${i - 1} of ${pageCount - 1}`, pageWidth / 2, pageHeight - 10, { align: 'center' });
+      }
+    };
+
+    addHeader();
+
+    // Table data
+    const headers = [
+      '#',
+      'Student Name',
+      'Student ID',
+      'Email',
+      'Applied Role',
+      'Total Marks',
+      'Obtained Marks',
+      'Status'
+    ];
+
+    const body = this.filteredAssessments.map((assessment, index) => [
+      index + 1,
+      assessment.student.name || 'N/A',
+      assessment.student.studentid || 'N/A',
+      assessment.student.email || 'N/A',
+      assessment.student.appliedrole || 'N/A',
+      assessment.total_marks || 'N/A',
+      assessment.obtained_marks || '0',
+      assessment.status ? assessment.status.charAt(0).toUpperCase() + assessment.status.slice(1) : 'N/A'
+
+    ]);
+
+    autoTable(doc, {
+      head: [headers],
+      body: body,
+      startY: 35,
+      theme: 'grid',
+      styles: {
+        font: 'helvetica',
+        fontSize: 9,
+        cellPadding: 3,
+        overflow: 'linebreak',
+        minCellHeight: 8
+      },
+      headStyles: {
+        fillColor: [41, 128, 185],
+        textColor: 255,
+        fontStyle: 'bold',
+        fontSize: 10
+      },
+      alternateRowStyles: { fillColor: [240, 240, 240] },
+      margin: { left: 14, right: 14 },
+      columnStyles: {
+        0: { cellWidth: 15 }, // #
+        1: { cellWidth: 40 }, // Student Name
+        2: { cellWidth: 30 }, // Student ID
+        3: { cellWidth: 50 }, // Email
+        4: { cellWidth: 40 }, // Applied Role
+        5: { cellWidth: 30 }, // Status
+        6: { cellWidth: 30 }, // Total Marks
+        7: { cellWidth: 30 }  // Obtained Marks
+      },
+      didDrawPage: () => {
+        addHeader();
+      }
+    });
+
+    addFooter();
+
+    doc.save(`assessment-report-${this.getCurrentDateString()}.pdf`);
+  }
+
+  downloadExcel() {
+    if (this.filteredAssessments.length === 0) {
+      this.toastr.warning('No data available to download.');
+      return;
+    }
+
+    const worksheetData: WorksheetRow[] = this.filteredAssessments.map((assessment, index) => ({
+      '#': index + 1,
+      'Student Name': assessment.student.name || 'N/A',
+      'Student ID': assessment.student.studentid || 'N/A',
+      Email: assessment.student.email || 'N/A',
+      'Applied Role': assessment.student.appliedrole || 'N/A',
+      Status: assessment.status ? assessment.status.charAt(0).toUpperCase() + assessment.status.slice(1) : 'N/A',
+      'Total Marks': assessment.total_marks || 'N/A',
+      'Obtained Marks': assessment.obtained_marks || '0'
+    }));
+
+    const worksheet = XLSX.utils.json_to_sheet(worksheetData);
+    // Apply bold formatting to header row
+    const headerStyle = { font: { bold: true } };
+    XLSX.utils.sheet_add_aoa(worksheet, [Object.keys(worksheetData[0])], { origin: 'A1' });
+    worksheet['!rows'] = [{ hpt: 20 }]; // Header row height
+    for (let col in worksheet) {
+      if (col[0] === '!' || parseInt(col.slice(1)) !== 1) continue;
+      worksheet[col].s = headerStyle;
+    }
+
+    // Auto-width columns
+    const colWidths = Object.keys(worksheetData[0]).map((key) => ({
+      wch: Math.max(
+        key.length,
+        ...(worksheetData.map(row => String(row[key as keyof WorksheetRow]).length))
+      ) + 2
+    }));
+    worksheet['!cols'] = colWidths;
+
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Assessments');
+
+    // Summary sheet
+    const today = new Date('2025-10-07T15:47:00+05:30'); // 03:47 PM IST, October 07, 2025
+    const summaryData = [
+      { Field: 'Report Title', Value: 'Student Assessment Report' },
+      { Field: 'Institute', Value: this.filterCollege || 'All Institutes' },
+      { Field: 'Generated On', Value: today.toLocaleString('en-GB', { timeZone: 'Asia/Kolkata', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true }) },
+      { Field: 'Filters Applied', Value: this.getFiltersText() },
+      { Field: 'Total Records', Value: this.filteredAssessments.length }
+    ];
+    const summarySheet = XLSX.utils.json_to_sheet(summaryData);
+    summarySheet['!cols'] = [{ wch: 20 }, { wch: 50 }];
+    XLSX.utils.book_append_sheet(workbook, summarySheet, 'Summary');
+
+    XLSX.writeFile(workbook, `assessment-report-${this.getCurrentDateString()}.xlsx`);
+  }
+
+  private getFiltersText(): string {
+    const filters: string[] = [];
+    if (this.searchTerm) filters.push(`Search: ${this.searchTerm}`);
+    if (this.filterCollege) filters.push(`College: ${this.filterCollege}`);
+    if (this.selectedDate) filters.push(`Date: ${this.selectedDate}`);
+    if (this.filterStatus) filters.push(`Status: ${this.filterStatus}`);
+    return filters.length > 0 ? `Filters: ${filters.join(', ')}` : 'No filters applied';
+  }
+
+  private getCurrentDateString(): string {
+    const today = new Date('2025-10-07T15:47:00+05:30'); // 03:47 PM IST, October 07, 2025
+    return today.toISOString().split('T')[0];
   }
 
   openPreviewModal(modal: any, assessment: any) {
@@ -137,7 +348,6 @@ export class AssessmentReviewComponent implements OnInit {
         if (response.success) {
           this.selectedAssessment = response.data;
 
-          // Build a safe URL for the resume
           const resumeUrl: string | null =
             this.selectedAssessment?.student?.resume && typeof this.selectedAssessment.student.resume === 'string'
               ? this.selectedAssessment.student.resume
@@ -254,16 +464,13 @@ export class AssessmentReviewComponent implements OnInit {
       next: (response) => {
         if (response.success) {
           this.toastr.success('Correctness updated');
-          // Update local data
           const answer = this.selectedAssessment.answers.find((a: any) => a.question_id === questionId);
           if (answer) {
             answer.is_correct = isCorrect;
-            // Update obtained_marks
             this.selectedAssessment.obtained_marks = this.selectedAssessment.answers.reduce(
               (sum: number, a: any) => sum + (a.is_correct === 1 ? Number(a.weight) : 0), 0
             );
           }
-          // Reload assessments list to reflect updated obtained_marks
           this.loadAssessments();
         } else {
           this.toastr.error(response.message || 'Failed to update');
