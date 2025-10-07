@@ -186,7 +186,7 @@
 
                             <div class="col-lg-2 mb-2">
                                 <div class="form-group mb-3">
-                                    <label for="name">Upload job Opening Image</label>
+                                    <label for="name">Upload Job Opening Image</label>
                                     <div class="custom-avatar-uploader">
                                         <div class="d-flex justify-content-center">
                                             <label class="custom-upload-box" *ngIf="!imageUrl" tooltip="Upload Image"
@@ -196,7 +196,8 @@
                                                 <a><i class="mdi mdi-plus-circle"></i></a>
                                             </label>
                                             <div class="custom-preview-box" *ngIf="imageUrl">
-                                                <img [src]="serverPath+jobopeningimage" alt="Logo" />
+                                                <img [src]="serverPath+jobopeningimage" alt="Logo"
+                                                    style="width: 200px; height: 200px; object-fit: contain;" />
                                                 <a class="custom-remove-btn" tooltip="Remove Uploaded Image"
                                                     tooltipPosition="above"
                                                     (click)="removeUploadedImage(jobopeningimage)">
