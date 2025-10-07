@@ -70,6 +70,7 @@ export class AssessmentReviewComponent implements OnInit {
   loadAssessments() {
     this.placementService.getAllStudentAssessments(this.filterStatus).subscribe({
       next: (response) => {
+        console.log(response)
         if (response.success) {
           this.assessments = response.data.map((item: any, index: number) => ({
             ...item,

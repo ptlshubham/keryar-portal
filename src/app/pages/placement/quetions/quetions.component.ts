@@ -237,17 +237,23 @@ export class QuetionsComponent implements OnInit {
 
   saveQuestionList() {
     if (this.isFormValid) {
+      // Calculate total time
+      const totalTime = this.questionData
+        .filter(q => q.question_text && q.question_text.trim().length > 0)
+        .reduce((sum, q) => sum + (parseInt(q.time) || 0), 0);
+
       let data = {
         type: this.validationForm.value.type,
         categoriesid: this.validationForm.value.category,
         subcategoriesid: this.validationForm.value.subcategory,
         subtosubcategoriesid: this.validationForm.value.subtosubcategory,
         difficulty: this.validationForm.value.difficulty,
+        totalTime: totalTime, // Add totalTime
         questions: this.questionData.filter(q => q.question_text && q.question_text.trim().length > 0).map(q => ({
           question_text: q.question_text,
           option_type: q.option_type,
           weight: q.weight,
-          time: q.time, // Time in minutes
+          time: q.time,
           optionsArr: q.optionsArr?.map((opt: any) => ({
             options: opt.options,
             value: opt.value,
@@ -422,6 +428,11 @@ export class QuetionsComponent implements OnInit {
   }
 
   updateSelfQuestionSet() {
+    // Calculate total time
+    const totalTime = this.questionData
+      .filter(q => q.question_text && q.question_text.trim().length > 0)
+      .reduce((sum, q) => sum + (parseInt(q.time) || 0), 0);
+
     const data = {
       id: this.questionModel.id,
       type: this.validationForm.value.type,
@@ -429,6 +440,7 @@ export class QuetionsComponent implements OnInit {
       subcategoriesid: this.validationForm.value.subcategory,
       subtosubcategoriesid: this.validationForm.value.subtosubcategory,
       difficulty: this.validationForm.value.difficulty,
+      totalTime: totalTime, // Add totalTime
       questions: this.questionData
         .filter(q => q.question_text && q.question_text.trim().length > 0)
         .map(q => ({
@@ -436,7 +448,7 @@ export class QuetionsComponent implements OnInit {
           question_text: q.question_text,
           option_type: q.option_type,
           weight: q.weight,
-          time: q.time, // Time in minutes
+          time: q.time,
           optionsArr: q.optionsArr?.map((opt: any) => ({
             id: opt.id,
             options: opt.options,

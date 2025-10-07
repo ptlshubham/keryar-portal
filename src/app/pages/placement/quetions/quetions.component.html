@@ -254,6 +254,7 @@
                             <th class="text-center">Subcategory</th>
                             <th class="text-center">Sub-to-subcategory</th>
                             <th class="text-center">Question Count</th>
+                            <th class="text-center">Total Time (min)</th> <!-- New Column -->
                             <th class="text-end">Action</th>
                         </tr>
                     </thead>
@@ -276,6 +277,7 @@
                             <td class="text-center">
                                 <span class="badge bg-info">{{ c.questions?.length ?? 0 }}</span>
                             </td>
+                            <td class="text-center">{{ c.totaltime ?? 0 }}</td> <!-- Display Total Time -->
                             <td class="text-end">
                                 <div class="d-flex justify-content-end gap-1">
                                     <button type="button" class="btn btn-soft-primary waves-effect waves-light"
@@ -321,6 +323,7 @@
                 <h5 class="modal-title mt-0">Form Type: {{viewQuestions.type}}</h5>
                 <h5 class="modal-title mt-0">Year: {{viewQuestions.year}}</h5>
                 <h5 class="modal-title mt-0">Difficulty: {{viewQuestions.difficulty}}</h5>
+                <h5 class="modal-title mt-0">Total Time: {{viewQuestions.totaltime}} min</h5> <!-- New Field -->
             </div>
             <h5 class="title text-center mb-3">Question List</h5>
             <div class="row">

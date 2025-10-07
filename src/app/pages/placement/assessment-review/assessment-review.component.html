@@ -14,11 +14,12 @@
     <div class="row">
         <div class="col-12">
             <div class="card">
-                <div class="card-body">
-                    <h4 class="card-title">List of All Student Assessments</h4>
+                <div class="card-header">
+                    <h5 class="card-title">List of All Student Assessments</h5>
                     <p class="card-title-desc">Review student assessments, approve/reject submissions, and preview test
                         details.</p>
-
+                </div>
+                <div class="card-body">
                     <div class="row mb-3 align-items-center">
                         <div class="col-md-3">
                             <label for="searchTerm" class="form-label">Search</label>
@@ -102,8 +103,9 @@
                                         'text-danger': assessment.status === assessmentStatus.Rejected,
                                         'text-secondary': assessment.status !== assessmentStatus.Pending && assessment.status !== assessmentStatus.Approved && assessmentStatus.Rejected
                                     }">{{ assessment.status | titlecase }}</td>
-                                    <td>{{ assessment.total_time ? (assessment.total_time | number:'1.0-0') + ' min' :
-                                        'N/A' }}</td>
+                                    <td>{{ assessment.questionset.totaltime ? (assessment.questionset.totaltime |
+                                        number:'1.0-0') + ' min' : 'N/A' }}</td>
+                                    <!-- Updated to use questionset.totaltime -->
                                     <td>{{ assessment.remaining_time ? (assessment.remaining_time / 60 | number:'1.0-0')
                                         + ' min' : 'N/A' }}</td>
                                     <td>{{ assessment.obtained_marks }} / {{ assessment.total_marks }}</td>
@@ -174,8 +176,9 @@
                                 'badge-secondary': selectedAssessment.status !== assessmentStatus.Pending && selectedAssessment.status !== assessmentStatus.Approved && selectedAssessment.status !== assessmentStatus.Rejected
                             }">{{ selectedAssessment.status | titlecase }}</span>
                             </p>
-                            <p><strong>Total Time:</strong> {{ selectedAssessment.total_time ?
-                                (selectedAssessment.total_time | number:'1.0-0') + ' min' : 'N/A' }}</p>
+                            <p><strong>Total Time:</strong> {{ selectedAssessment.questionset.totaltime ?
+                                (selectedAssessment.questionset.totaltime | number:'1.0-0') + ' min' : 'N/A' }}</p>
+                            <!-- Updated to use questionset.totaltime -->
                             <p><strong>Remaining Time:</strong> {{ selectedAssessment.remaining_time ?
                                 (selectedAssessment.remaining_time / 60 | number:'1.0-0') + ' min' : 'N/A' }}</p>
                             <p><strong>Marks:</strong> {{ selectedAssessment.obtained_marks }} / {{
@@ -347,15 +350,7 @@
         </div>
         <div class="modal-footer">
             <button type="button" class="btn btn-secondary" (click)="closeModal()">Close</button>
-            <button type="button" class="btn btn-success"
-                *ngIf="selectedAssessment?.status === assessmentStatus.Pending"
-                (click)="approveAssessment(selectedAssessment.assessment_id)" [disabled]="isApproving">
-                {{ isApproving ? 'Approving...' : 'Approve' }}
-            </button>
-            <button type="button" class="btn btn-danger" *ngIf="selectedAssessment?.status === assessmentStatus.Pending"
-                (click)="rejectAssessment(selectedAssessment.assessment_id)" [disabled]="isRejecting">
-                {{ isRejecting ? 'Rejecting...' : 'Reject' }}
-            </button>
+
         </div>
     </ng-template>
 </div>
