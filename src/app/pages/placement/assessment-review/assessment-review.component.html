@@ -105,7 +105,6 @@
                                     }">{{ assessment.status | titlecase }}</td>
                                     <td>{{ assessment.questionset.totaltime ? (assessment.questionset.totaltime |
                                         number:'1.0-0') + ' min' : 'N/A' }}</td>
-                                    <!-- Updated to use questionset.totaltime -->
                                     <td>{{ assessment.remaining_time ? (assessment.remaining_time / 60 | number:'1.0-0')
                                         + ' min' : 'N/A' }}</td>
                                     <td>{{ assessment.obtained_marks }} / {{ assessment.total_marks }}</td>
@@ -125,6 +124,10 @@
                                             (click)="rejectAssessment(assessment.assessment_id)"
                                             [disabled]="isRejecting">
                                             <i class="mdi mdi-close"></i> {{ isRejecting ? 'Rejecting...' : 'Reject' }}
+                                        </button>
+                                        <button class="btn btn-outline-danger btn-sm"
+                                            (click)="removeAssessment(assessment.student.id)" [disabled]="isRemoving">
+                                            <i class="mdi mdi-delete"></i> {{ isRemoving ? 'Removing...' : 'Remove' }}
                                         </button>
                                     </td>
                                 </tr>
@@ -178,7 +181,6 @@
                             </p>
                             <p><strong>Total Time:</strong> {{ selectedAssessment.questionset.totaltime ?
                                 (selectedAssessment.questionset.totaltime | number:'1.0-0') + ' min' : 'N/A' }}</p>
-                            <!-- Updated to use questionset.totaltime -->
                             <p><strong>Remaining Time:</strong> {{ selectedAssessment.remaining_time ?
                                 (selectedAssessment.remaining_time / 60 | number:'1.0-0') + ' min' : 'N/A' }}</p>
                             <p><strong>Marks:</strong> {{ selectedAssessment.obtained_marks }} / {{
@@ -196,6 +198,12 @@
                         <a class="btn btn-outline-primary btn-sm" [href]="selectedAssessment.student.resume" download>
                             Download Resume
                         </a>
+                    </div>
+                    <div class="d-flex gap-2 mt-3">
+                        <button class="btn btn-outline-danger btn-sm"
+                            (click)="removeAssessment(selectedAssessment.student.is)" [disabled]="isRemoving">
+                            <i class="mdi mdi-delete"></i> {{ isRemoving ? 'Removing...' : 'Remove Assessment' }}
+                        </button>
                     </div>
                 </div>
 
@@ -350,7 +358,6 @@
         </div>
         <div class="modal-footer">
             <button type="button" class="btn btn-secondary" (click)="closeModal()">Close</button>
-
         </div>
     </ng-template>
 </div>

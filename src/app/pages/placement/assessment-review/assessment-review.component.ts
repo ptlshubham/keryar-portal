@@ -48,6 +48,7 @@ export class AssessmentReviewComponent implements OnInit {
   isLoadingPreview = false;
   isApproving = false;
   isRejecting = false;
+  isRemoving = false;
   private modalRef?: NgbModalRef;
   assessmentStatus = AssessmentStatus;
   safeResumeUrl?: SafeResourceUrl;
@@ -164,7 +165,7 @@ export class AssessmentReviewComponent implements OnInit {
     const doc = new jsPDF('l', 'mm', 'a4');
     const pageWidth = doc.internal.pageSize.width;
     const pageHeight = doc.internal.pageSize.height;
-    const today = new Date('2025-10-07T15:47:00+05:30'); // 03:47 PM IST, October 07, 2025
+    const today = new Date('2025-10-07T15:47:00+05:30');
     const instituteName = this.filterCollege || 'All Institutes';
 
     // Cover Page
@@ -227,7 +228,6 @@ export class AssessmentReviewComponent implements OnInit {
       assessment.total_marks || 'N/A',
       assessment.obtained_marks || '0',
       assessment.status ? assessment.status.charAt(0).toUpperCase() + assessment.status.slice(1) : 'N/A'
-
     ]);
 
     autoTable(doc, {
@@ -251,14 +251,14 @@ export class AssessmentReviewComponent implements OnInit {
       alternateRowStyles: { fillColor: [240, 240, 240] },
       margin: { left: 14, right: 14 },
       columnStyles: {
-        0: { cellWidth: 15 }, // #
-        1: { cellWidth: 40 }, // Student Name
-        2: { cellWidth: 30 }, // Student ID
-        3: { cellWidth: 50 }, // Email
-        4: { cellWidth: 40 }, // Applied Role
-        5: { cellWidth: 30 }, // Status
-        6: { cellWidth: 30 }, // Total Marks
-        7: { cellWidth: 30 }  // Obtained Marks
+        0: { cellWidth: 15 },
+        1: { cellWidth: 40 },
+        2: { cellWidth: 30 },
+        3: { cellWidth: 50 },
+        4: { cellWidth: 40 },
+        5: { cellWidth: 30 },
+        6: { cellWidth: 30 },
+        7: { cellWidth: 30 }
       },
       didDrawPage: () => {
         addHeader();
@@ -288,16 +288,14 @@ export class AssessmentReviewComponent implements OnInit {
     }));
 
     const worksheet = XLSX.utils.json_to_sheet(worksheetData);
-    // Apply bold formatting to header row
     const headerStyle = { font: { bold: true } };
     XLSX.utils.sheet_add_aoa(worksheet, [Object.keys(worksheetData[0])], { origin: 'A1' });
-    worksheet['!rows'] = [{ hpt: 20 }]; // Header row height
+    worksheet['!rows'] = [{ hpt: 20 }];
     for (let col in worksheet) {
       if (col[0] === '!' || parseInt(col.slice(1)) !== 1) continue;
       worksheet[col].s = headerStyle;
     }
 
-    // Auto-width columns
     const colWidths = Object.keys(worksheetData[0]).map((key) => ({
       wch: Math.max(
         key.length,
@@ -309,8 +307,7 @@ export class AssessmentReviewComponent implements OnInit {
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, 'Assessments');
 
-    // Summary sheet
-    const today = new Date('2025-10-07T15:47:00+05:30'); // 03:47 PM IST, October 07, 2025
+    const today = new Date('2025-10-07T15:47:00+05:30');
     const summaryData = [
       { Field: 'Report Title', Value: 'Student Assessment Report' },
       { Field: 'Institute', Value: this.filterCollege || 'All Institutes' },
@@ -335,7 +332,7 @@ export class AssessmentReviewComponent implements OnInit {
   }
 
   private getCurrentDateString(): string {
-    const today = new Date('2025-10-07T15:47:00+05:30'); // 03:47 PM IST, October 07, 2025
+    const today = new Date('2025-10-07T15:47:00+05:30');
     return today.toISOString().split('T')[0];
   }
 
@@ -451,6 +448,39 @@ export class AssessmentReviewComponent implements OnInit {
           },
           complete: () => {
             this.isRejecting = false;
+          }
+        });
+      }
+    });
+  }
+
+  removeAssessment(assessmentId: string) {
+    Swal.fire({
+      title: 'Are you sure?',
+      text: 'Do you want to remove this assessment? This action cannot be undone.',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Yes, remove it!'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.isRemoving = true;
+        this.placementService.removePlacementFormById(assessmentId).subscribe({
+          next: (response) => {
+            if (response.success) {
+              this.toastr.success(response.message || 'Assessment removed successfully');
+              this.loadAssessments();
+              this.closeModal();
+            } else {
+              this.toastr.error(response.message || 'Failed to remove assessment');
+            }
+          },
+          error: (err) => {
+            this.toastr.error('Error removing assessment: ' + (err.error?.message || err.message));
+          },
+          complete: () => {
+            this.isRemoving = false;
           }
         });
       }
