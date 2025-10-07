@@ -16,12 +16,13 @@ export class CollegeJobMappingComponent implements OnInit {
   colleges: any[] = [];
   jobOpenings: any[] = [];
   mappings: any[] = [];
-  groupedMappings: any[] = []; // Store grouped mappings
+  groupedMappings: any[] = [];
   page = 1;
   pageSize = 10;
   collectionSize = 0;
   paginateData: any[] = [];
   serverPath: string = "http://localhost:4500/";
+  addingCollege = false; // Track college addition state
 
   constructor(
     private fb: FormBuilder,
@@ -36,7 +37,7 @@ export class CollegeJobMappingComponent implements OnInit {
       { label: 'Manage College-Job Mappings', active: true }
     ];
 
-    // Initialize form with jobopening_ids as an array
+    // Initialize mapping form
     this.mappingForm = this.fb.group({
       college_id: ['', Validators.required],
       jobopening_ids: [[], Validators.required],
@@ -85,7 +86,6 @@ export class CollegeJobMappingComponent implements OnInit {
       next: (res: any) => {
         if (res.success && Array.isArray(res.data)) {
           this.mappings = res.data;
-          // Group mappings by college_id
           this.groupedMappings = this.groupMappingsByCollege(this.mappings);
           this.collectionSize = this.groupedMappings.length;
           this.getPagination();
@@ -109,18 +109,16 @@ export class CollegeJobMappingComponent implements OnInit {
           college_name: mapping.college_name,
           jobtitles: [mapping.jobtitle],
           link_active: mapping.link_active,
-          ids: [mapping.id] // Store all mapping IDs for this college
+          ids: [mapping.id]
         });
       } else {
         const existing = grouped.get(collegeId)!;
         existing.jobtitles.push(mapping.jobtitle);
         existing.ids.push(mapping.id);
-        // Set link_active to true if any mapping for this college is active
         existing.link_active = existing.link_active || mapping.link_active;
       }
     });
 
-    // Convert jobtitles array to a comma-separated string
     return Array.from(grouped.values()).map(group => ({
       ...group,
       jobtitle: group.jobtitles.join(', ')
@@ -163,10 +161,34 @@ export class CollegeJobMappingComponent implements OnInit {
     });
   }
 
+  addNewCollege = (term: string): Promise<any> => {
+    this.addingCollege = true; // Show loading spinner
+    const newCollege = { name: term, isactive: true };
+    return new Promise((resolve, reject) => {
+      this.placementService.saveCollegeDetails(newCollege).subscribe({
+        next: (res: any) => {
+          this.addingCollege = false;
+          if (res.success && res.data && res.data.id) {
+            this.toastr.success(`College "${term}" added successfully`);
+            this.colleges = [...this.colleges, res.data]; // Update colleges list
+            this.mappingForm.patchValue({ college_id: res.data.id }); // Set new college ID
+            resolve(res.data); // Resolve with the new college object
+          } else {
+            this.toastr.error(res.message || 'Failed to add college');
+            reject(new Error(res.message || 'Failed to add college'));
+          }
+        },
+        error: (err) => {
+          this.addingCollege = false;
+          this.toastr.error('Error adding college: ' + (err.error?.message || err.message));
+          reject(err);
+        }
+      });
+    });
+  }
+
   toggleLinkStatus(mapping: any, link_active: boolean) {
-    // Update all mappings for this college_id
     const updateData = mapping.ids.map((id: string) => ({ id, link_active }));
-    // Send multiple update requests
     Promise.all(
       updateData.map((data: any) =>
         this.placementService.updateCollegeJobLinkStatus(data).toPromise()
@@ -185,7 +207,6 @@ export class CollegeJobMappingComponent implements OnInit {
   }
 
   deleteMapping(collegeId: string) {
-    // Delete all mappings for this college_id
     const mappingIds = this.groupedMappings.find(m => m.college_id === collegeId)?.ids || [];
     Promise.all(
       mappingIds.map((id: string) =>

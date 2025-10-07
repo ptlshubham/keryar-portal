@@ -10,14 +10,15 @@
                     <div class="row">
                         <div class="col-md-4 mb-3">
                             <label class="form-label">College</label>
-                            <select class="form-select" formControlName="college_id">
-                                <option value="" disabled selected>Select a college</option>
-                                <option *ngFor="let college of colleges" [value]="college.id">{{ college.name }}
-                                </option>
-                            </select>
-                            <div class="invalid-feedback d-block"
-                                *ngIf="f['college_id'].touched && f['college_id'].invalid">
-                                Please select a college.
+                            <ng-select [items]="colleges" bindLabel="name" bindValue="id" formControlName="college_id"
+                                placeholder="Select or add a college" [addTag]="addNewCollege"
+                                [addTagText]="'Add new college: '" [loading]="addingCollege">
+                                <ng-template ng-optgroup-tmp let-item="item">
+                                    {{item.name}}
+                                </ng-template>
+                            </ng-select>
+                            <div class="text-danger mt-1" *ngIf="f['college_id'].touched && f['college_id'].invalid">
+                                Please select or add a college.
                             </div>
                         </div>
                         <div class="col-md-4 mb-3">
@@ -40,9 +41,10 @@
                         </div>
                     </div>
                     <div class="d-flex justify-content-end gap-2">
-                        <button type="button" class="btn btn-danger waves-effect">Cancel</button>
+                        <button type="button" class="btn btn-danger waves-effect"
+                            (click)="mappingForm.reset({ link_active: true, jobopening_ids: [] })">Cancel</button>
                         <button type="button" class="btn btn-primary waves-effect waves-light" (click)="submitMapping()"
-                            [disabled]="mappingForm.invalid">Submit</button>
+                            [disabled]="mappingForm.invalid || addingCollege">Submit</button>
                     </div>
                 </form>
             </div>
@@ -92,7 +94,7 @@
                                 <td class="text-end">
                                     <button type="button" class="btn btn-soft-danger waves-effect waves-light"
                                         data-bs-toggle="tooltip" data-bs-placement="top" title="Delete"
-                                        (click)="deleteMapping(mapping.id)">
+                                        (click)="deleteMapping(mapping.college_id)">
                                         <i class="bx bx-trash-alt font-size-16 align-middle"></i>
                                     </button>
                                 </td>
@@ -103,7 +105,7 @@
                 <div class="row mt-4">
                     <ngb-pagination [collectionSize]="collectionSize" [pageSize]="pageSize" [(page)]="page"
                         [maxSize]="5" [rotate]="true" [ellipses]="false" [boundaryLinks]="true"
-                        (pageChange)="getPagination()" aria-label="Default pagination"
+                        (pageChange)="getPagination()" aria-label="Mapping pagination"
                         class="d-flex justify-content-end pagination-rounded-flat pagination-success"></ngb-pagination>
                 </div>
             </div>
