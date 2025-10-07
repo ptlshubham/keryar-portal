@@ -65,8 +65,9 @@
                                     <th>Question Set</th>
                                     <th>Difficulty</th>
                                     <th>Status</th>
-                                    <th>Total Time</th> <!-- New column for total time -->
+                                    <th>Total Time</th>
                                     <th>Remaining Time</th>
+                                    <th>Marks</th> <!-- Updated column name -->
                                     <th>Actions</th>
                                 </tr>
                             </thead>
@@ -80,15 +81,17 @@
                                     <td>{{ assessment.questionset.type }} - {{ assessment.questionset.category }}</td>
                                     <td>{{ assessment.questionset.difficulty }}</td>
                                     <td [ngClass]="{
-    'text-warning': assessment.status === assessmentStatus.Pending,
-    'text-success': assessment.status === assessmentStatus.Approved,
-    'text-danger': assessment.status === assessmentStatus.Rejected,
-    'text-secondary': assessment.status !== assessmentStatus.Pending && assessment.status !== assessmentStatus.Approved && assessment.status !== assessmentStatus.Rejected
-}">{{ assessment.status | titlecase }}</td>
+                                        'text-warning': assessment.status === assessmentStatus.Pending,
+                                        'text-success': assessment.status === assessmentStatus.Approved,
+                                        'text-danger': assessment.status === assessmentStatus.Rejected,
+                                        'text-secondary': assessment.status !== assessmentStatus.Pending && assessment.status !== assessmentStatus.Approved && assessment.status !== assessmentStatus.Rejected
+                                    }">{{ assessment.status | titlecase }}</td>
                                     <td>{{ assessment.total_time ? (assessment.total_time | number:'1.0-0') + ' min' :
-                                        'N/A' }}</td> <!-- Display total time -->
+                                        'N/A' }}</td>
                                     <td>{{ assessment.remaining_time ? (assessment.remaining_time / 60 | number:'1.0-0')
                                         + ' min' : 'N/A' }}</td>
+                                    <td>{{ assessment.obtained_marks }} / {{ assessment.total_marks }}</td>
+                                    <!-- Updated to show obtained_marks / total_marks -->
                                     <td>
                                         <button class="btn btn-primary btn-sm"
                                             (click)="openPreviewModal(previewModal, assessment)">
@@ -109,8 +112,7 @@
                                     </td>
                                 </tr>
                                 <tr *ngIf="!paginateData?.length">
-                                    <td colspan="11" class="text-center">No assessments found</td>
-                                    <!-- Updated colspan to 11 -->
+                                    <td colspan="12" class="text-center">No assessments found</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -151,32 +153,32 @@
                             <p><strong>Year:</strong> {{ selectedAssessment.questionset.year || 'N/A' }}</p>
                             <p><strong>Status:</strong>
                                 <span class="badge" [ngClass]="{
-                                    'badge-warning': selectedAssessment.status === assessmentStatus.Pending,
-                                    'badge-success': selectedAssessment.status === assessmentStatus.Approved,
-                                    'badge-danger': selectedAssessment.status === assessmentStatus.Rejected,
-                                    'badge-secondary': selectedAssessment.status !== assessmentStatus.Pending && selectedAssessment.status !== assessmentStatus.Approved && selectedAssessment.status !== assessmentStatus.Rejected
-                                }">{{ selectedAssessment.status | titlecase }}</span>
+                                'badge-warning': selectedAssessment.status === assessmentStatus.Pending,
+                                'badge-success': selectedAssessment.status === assessmentStatus.Approved,
+                                'badge-danger': selectedAssessment.status === assessmentStatus.Rejected,
+                                'badge-secondary': selectedAssessment.status !== assessmentStatus.Pending && selectedAssessment.status !== assessmentStatus.Approved && selectedAssessment.status !== assessmentStatus.Rejected
+                            }">{{ selectedAssessment.status | titlecase }}</span>
                             </p>
                             <p><strong>Total Time:</strong> {{ selectedAssessment.total_time ?
                                 (selectedAssessment.total_time | number:'1.0-0') + ' min' : 'N/A' }}</p>
-                            <!-- New field -->
                             <p><strong>Remaining Time:</strong> {{ selectedAssessment.remaining_time ?
                                 (selectedAssessment.remaining_time / 60 | number:'1.0-0') + ' min' : 'N/A' }}</p>
+                            <p><strong>Marks:</strong> {{ selectedAssessment.obtained_marks }} / {{
+                                selectedAssessment.total_marks }}</p>
+                            <!-- Updated to show obtained_marks / total_marks -->
                             <p><strong>Created Date:</strong> {{ selectedAssessment.createddate | date:'medium' || 'N/A'
-                                }}
-                            </p>
-
-                            <div class="d-flex gap-2 mt-3" *ngIf="selectedAssessment.student.resume">
-                                <a class="btn btn-primary btn-sm" [href]="selectedAssessment.student.resume"
-                                    target="_blank" rel="noopener">
-                                    Open Resume in New Tab
-                                </a>
-                                <a class="btn btn-outline-primary btn-sm" [href]="selectedAssessment.student.resume"
-                                    download>
-                                    Download Resume
-                                </a>
-                            </div>
+                                }}</p>
                         </div>
+                    </div>
+
+                    <div class="d-flex gap-2 mt-3" *ngIf="selectedAssessment.student.resume">
+                        <a class="btn btn-primary btn-sm" [href]="selectedAssessment.student.resume" target="_blank"
+                            rel="noopener">
+                            Open Resume in New Tab
+                        </a>
+                        <a class="btn btn-outline-primary btn-sm" [href]="selectedAssessment.student.resume" download>
+                            Download Resume
+                        </a>
                     </div>
                 </div>
 
@@ -185,9 +187,7 @@
                     <h6 class="mb-3">Resume Preview</h6>
                     <div class="border rounded" style="height:70vh; overflow:hidden;">
                         <ng-container *ngIf="safeResumeUrl; else noResume">
-                            <!-- Try object first (often best for PDFs) -->
                             <object [data]="safeResumeUrl" type="application/pdf" width="100%" height="100%">
-                                <!-- Fallback: iframe -->
                                 <iframe [src]="safeResumeUrl" width="100%" height="100%" style="border:0;"></iframe>
                             </object>
                         </ng-container>
@@ -208,8 +208,7 @@
                         <h5 class="modal-title mt-0">Form Type: {{ selectedAssessment.questionset.type || 'N/A' }}</h5>
                         <h5 class="modal-title mt-0">Year: {{ selectedAssessment.questionset.year || 'N/A' }}</h5>
                         <h5 class="modal-title mt-0">Difficulty: {{ selectedAssessment.questionset.difficulty || 'N/A'
-                            }}
-                        </h5>
+                            }}</h5>
                     </div>
                     <h5 class="title text-center mb-3">Question List</h5>
                     <div class="row">
@@ -223,8 +222,7 @@
                                                 <h5 class="badge bg-primary" style="font-size:medium;">Weight: {{
                                                     data.weight }}</h5>
                                                 <h5 class="badge bg-secondary" style="font-size:medium;">Time: {{
-                                                    data.time
-                                                    }} min</h5>
+                                                    data.time }} min</h5>
                                             </div>
                                         </div>
                                         <div *ngIf="data.option_type === 'Checkbox' || data.option_type === 'Radio'">
@@ -243,16 +241,14 @@
                                                         <ng-container *ngIf="data.option_type === 'Checkbox'">
                                                             <tr *ngFor="let opt of data.optionsArr; let optInd = index">
                                                                 <td class="fw-bold" style="font-size: 1rem;">{{
-                                                                    opt.options
-                                                                    }}</td>
+                                                                    opt.options }}</td>
                                                                 <td>
                                                                     <input class="form-check-input" type="checkbox"
                                                                         disabled
                                                                         [checked]="data.answer?.includes(opt.value)" />
                                                                 </td>
                                                                 <td class="fw-bold" style="font-size: 1rem;">{{
-                                                                    opt.value }}
-                                                                </td>
+                                                                    opt.value }}</td>
                                                                 <td>
                                                                     <i class="bx bx-check text-success font-size-18"
                                                                         *ngIf="opt.isCorrect"></i>
@@ -266,19 +262,17 @@
                                                         <ng-container *ngIf="data.option_type === 'Radio'">
                                                             <tr *ngFor="let opt of data.optionsArr; let optInd = index">
                                                                 <td class="fw-bold" style="font-size: 1rem;">{{
-                                                                    opt.options
-                                                                    }}</td>
+                                                                    opt.options }}</td>
                                                                 <td>
                                                                     <input class="form-check-input" type="radio"
                                                                         [name]="'radio'+i" disabled
                                                                         [checked]="data.answer === opt.value" />
                                                                 </td>
                                                                 <td class="fw-bold" style="font-size: 1rem;">{{
-                                                                    opt.value }}
-                                                                </td>
+                                                                    opt.value }}</td>
                                                                 <td>
                                                                     <i class="bx bx-check text-success font-size-18"
-                                                                        *ngIf="optInd === data.correctAnswer || opt.isCorrect"></i>
+                                                                        *ngIf="opt.isCorrect"></i>
                                                                 </td>
                                                                 <td>
                                                                     <i class="bx bx-check text-primary font-size-18"
@@ -307,15 +301,23 @@
                                                     rows="4" [value]="data.answer || 'No answer provided'"
                                                     readonly></textarea>
                                             </div>
-                                            <div class="form-group mt-3">
+                                            <div class="form-group mt-3" *ngIf="data.answer">
                                                 <label>Correctness</label>
-                                                <p>
-                                                    <i class="bx bx-check text-success font-size-18"
-                                                        *ngIf="data.is_correct === 1"></i>
-                                                    <i class="bx bx-x text-danger font-size-18"
-                                                        *ngIf="data.is_correct === 0"></i>
-                                                    {{ data.is_correct === 1 ? 'Correct' : 'Incorrect' }}
-                                                </p>
+                                                <div>
+                                                    <button class="btn btn-success btn-sm me-2"
+                                                        (click)="setCorrect(data.question_id, 1)"
+                                                        [disabled]="data.is_correct === 1 || isLoadingPreview">
+                                                        Mark Correct
+                                                    </button>
+                                                    <button class="btn btn-danger btn-sm me-2"
+                                                        (click)="setCorrect(data.question_id, 0)"
+                                                        [disabled]="data.is_correct === 0 || isLoadingPreview">
+                                                        Mark Incorrect
+                                                    </button>
+                                                    <span *ngIf="data.is_correct !== null">{{ data.is_correct === 1 ?
+                                                        'Correct' : 'Incorrect' }}</span>
+                                                    <span *ngIf="data.is_correct === null">Not evaluated</span>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>

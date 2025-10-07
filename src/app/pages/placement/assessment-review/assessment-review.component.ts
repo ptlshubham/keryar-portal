@@ -137,7 +137,7 @@ export class AssessmentReviewComponent implements OnInit {
         if (response.success) {
           this.selectedAssessment = response.data;
 
-          // Build a safe URL for the resume (works for absolute URLs or your served file path)
+          // Build a safe URL for the resume
           const resumeUrl: string | null =
             this.selectedAssessment?.student?.resume && typeof this.selectedAssessment.student.resume === 'string'
               ? this.selectedAssessment.student.resume
@@ -145,18 +145,14 @@ export class AssessmentReviewComponent implements OnInit {
 
           if (resumeUrl) {
             let fullResumeUrl: string;
-
-            // Case 1: If backend already gives something like "/images/keryar/studentresume/xyz.pdf"
             if (resumeUrl.startsWith('/')) {
               fullResumeUrl = `http://localhost:8300${resumeUrl}`;
-            }
-            // Case 2: If backend only gives the filename
-            else {
+            } else {
               fullResumeUrl = `http://localhost:8300${resumeUrl}`;
             }
 
             this.safeResumeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(fullResumeUrl);
-            this.selectedAssessment.student.resume = fullResumeUrl; // update for download/open
+            this.selectedAssessment.student.resume = fullResumeUrl;
           }
 
           this.modalRef = this.modalService.open(modal, {
@@ -246,6 +242,35 @@ export class AssessmentReviewComponent implements OnInit {
             this.isRejecting = false;
           }
         });
+      }
+    });
+  }
+
+  setCorrect(questionId: string, isCorrect: number) {
+    if (!this.selectedAssessment) return;
+    const pfId = this.selectedAssessment.student.id;
+    const qsId = this.selectedAssessment.questionset.id;
+    this.placementService.updateAnswerCorrectness(pfId, qsId, questionId, isCorrect).subscribe({
+      next: (response) => {
+        if (response.success) {
+          this.toastr.success('Correctness updated');
+          // Update local data
+          const answer = this.selectedAssessment.answers.find((a: any) => a.question_id === questionId);
+          if (answer) {
+            answer.is_correct = isCorrect;
+            // Update obtained_marks
+            this.selectedAssessment.obtained_marks = this.selectedAssessment.answers.reduce(
+              (sum: number, a: any) => sum + (a.is_correct === 1 ? Number(a.weight) : 0), 0
+            );
+          }
+          // Reload assessments list to reflect updated obtained_marks
+          this.loadAssessments();
+        } else {
+          this.toastr.error(response.message || 'Failed to update');
+        }
+      },
+      error: (err) => {
+        this.toastr.error('Error updating correctness: ' + (err.error?.message || err.message));
       }
     });
   }

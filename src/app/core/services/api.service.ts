@@ -124,4 +124,7 @@ export class ApiService {
   public static getJobOpeningsByCollegeURL: string = ApiService.HOST_URL + '/keryar/GetJobOpeningsByCollege/';
   public static getCollegeByLinkTokenURL: string = ApiService.HOST_URL + '/keryar/GetCollegeByLinkToken/';
 
+
+  public static updateAnswerCorrectnessURL: string = ApiService.HOST_URL + '/keryar/UpdateAnswerCorrectness';
+
 }

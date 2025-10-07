@@ -166,5 +166,8 @@ export class PlacementService {
     getCollegeByLinkToken(collegeId: any): Observable<any> {
         return this.httpClient.get(`${ApiService.getCollegeByLinkTokenURL}${collegeId}`);
     }
+    updateAnswerCorrectness(placementFormId: string, questionSetId: string, questionId: string, isCorrect: number): Observable<any> {
+        return this.httpClient.post(ApiService.updateAnswerCorrectnessURL, { placementFormId, questionSetId, questionId, isCorrect });
+    }
 
 }
