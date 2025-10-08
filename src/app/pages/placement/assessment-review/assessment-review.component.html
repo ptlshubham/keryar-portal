@@ -20,51 +20,50 @@
                         details.</p>
                 </div>
                 <div class="card-body">
-                    <div class="row mb-3 align-items-center">
-                        <div class="col-md-3">
-                            <label for="searchTerm" class="form-label">Search</label>
-                            <input id="searchTerm" type="text" class="form-control" [(ngModel)]="searchTerm"
-                                (ngModelChange)="onSearchChange()" placeholder="Search by name, email, or ID">
-                        </div>
-                        <div class="col-md-3">
-                            <label for="collegeFilter" class="form-label">Filter by College</label>
-                            <select id="collegeFilter" class="form-select" [(ngModel)]="filterCollege"
-                                (change)="onCollegeChange()">
-                                <option value="">All Colleges</option>
-                                <option *ngFor="let college of colleges" [value]="college">{{ college }}</option>
-                            </select>
-                        </div>
-                        <div class="col-md-3">
-                            <label for="selectedDate" class="form-label">Selected Date</label>
-                            <input id="selectedDate" type="date" class="form-control" [(ngModel)]="selectedDate"
-                                (ngModelChange)="onDateChange()">
-                        </div>
-                        <div class="col-md-3">
-                            <label for="statusFilter" class="form-label">Filter by Status</label>
-                            <select id="statusFilter" class="form-select" [(ngModel)]="filterStatus"
-                                (change)="filterByStatus(filterStatus)">
-                                <option value="">All Status</option>
-                                <option [value]="assessmentStatus.Pending">Pending</option>
-                                <option [value]="assessmentStatus.Approved">Approved</option>
-                                <option [value]="assessmentStatus.Rejected">Rejected</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="row mb-3 align-items-center">
-                        <div class="col-md-8">
-                            <!-- Existing filters remain here -->
-                        </div>
-                        <div class="col-md-4 text-end">
-                            <button class="btn btn-primary me-2" (click)="loadAssessments()">Refresh</button>
-                            <button class="btn btn-outline-success me-2" (click)="downloadPdf()"
-                                [disabled]="filteredAssessments.length === 0">
-                                <i class="mdi mdi-file-pdf"></i> Download PDF
-                            </button>
-                            <button class="btn btn-outline-primary" (click)="downloadExcel()"
-                                [disabled]="filteredAssessments.length === 0">
-                                <i class="mdi mdi-file-excel"></i> Download Excel
-                            </button>
+                    <div class="card-body">
+                        <div class="row mb-3 align-items-end">
+                            <div class="col-md-2">
+                                <label for="searchTerm" class="form-label">Search</label>
+                                <input id="searchTerm" type="text" class="form-control" [(ngModel)]="searchTerm"
+                                    (ngModelChange)="onSearchChange()" placeholder="Search by name, email, or ID">
+                            </div>
+                            <div class="col-md-2">
+                                <label for="selectedDate" class="form-label">Selected Date</label>
+                                <input id="selectedDate" type="date" class="form-control" [(ngModel)]="selectedDate"
+                                    (ngModelChange)="onDateChange()" placeholder="dd/mm/yyyy">
+                            </div>
+                            <div class="col-md-2">
+                                <label for="statusFilter" class="form-label">Filter by Status</label>
+                                <select id="statusFilter" class="form-select" [(ngModel)]="filterStatus"
+                                    (change)="filterByStatus(filterStatus)">
+                                    <option value="">All Status</option>
+                                    <option [value]="assessmentStatus.Pending">Pending</option>
+                                    <option [value]="assessmentStatus.Approved">Approved</option>
+                                    <option [value]="assessmentStatus.Rejected">Rejected</option>
+                                </select>
+                            </div>
+                            <div class="col-md-2">
+                                <label for="collegeFilter" class="form-label">Filter by College</label>
+                                <select id="collegeFilter" class="form-select" [(ngModel)]="filterCollege"
+                                    (change)="onCollegeChange()">
+                                    <option value="">All Colleges</option>
+                                    <option *ngFor="let college of colleges" [value]="college">{{ college }}</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4 d-flex justify-content-end gap-2">
+                                <button class="btn btn-primary btn-sm" (click)="loadAssessments()"
+                                    aria-label="Refresh assessments">
+                                    <i class="mdi mdi-refresh"></i>
+                                </button>
+                                <button class="btn btn-outline-success btn-sm" (click)="downloadPdf()"
+                                    [disabled]="filteredAssessments.length === 0" aria-label="Download PDF">
+                                    <i class="mdi mdi-file-pdf"></i>
+                                </button>
+                                <button class="btn btn-outline-primary btn-sm" (click)="downloadExcel()"
+                                    [disabled]="filteredAssessments.length === 0" aria-label="Download Excel">
+                                    <i class="mdi mdi-file-excel"></i>
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
