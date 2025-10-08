@@ -169,6 +169,12 @@ export const MENU: MenuItem[] = [
                 link: '/placement/interview-round',
                 parentId: 12
             },
+            {
+                id: 12,
+                label: 'Hired',
+                link: '/placement/hired-students',
+                parentId: 12
+            },
 
 
         ]

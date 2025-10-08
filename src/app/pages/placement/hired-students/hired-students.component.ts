@@ -2,17 +2,10 @@ import { Component, OnInit } from '@angular/core';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { ToastrService } from 'ngx-toastr';
 import { PlacementService } from 'src/app/core/services/placement.service';
-import Swal from 'sweetalert2';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import * as XLSX from 'xlsx';
-
-enum InterviewStatus {
-  Pending = 'pending',
-  Hired = 'hired',
-  Rejected = 'rejected'
-}
 
 interface WorksheetRow {
   '#': number;
@@ -20,24 +13,22 @@ interface WorksheetRow {
   'Student ID': string;
   Email: string;
   'Applied Role': string;
-  'Interview Status': string;
   'Total Marks': number;
   'Obtained Marks': number;
   'Remarks': string;
 }
 
 @Component({
-  selector: 'app-interview-round',
-  templateUrl: './interview-round.component.html',
-  styleUrls: ['./interview-round.component.scss']
+  selector: 'app-hired-students',
+  templateUrl: './hired-students.component.html',
+  styleUrls: ['./hired-students.component.scss']
 })
-export class InterviewRoundComponent implements OnInit {
+export class HiredStudentsComponent implements OnInit {
   breadCrumbItems: Array<{}> = [];
   students: any[] = [];
   paginateData: any[] = [];
   filteredStudents: any[] = [];
   selectedStudent: any | null = null;
-  filterStatus: string = '';
   searchTerm: string = '';
   filterCollege: string = '';
   colleges: string[] = [];
@@ -46,12 +37,8 @@ export class InterviewRoundComponent implements OnInit {
   pageSize = 10;
   collectionSize = 0;
   isLoadingPreview = false;
-  isHiring = false;
-  isRejecting = false;
-  isRemoving = false;
   isSavingRemarks = false;
   private modalRef?: NgbModalRef;
-  interviewStatus = InterviewStatus;
   safeResumeUrl?: SafeResourceUrl;
 
   constructor(
@@ -64,25 +51,27 @@ export class InterviewRoundComponent implements OnInit {
   ngOnInit() {
     this.breadCrumbItems = [
       { label: 'Home' },
-      { label: 'Interview Round', active: true }
+      { label: 'Hired Students', active: true }
     ];
-    this.loadApprovedStudents();
+    this.loadHiredStudents();
   }
 
-  loadApprovedStudents() {
+  loadHiredStudents() {
     this.placementService.getApprovedStudents().subscribe({
       next: (response) => {
         if (response.success) {
-          this.students = response.data.map((item: any, index: number) => ({
-            ...item,
-            index: index + 1,
-            obtained_marks: item.obtained_marks ?? 0,
-            total_marks: item.total_marks ?? 0
-          }));
+          this.students = response.data
+            .filter((item: any) => item.interviewround === 'hired')
+            .map((item: any, index: number) => ({
+              ...item,
+              index: index + 1,
+              obtained_marks: item.obtained_marks ?? 0,
+              total_marks: item.total_marks ?? 0
+            }));
           this.colleges = [...new Set(this.students.map(student => student.institute).filter(institute => institute))].sort();
           this.applyFilters();
         } else {
-          this.toastr.error(response.message || 'Failed to fetch approved students');
+          this.toastr.error(response.message || 'Failed to fetch hired students');
         }
       },
       error: (err) => {
@@ -119,12 +108,6 @@ export class InterviewRoundComponent implements OnInit {
       });
     }
 
-    if (this.filterStatus) {
-      filteredStudents = filteredStudents.filter(student =>
-        student.interviewround === this.filterStatus
-      );
-    }
-
     this.filteredStudents = filteredStudents;
     this.collectionSize = filteredStudents.length;
     this.getPagination(filteredStudents);
@@ -135,12 +118,6 @@ export class InterviewRoundComponent implements OnInit {
       (this.page - 1) * this.pageSize,
       this.page * this.pageSize
     );
-  }
-
-  filterByStatus(status: string) {
-    this.filterStatus = status;
-    this.page = 1;
-    this.applyFilters();
   }
 
   onSearchChange() {
@@ -173,7 +150,7 @@ export class InterviewRoundComponent implements OnInit {
     // Cover Page
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(24);
-    doc.text('Interview Round Report', pageWidth / 2, 50, { align: 'center' });
+    doc.text('Hired Students Report', pageWidth / 2, 50, { align: 'center' });
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(14);
     doc.text(`Prepared for: ${instituteName}`, pageWidth / 2, 70, { align: 'center' });
@@ -189,7 +166,7 @@ export class InterviewRoundComponent implements OnInit {
     const addHeader = () => {
       doc.setFont('helvetica', 'bold');
       doc.setFontSize(14);
-      doc.text('Interview Round Report', 14, 20);
+      doc.text('Hired Students Report', 14, 20);
       doc.setFont('helvetica', 'normal');
       doc.setFontSize(10);
       doc.text(`Institute: ${instituteName}`, 14, 28);
@@ -217,8 +194,7 @@ export class InterviewRoundComponent implements OnInit {
       'Email',
       'Applied Role',
       'Total Marks',
-      'Obtained Marks',
-      'Interview Status'
+      'Obtained Marks'
     ];
 
     const body = this.filteredStudents.map((student, index) => [
@@ -228,8 +204,7 @@ export class InterviewRoundComponent implements OnInit {
       student.email || 'N/A',
       student.appliedrole || 'N/A',
       student.total_marks || 0,
-      student.obtained_marks || 0,
-      student.interviewround ? student.interviewround.charAt(0).toUpperCase() + student.interviewround.slice(1) : 'Pending'
+      student.obtained_marks || 0
     ]);
 
     autoTable(doc, {
@@ -259,8 +234,7 @@ export class InterviewRoundComponent implements OnInit {
         3: { cellWidth: 50 },
         4: { cellWidth: 40 },
         5: { cellWidth: 30 },
-        6: { cellWidth: 30 },
-        7: { cellWidth: 30 }
+        6: { cellWidth: 30 }
       },
       didDrawPage: () => {
         addHeader();
@@ -269,7 +243,7 @@ export class InterviewRoundComponent implements OnInit {
 
     addFooter();
 
-    doc.save(`interview-round-report-${this.getCurrentDateString()}.pdf`);
+    doc.save(`hired-students-report-${this.getCurrentDateString()}.pdf`);
   }
 
   downloadExcel() {
@@ -284,7 +258,6 @@ export class InterviewRoundComponent implements OnInit {
       'Student ID': student.studentid || 'N/A',
       Email: student.email || 'N/A',
       'Applied Role': student.appliedrole || 'N/A',
-      'Interview Status': student.interviewround ? student.interviewround.charAt(0).toUpperCase() + student.interviewround.slice(1) : 'Pending',
       'Total Marks': student.total_marks || 0,
       'Obtained Marks': student.obtained_marks || 0,
       'Remarks': student.remarks || 'N/A'
@@ -308,11 +281,11 @@ export class InterviewRoundComponent implements OnInit {
     worksheet['!cols'] = colWidths;
 
     const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, 'InterviewRound');
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'HiredStudents');
 
     const today = new Date();
     const summaryData = [
-      { Field: 'Report Title', Value: 'Interview Round Report' },
+      { Field: 'Report Title', Value: 'Hired Students Report' },
       { Field: 'Institute', Value: this.filterCollege || 'All Institutes' },
       { Field: 'Generated On', Value: today.toLocaleString('en-GB', { timeZone: 'Asia/Kolkata', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true }) },
       { Field: 'Filters Applied', Value: this.getFiltersText() },
@@ -322,7 +295,7 @@ export class InterviewRoundComponent implements OnInit {
     summarySheet['!cols'] = [{ wch: 20 }, { wch: 50 }];
     XLSX.utils.book_append_sheet(workbook, summarySheet, 'Summary');
 
-    XLSX.writeFile(workbook, `interview-round-report-${this.getCurrentDateString()}.xlsx`);
+    XLSX.writeFile(workbook, `hired-students-report-${this.getCurrentDateString()}.xlsx`);
   }
 
   private getFiltersText(): string {
@@ -330,7 +303,6 @@ export class InterviewRoundComponent implements OnInit {
     if (this.searchTerm) filters.push(`Search: ${this.searchTerm}`);
     if (this.filterCollege) filters.push(`Institute: ${this.filterCollege}`);
     if (this.selectedDate) filters.push(`Date: ${this.selectedDate}`);
-    if (this.filterStatus) filters.push(`Interview Status: ${this.filterStatus.charAt(0).toUpperCase() + this.filterStatus.slice(1)}`);
     return filters.length > 0 ? `${filters.join(', ')}` : 'No filters applied';
   }
 
@@ -407,7 +379,7 @@ export class InterviewRoundComponent implements OnInit {
       next: (response) => {
         if (response.success) {
           this.toastr.success(response.message || 'Remarks saved successfully');
-          this.loadApprovedStudents(); // Reload to update table
+          this.loadHiredStudents(); // Reload to update table
         } else {
           this.toastr.error(response.message || 'Failed to save remarks');
         }
@@ -417,105 +389,6 @@ export class InterviewRoundComponent implements OnInit {
       },
       complete: () => {
         this.isSavingRemarks = false;
-      }
-    });
-  }
-
-  hireStudent(studentId: string) {
-    Swal.fire({
-      title: 'Are you sure?',
-      text: 'Do you want to mark this student as hired?',
-      icon: 'question',
-      showCancelButton: true,
-      confirmButtonColor: '#3085d6',
-      cancelButtonColor: '#d33',
-      confirmButtonText: 'Yes, hire them!'
-    }).then((result) => {
-      if (result.isConfirmed) {
-        this.isHiring = true;
-        this.placementService.updateInterviewStatus({ id: studentId, interviewround: InterviewStatus.Hired }).subscribe({
-          next: (response) => {
-            if (response.success) {
-              this.toastr.success(response.message || 'Student marked as hired');
-              this.loadApprovedStudents();
-              this.closeModal();
-            } else {
-              this.toastr.error(response.message || 'Failed to mark as hired');
-            }
-          },
-          error: (err) => {
-            this.toastr.error('Error marking as hired: ' + (err.error?.message || err.message));
-          },
-          complete: () => {
-            this.isHiring = false;
-          }
-        });
-      }
-    });
-  }
-
-  rejectStudent(studentId: string) {
-    Swal.fire({
-      title: 'Are you sure?',
-      text: 'Do you want to reject this student?',
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#3085d6',
-      cancelButtonColor: '#d33',
-      confirmButtonText: 'Yes, reject them!'
-    }).then((result) => {
-      if (result.isConfirmed) {
-        this.isRejecting = true;
-        this.placementService.updateInterviewStatus({ id: studentId, interviewround: InterviewStatus.Rejected }).subscribe({
-          next: (response) => {
-            if (response.success) {
-              this.toastr.success(response.message || 'Student marked as rejected');
-              this.loadApprovedStudents();
-              this.closeModal();
-            } else {
-              this.toastr.error(response.message || 'Failed to mark as rejected');
-            }
-          },
-          error: (err) => {
-            this.toastr.error('Error marking as rejected: ' + (err.error?.message || err.message));
-          },
-          complete: () => {
-            this.isRejecting = false;
-          }
-        });
-      }
-    });
-  }
-
-  removeStudent(studentId: string) {
-    Swal.fire({
-      title: 'Are you sure?',
-      text: 'Do you want to remove this student? This action cannot be undone.',
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#3085d6',
-      cancelButtonColor: '#d33',
-      confirmButtonText: 'Yes, remove them!'
-    }).then((result) => {
-      if (result.isConfirmed) {
-        this.isRemoving = true;
-        this.placementService.removeInterviewStudent(studentId).subscribe({
-          next: (response) => {
-            if (response.success) {
-              this.toastr.success(response.message || 'Student removed successfully');
-              this.loadApprovedStudents();
-              this.closeModal();
-            } else {
-              this.toastr.error(response.message || 'Failed to remove student');
-            }
-          },
-          error: (err) => {
-            this.toastr.error('Error removing student: ' + (err.error?.message || err.message));
-          },
-          complete: () => {
-            this.isRemoving = false;
-          }
-        });
       }
     });
   }

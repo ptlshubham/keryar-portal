@@ -10,6 +10,7 @@ import { AssessmentReviewComponent } from './assessment-review/assessment-review
 import { CollegeListComponent } from './college-list/college-list.component';
 import { CollegeJobMappingComponent } from './college-job-mapping/college-job-mapping.component';
 import { InterviewRoundComponent } from './interview-round/interview-round.component';
+import { HiredStudentsComponent } from './hired-students/hired-students.component';
 
 const routes: Routes = [
   {
@@ -54,6 +55,10 @@ const routes: Routes = [
   {
     path: 'interview-round',
     component: InterviewRoundComponent
+  },
+  {
+    path: 'hired-students',
+    component: HiredStudentsComponent
   },
 ];
 

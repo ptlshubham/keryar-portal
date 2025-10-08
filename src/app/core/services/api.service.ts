@@ -132,4 +132,7 @@ export class ApiService {
   public static getApprovedStudentsURL: string = `${ApiService.HOST_URL}/keryar/GetApprovedStudents`;
   public static updateInterviewStatusURL: string = `${ApiService.HOST_URL}/keryar/UpdateInterviewStatus`;
   public static removeInterviewStudentURL: string = `${ApiService.HOST_URL}/keryar/RemoveInterviewStudent`;
+
+
+  public static updateRemarksURL: string = ApiService.HOST_URL + '/keryar/UpdateRemarks';
 }

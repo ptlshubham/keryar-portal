@@ -181,4 +181,8 @@ export class PlacementService {
         return this.httpClient.post(ApiService.removeInterviewStudentURL, { id });
     }
 
+    updateRemarks(assessmentId: string, remarks: string): Observable<any> {
+        return this.httpClient.post(ApiService.updateRemarksURL, { assessmentId, remarks });
+    }
+
 }
