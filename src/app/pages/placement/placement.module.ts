@@ -21,6 +21,7 @@ import { StudentListComponent } from './student-list/student-list.component';
 import { AssessmentReviewComponent } from './assessment-review/assessment-review.component';
 import { CollegeListComponent } from './college-list/college-list.component';
 import { CollegeJobMappingComponent } from './college-job-mapping/college-job-mapping.component';
+import { InterviewRoundComponent } from './interview-round/interview-round.component';
 
 
 @NgModule({
@@ -34,6 +35,7 @@ import { CollegeJobMappingComponent } from './college-job-mapping/college-job-ma
     AssessmentReviewComponent,
     CollegeListComponent,
     CollegeJobMappingComponent,
+    InterviewRoundComponent,
   ],
   imports: [
     CommonModule,

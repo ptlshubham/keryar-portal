@@ -127,4 +127,9 @@ export class ApiService {
 
   public static updateAnswerCorrectnessURL: string = ApiService.HOST_URL + '/keryar/UpdateAnswerCorrectness';
 
+
+  // interviw Round
+  public static getApprovedStudentsURL: string = `${ApiService.HOST_URL}/keryar/GetApprovedStudents`;
+  public static updateInterviewStatusURL: string = `${ApiService.HOST_URL}/keryar/UpdateInterviewStatus`;
+  public static removeInterviewStudentURL: string = `${ApiService.HOST_URL}/keryar/RemoveInterviewStudent`;
 }

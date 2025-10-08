@@ -8,35 +8,34 @@ import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import * as XLSX from 'xlsx';
 
-enum AssessmentStatus {
+enum InterviewStatus {
   Pending = 'pending',
-  Approved = 'approved',
+  Hired = 'hired',
   Rejected = 'rejected'
 }
 
-// Interface for Excel worksheet data
 interface WorksheetRow {
   '#': number;
   'Student Name': string;
   'Student ID': string;
   Email: string;
   'Applied Role': string;
-  Status: string;
+  'Interview Status': string;
   'Total Marks': number;
   'Obtained Marks': number;
 }
 
 @Component({
-  selector: 'app-assessment-review',
-  templateUrl: './assessment-review.component.html',
-  styleUrls: ['./assessment-review.component.scss']
+  selector: 'app-interview-round',
+  templateUrl: './interview-round.component.html',
+  styleUrls: ['./interview-round.component.scss']
 })
-export class AssessmentReviewComponent implements OnInit {
+export class InterviewRoundComponent implements OnInit {
   breadCrumbItems: Array<{}> = [];
-  assessments: any[] = [];
+  students: any[] = [];
   paginateData: any[] = [];
-  filteredAssessments: any[] = [];
-  selectedAssessment: any | null = null;
+  filteredStudents: any[] = [];
+  selectedStudent: any | null = null;
   filterStatus: string = '';
   searchTerm: string = '';
   filterCollege: string = '';
@@ -46,11 +45,11 @@ export class AssessmentReviewComponent implements OnInit {
   pageSize = 10;
   collectionSize = 0;
   isLoadingPreview = false;
-  isApproving = false;
+  isHiring = false;
   isRejecting = false;
   isRemoving = false;
   private modalRef?: NgbModalRef;
-  assessmentStatus = AssessmentStatus;
+  interviewStatus = InterviewStatus;
   safeResumeUrl?: SafeResourceUrl;
 
   constructor(
@@ -63,72 +62,74 @@ export class AssessmentReviewComponent implements OnInit {
   ngOnInit() {
     this.breadCrumbItems = [
       { label: 'Home' },
-      { label: 'Assessment Review', active: true }
+      { label: 'Interview Round', active: true }
     ];
-    this.loadAssessments();
+    this.loadApprovedStudents();
   }
 
-  loadAssessments() {
-    this.placementService.getAllStudentAssessments(this.filterStatus).subscribe({
+  loadApprovedStudents() {
+    this.placementService.getApprovedStudents().subscribe({
       next: (response) => {
         if (response.success) {
-          this.assessments = response.data.map((item: any, index: number) => ({
+          this.students = response.data.map((item: any, index: number) => ({
             ...item,
-            index: index + 1
+            index: index + 1,
+            obtained_marks: item.obtained_marks ?? 0, // Fallback to 0
+            total_marks: item.total_marks ?? 0 // Fallback to 0
           }));
-          this.colleges = [...new Set(this.assessments.map(assessment => assessment.student.institute).filter(institute => institute))].sort();
+          this.colleges = [...new Set(this.students.map(student => student.institute).filter(institute => institute))].sort();
           this.applyFilters();
         } else {
-          this.toastr.error(response.message || 'Failed to fetch assessments');
+          this.toastr.error(response.message || 'Failed to fetch approved students');
         }
       },
       error: (err) => {
-        this.toastr.error('Error fetching assessments: ' + (err.error?.message || err.message));
+        this.toastr.error('Error fetching students: ' + (err.error?.message || err.message));
       }
     });
   }
 
   applyFilters() {
-    let filteredAssessments = [...this.assessments];
+    let filteredStudents = [...this.students];
 
     if (this.searchTerm) {
       const searchLower = this.searchTerm.toLowerCase();
-      filteredAssessments = filteredAssessments.filter(assessment =>
-        assessment.student.name.toLowerCase().includes(searchLower) ||
-        assessment.student.email.toLowerCase().includes(searchLower) ||
-        assessment.student.studentid.toLowerCase().includes(searchLower)
+      filteredStudents = filteredStudents.filter(student =>
+        (student.firstname + ' ' + student.lastname).toLowerCase().includes(searchLower) ||
+        student.email.toLowerCase().includes(searchLower) ||
+        student.studentid.toLowerCase().includes(searchLower)
       );
     }
 
     if (this.filterCollege) {
-      filteredAssessments = filteredAssessments.filter(assessment =>
-        assessment.student.institute.toLowerCase() === this.filterCollege.toLowerCase()
+      filteredStudents = filteredStudents.filter(student =>
+        student.institute.toLowerCase() === this.filterCollege.toLowerCase()
       );
     }
 
     if (this.selectedDate) {
       const selected = new Date(this.selectedDate);
       const selectedDateStr = selected.toISOString().split('T')[0];
-      filteredAssessments = filteredAssessments.filter(assessment => {
-        const assessmentDate = new Date(assessment.createddate);
-        const assessmentDateStr = assessmentDate.toISOString().split('T')[0];
-        return assessmentDateStr === selectedDateStr;
+      filteredStudents = filteredStudents.filter(student => {
+        const studentDate = new Date(student.createddate);
+        const studentDateStr = studentDate.toISOString().split('T')[0];
+        return studentDateStr === selectedDateStr;
       });
     }
 
     if (this.filterStatus) {
-      filteredAssessments = filteredAssessments.filter(assessment =>
-        assessment.status === this.filterStatus
+      filteredStudents = filteredStudents.filter(student =>
+        student.interviewround === this.filterStatus
       );
     }
 
-    this.filteredAssessments = filteredAssessments;
-    this.collectionSize = filteredAssessments.length;
-    this.getPagination(filteredAssessments);
+    this.filteredStudents = filteredStudents;
+    this.collectionSize = filteredStudents.length;
+    this.getPagination(filteredStudents);
   }
 
-  getPagination(filteredAssessments: any[] = this.filteredAssessments) {
-    this.paginateData = filteredAssessments.slice(
+  getPagination(filteredStudents: any[] = this.filteredStudents) {
+    this.paginateData = filteredStudents.slice(
       (this.page - 1) * this.pageSize,
       this.page * this.pageSize
     );
@@ -156,7 +157,7 @@ export class AssessmentReviewComponent implements OnInit {
   }
 
   downloadPdf() {
-    if (this.filteredAssessments.length === 0) {
+    if (this.filteredStudents.length === 0) {
       this.toastr.warning('No data available to download.');
       return;
     }
@@ -164,13 +165,13 @@ export class AssessmentReviewComponent implements OnInit {
     const doc = new jsPDF('l', 'mm', 'a4');
     const pageWidth = doc.internal.pageSize.width;
     const pageHeight = doc.internal.pageSize.height;
-    const today = new Date('2025-10-07T15:47:00+05:30');
+    const today = new Date();
     const instituteName = this.filterCollege || 'All Institutes';
 
     // Cover Page
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(24);
-    doc.text('Student Assessment Report', pageWidth / 2, 50, { align: 'center' });
+    doc.text('Interview Round Report', pageWidth / 2, 50, { align: 'center' });
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(14);
     doc.text(`Prepared for: ${instituteName}`, pageWidth / 2, 70, { align: 'center' });
@@ -186,7 +187,7 @@ export class AssessmentReviewComponent implements OnInit {
     const addHeader = () => {
       doc.setFont('helvetica', 'bold');
       doc.setFontSize(14);
-      doc.text('Student Assessment Report', 14, 20);
+      doc.text('Interview Round Report', 14, 20);
       doc.setFont('helvetica', 'normal');
       doc.setFontSize(10);
       doc.text(`Institute: ${instituteName}`, 14, 28);
@@ -215,18 +216,18 @@ export class AssessmentReviewComponent implements OnInit {
       'Applied Role',
       'Total Marks',
       'Obtained Marks',
-      'Status'
+      'Interview Status'
     ];
 
-    const body = this.filteredAssessments.map((assessment, index) => [
+    const body = this.filteredStudents.map((student, index) => [
       index + 1,
-      assessment.student.name || 'N/A',
-      assessment.student.studentid || 'N/A',
-      assessment.student.email || 'N/A',
-      assessment.student.appliedrole || 'N/A',
-      assessment.total_marks || 'N/A',
-      assessment.obtained_marks || '0',
-      assessment.status ? assessment.status.charAt(0).toUpperCase() + assessment.status.slice(1) : 'N/A'
+      `${student.firstname} ${student.lastname}` || 'N/A',
+      student.studentid || 'N/A',
+      student.email || 'N/A',
+      student.appliedrole || 'N/A',
+      student.total_marks || 0,
+      student.obtained_marks || 0,
+      student.interviewround ? student.interviewround.charAt(0).toUpperCase() + student.interviewround.slice(1) : 'Pending'
     ]);
 
     autoTable(doc, {
@@ -266,24 +267,24 @@ export class AssessmentReviewComponent implements OnInit {
 
     addFooter();
 
-    doc.save(`assessment-report-${this.getCurrentDateString()}.pdf`);
+    doc.save(`interview-round-report-${this.getCurrentDateString()}.pdf`);
   }
 
   downloadExcel() {
-    if (this.filteredAssessments.length === 0) {
+    if (this.filteredStudents.length === 0) {
       this.toastr.warning('No data available to download.');
       return;
     }
 
-    const worksheetData: WorksheetRow[] = this.filteredAssessments.map((assessment, index) => ({
+    const worksheetData: WorksheetRow[] = this.filteredStudents.map((student, index) => ({
       '#': index + 1,
-      'Student Name': assessment.student.name || 'N/A',
-      'Student ID': assessment.student.studentid || 'N/A',
-      Email: assessment.student.email || 'N/A',
-      'Applied Role': assessment.student.appliedrole || 'N/A',
-      Status: assessment.status ? assessment.status.charAt(0).toUpperCase() + assessment.status.slice(1) : 'N/A',
-      'Total Marks': assessment.total_marks || 'N/A',
-      'Obtained Marks': assessment.obtained_marks || '0'
+      'Student Name': `${student.firstname} ${student.lastname}` || 'N/A',
+      'Student ID': student.studentid || 'N/A',
+      Email: student.email || 'N/A',
+      'Applied Role': student.appliedrole || 'N/A',
+      'Interview Status': student.interviewround ? student.interviewround.charAt(0).toUpperCase() + student.interviewround.slice(1) : 'Pending',
+      'Total Marks': student.total_marks || 0,
+      'Obtained Marks': student.obtained_marks || 0
     }));
 
     const worksheet = XLSX.utils.json_to_sheet(worksheetData);
@@ -304,21 +305,21 @@ export class AssessmentReviewComponent implements OnInit {
     worksheet['!cols'] = colWidths;
 
     const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, 'Assessments');
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'InterviewRound');
 
-    const today = new Date('2025-10-07T15:47:00+05:30');
+    const today = new Date();
     const summaryData = [
-      { Field: 'Report Title', Value: 'Student Assessment Report' },
+      { Field: 'Report Title', Value: 'Interview Round Report' },
       { Field: 'Institute', Value: this.filterCollege || 'All Institutes' },
       { Field: 'Generated On', Value: today.toLocaleString('en-GB', { timeZone: 'Asia/Kolkata', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true }) },
       { Field: 'Filters Applied', Value: this.getFiltersText() },
-      { Field: 'Total Records', Value: this.filteredAssessments.length }
+      { Field: 'Total Records', Value: this.filteredStudents.length }
     ];
     const summarySheet = XLSX.utils.json_to_sheet(summaryData);
     summarySheet['!cols'] = [{ wch: 20 }, { wch: 50 }];
     XLSX.utils.book_append_sheet(workbook, summarySheet, 'Summary');
 
-    XLSX.writeFile(workbook, `assessment-report-${this.getCurrentDateString()}.xlsx`);
+    XLSX.writeFile(workbook, `interview-round-report-${this.getCurrentDateString()}.xlsx`);
   }
 
   private getFiltersText(): string {
@@ -326,28 +327,33 @@ export class AssessmentReviewComponent implements OnInit {
     if (this.searchTerm) filters.push(`Search: ${this.searchTerm}`);
     if (this.filterCollege) filters.push(`Institute: ${this.filterCollege}`);
     if (this.selectedDate) filters.push(`Date: ${this.selectedDate}`);
-    if (this.filterStatus) filters.push(`Status: ${this.filterStatus}`);
+    if (this.filterStatus) filters.push(`Interview Status: ${this.filterStatus.charAt(0).toUpperCase() + this.filterStatus.slice(1)}`);
     return filters.length > 0 ? `${filters.join(', ')}` : 'No filters applied';
   }
 
   private getCurrentDateString(): string {
-    const today = new Date('2025-10-07T15:47:00+05:30');
+    const today = new Date();
     return today.toISOString().split('T')[0];
   }
 
-  openPreviewModal(modal: any, assessment: any) {
+  openPreviewModal(modal: any, student: any) {
     this.isLoadingPreview = true;
-    this.selectedAssessment = null;
+    this.selectedStudent = null;
     this.safeResumeUrl = undefined;
 
-    this.placementService.getAssessmentPreview(assessment.assessment_id).subscribe({
+    this.placementService.getAssessmentPreview(student.id).subscribe({
       next: (response) => {
         if (response.success) {
-          this.selectedAssessment = response.data;
+          this.selectedStudent = {
+            ...student,
+            answers: response.data.answers,
+            obtained_marks: response.data.obtained_marks ?? 0, // Fallback
+            total_marks: response.data.total_marks ?? 0 // Fallback
+          };
 
           const resumeUrl: string | null =
-            this.selectedAssessment?.student?.resume && typeof this.selectedAssessment.student.resume === 'string'
-              ? this.selectedAssessment.student.resume
+            this.selectedStudent?.resume && typeof this.selectedStudent.resume === 'string'
+              ? this.selectedStudent.resume
               : null;
 
           if (resumeUrl) {
@@ -359,7 +365,7 @@ export class AssessmentReviewComponent implements OnInit {
             }
 
             this.safeResumeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(fullResumeUrl);
-            this.selectedAssessment.student.resume = fullResumeUrl;
+            this.selectedStudent.resume = fullResumeUrl;
           }
 
           this.modalRef = this.modalService.open(modal, {
@@ -382,68 +388,68 @@ export class AssessmentReviewComponent implements OnInit {
 
   closeModal() {
     this.modalRef?.close();
-    this.selectedAssessment = null;
+    this.selectedStudent = null;
     this.isLoadingPreview = false;
     this.safeResumeUrl = undefined;
   }
 
-  approveAssessment(assessmentId: string) {
+  hireStudent(studentId: string) {
     Swal.fire({
       title: 'Are you sure?',
-      text: 'Do you want to approve this assessment?',
+      text: 'Do you want to mark this student as hired?',
       icon: 'question',
       showCancelButton: true,
       confirmButtonColor: '#3085d6',
       cancelButtonColor: '#d33',
-      confirmButtonText: 'Yes, approve it!'
+      confirmButtonText: 'Yes, hire them!'
     }).then((result) => {
       if (result.isConfirmed) {
-        this.isApproving = true;
-        this.placementService.approveRejectAssessment(assessmentId, AssessmentStatus.Approved).subscribe({
+        this.isHiring = true;
+        this.placementService.updateInterviewStatus({ id: studentId, interviewround: InterviewStatus.Hired }).subscribe({
           next: (response) => {
             if (response.success) {
-              this.toastr.success(response.message || 'Assessment approved');
-              this.loadAssessments();
+              this.toastr.success(response.message || 'Student marked as hired');
+              this.loadApprovedStudents();
               this.closeModal();
             } else {
-              this.toastr.error(response.message || 'Failed to approve assessment');
+              this.toastr.error(response.message || 'Failed to mark as hired');
             }
           },
           error: (err) => {
-            this.toastr.error('Error approving assessment: ' + (err.error?.message || err.message));
+            this.toastr.error('Error marking as hired: ' + (err.error?.message || err.message));
           },
           complete: () => {
-            this.isApproving = false;
+            this.isHiring = false;
           }
         });
       }
     });
   }
 
-  rejectAssessment(assessmentId: string) {
+  rejectStudent(studentId: string) {
     Swal.fire({
       title: 'Are you sure?',
-      text: 'Do you want to reject this assessment?',
+      text: 'Do you want to reject this student?',
       icon: 'warning',
       showCancelButton: true,
       confirmButtonColor: '#3085d6',
       cancelButtonColor: '#d33',
-      confirmButtonText: 'Yes, reject it!'
+      confirmButtonText: 'Yes, reject them!'
     }).then((result) => {
       if (result.isConfirmed) {
         this.isRejecting = true;
-        this.placementService.approveRejectAssessment(assessmentId, AssessmentStatus.Rejected).subscribe({
+        this.placementService.updateInterviewStatus({ id: studentId, interviewround: InterviewStatus.Rejected }).subscribe({
           next: (response) => {
             if (response.success) {
-              this.toastr.success(response.message || 'Assessment rejected');
-              this.loadAssessments();
+              this.toastr.success(response.message || 'Student marked as rejected');
+              this.loadApprovedStudents();
               this.closeModal();
             } else {
-              this.toastr.error(response.message || 'Failed to reject assessment');
+              this.toastr.error(response.message || 'Failed to mark as rejected');
             }
           },
           error: (err) => {
-            this.toastr.error('Error rejecting assessment: ' + (err.error?.message || err.message));
+            this.toastr.error('Error marking as rejected: ' + (err.error?.message || err.message));
           },
           complete: () => {
             this.isRejecting = false;
@@ -453,30 +459,30 @@ export class AssessmentReviewComponent implements OnInit {
     });
   }
 
-  removeAssessment(assessmentId: string) {
+  removeStudent(studentId: string) {
     Swal.fire({
       title: 'Are you sure?',
-      text: 'Do you want to remove this assessment? This action cannot be undone.',
+      text: 'Do you want to remove this student? This action cannot be undone.',
       icon: 'warning',
       showCancelButton: true,
       confirmButtonColor: '#3085d6',
       cancelButtonColor: '#d33',
-      confirmButtonText: 'Yes, remove it!'
+      confirmButtonText: 'Yes, remove them!'
     }).then((result) => {
       if (result.isConfirmed) {
         this.isRemoving = true;
-        this.placementService.removePlacementFormById(assessmentId).subscribe({
+        this.placementService.removeInterviewStudent(studentId).subscribe({
           next: (response) => {
             if (response.success) {
-              this.toastr.success(response.message || 'Assessment removed successfully');
-              this.loadAssessments();
+              this.toastr.success(response.message || 'Student removed successfully');
+              this.loadApprovedStudents();
               this.closeModal();
             } else {
-              this.toastr.error(response.message || 'Failed to remove assessment');
+              this.toastr.error(response.message || 'Failed to remove student');
             }
           },
           error: (err) => {
-            this.toastr.error('Error removing assessment: ' + (err.error?.message || err.message));
+            this.toastr.error('Error removing student: ' + (err.error?.message || err.message));
           },
           complete: () => {
             this.isRemoving = false;
@@ -486,33 +492,7 @@ export class AssessmentReviewComponent implements OnInit {
     });
   }
 
-  setCorrect(questionId: string, isCorrect: number) {
-    if (!this.selectedAssessment) return;
-    const pfId = this.selectedAssessment.student.id;
-    const qsId = this.selectedAssessment.questionset.id;
-    this.placementService.updateAnswerCorrectness(pfId, qsId, questionId, isCorrect).subscribe({
-      next: (response) => {
-        if (response.success) {
-          this.toastr.success('Correctness updated');
-          const answer = this.selectedAssessment.answers.find((a: any) => a.question_id === questionId);
-          if (answer) {
-            answer.is_correct = isCorrect;
-            this.selectedAssessment.obtained_marks = this.selectedAssessment.answers.reduce(
-              (sum: number, a: any) => sum + (a.is_correct === 1 ? Number(a.weight) : 0), 0
-            );
-          }
-          this.loadAssessments();
-        } else {
-          this.toastr.error(response.message || 'Failed to update');
-        }
-      },
-      error: (err) => {
-        this.toastr.error('Error updating correctness: ' + (err.error?.message || err.message));
-      }
-    });
-  }
-
   trackById(_: number, item: any) {
-    return item.assessment_id;
+    return item.id;
   }
 }

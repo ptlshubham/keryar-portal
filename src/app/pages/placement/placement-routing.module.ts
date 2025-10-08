@@ -9,6 +9,7 @@ import { StudentListComponent } from './student-list/student-list.component';
 import { AssessmentReviewComponent } from './assessment-review/assessment-review.component';
 import { CollegeListComponent } from './college-list/college-list.component';
 import { CollegeJobMappingComponent } from './college-job-mapping/college-job-mapping.component';
+import { InterviewRoundComponent } from './interview-round/interview-round.component';
 
 const routes: Routes = [
   {
@@ -49,6 +50,10 @@ const routes: Routes = [
   {
     path: 'college-mapping',
     component: CollegeJobMappingComponent
+  },
+  {
+    path: 'interview-round',
+    component: InterviewRoundComponent
   },
 ];
 

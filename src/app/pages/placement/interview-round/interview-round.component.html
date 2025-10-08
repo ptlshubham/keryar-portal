@@ -2,10 +2,10 @@
     <div class="page-title-box">
         <div class="row align-items-center">
             <div class="col-md-8">
-                <h6 class="page-title">Student Assessments</h6>
+                <h6 class="page-title">Interview Round</h6>
                 <ol class="breadcrumb m-0">
                     <li class="breadcrumb-item"><a href="javascript:void(0);">Home</a></li>
-                    <li class="breadcrumb-item active">Assessment Review</li>
+                    <li class="breadcrumb-item active">Interview Round</li>
                 </ol>
             </div>
         </div>
@@ -15,55 +15,53 @@
         <div class="col-12">
             <div class="card">
                 <div class="card-header">
-                    <h5 class="card-title">List of All Student Assessments</h5>
-                    <p class="card-title-desc">Review student assessments, approve/reject submissions, and preview test
+                    <h5 class="card-title">Approved Students for Interview</h5>
+                    <p class="card-title-desc">Review approved students, mark as Hired/Rejected, and preview assessment
                         details.</p>
                 </div>
                 <div class="card-body">
-                    <div class="card-body">
-                        <div class="row mb-3 align-items-end">
-                            <div class="col-md-2">
-                                <label for="searchTerm" class="form-label">Search</label>
-                                <input id="searchTerm" type="text" class="form-control" [(ngModel)]="searchTerm"
-                                    (ngModelChange)="onSearchChange()" placeholder="Search by name, email, or ID">
-                            </div>
-                            <div class="col-md-2">
-                                <label for="selectedDate" class="form-label">Selected Date</label>
-                                <input id="selectedDate" type="date" class="form-control" [(ngModel)]="selectedDate"
-                                    (ngModelChange)="onDateChange()" placeholder="dd/mm/yyyy">
-                            </div>
-                            <div class="col-md-2">
-                                <label for="statusFilter" class="form-label">Filter by Status</label>
-                                <select id="statusFilter" class="form-select" [(ngModel)]="filterStatus"
-                                    (change)="filterByStatus(filterStatus)">
-                                    <option value="">All Status</option>
-                                    <option [value]="assessmentStatus.Pending">Pending</option>
-                                    <option [value]="assessmentStatus.Approved">Approved</option>
-                                    <option [value]="assessmentStatus.Rejected">Rejected</option>
-                                </select>
-                            </div>
-                            <div class="col-md-2">
-                                <label for="collegeFilter" class="form-label">Filter by College</label>
-                                <select id="collegeFilter" class="form-select" [(ngModel)]="filterCollege"
-                                    (change)="onCollegeChange()">
-                                    <option value="">All Colleges</option>
-                                    <option *ngFor="let college of colleges" [value]="college">{{ college }}</option>
-                                </select>
-                            </div>
-                            <div class="col-md-4 d-flex justify-content-end gap-2">
-                                <button class="btn btn-primary btn-sm" (click)="loadAssessments()"
-                                    aria-label="Refresh assessments">
-                                    <i class="mdi mdi-refresh"></i>
-                                </button>
-                                <button class="btn btn-outline-success btn-sm" (click)="downloadPdf()"
-                                    [disabled]="filteredAssessments.length === 0" aria-label="Download PDF">
-                                    <i class="mdi mdi-file-pdf"></i>
-                                </button>
-                                <button class="btn btn-outline-primary btn-sm" (click)="downloadExcel()"
-                                    [disabled]="filteredAssessments.length === 0" aria-label="Download Excel">
-                                    <i class="mdi mdi-file-excel"></i>
-                                </button>
-                            </div>
+                    <div class="row mb-3 align-items-end">
+                        <div class="col-md-2">
+                            <label for="searchTerm" class="form-label">Search</label>
+                            <input id="searchTerm" type="text" class="form-control" [(ngModel)]="searchTerm"
+                                (ngModelChange)="onSearchChange()" placeholder="Search by name, email, or ID">
+                        </div>
+                        <div class="col-md-2">
+                            <label for="selectedDate" class="form-label">Selected Date</label>
+                            <input id="selectedDate" type="date" class="form-control" [(ngModel)]="selectedDate"
+                                (ngModelChange)="onDateChange()" placeholder="dd/mm/yyyy">
+                        </div>
+                        <div class="col-md-2">
+                            <label for="statusFilter" class="form-label">Filter by Interview Status</label>
+                            <select id="statusFilter" class="form-select" [(ngModel)]="filterStatus"
+                                (change)="filterByStatus(filterStatus)">
+                                <option value="">All Status</option>
+                                <option [value]="interviewStatus.Pending">Pending</option>
+                                <option [value]="interviewStatus.Hired">Hired</option>
+                                <option [value]="interviewStatus.Rejected">Rejected</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label for="collegeFilter" class="form-label">Filter by College</label>
+                            <select id="collegeFilter" class="form-select" [(ngModel)]="filterCollege"
+                                (change)="onCollegeChange()">
+                                <option value="">All Colleges</option>
+                                <option *ngFor="let college of colleges" [value]="college">{{ college }}</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4 d-flex justify-content-end gap-2">
+                            <button class="btn btn-primary btn-sm" (click)="loadApprovedStudents()"
+                                aria-label="Refresh students">
+                                <i class="mdi mdi-refresh"></i>
+                            </button>
+                            <button class="btn btn-outline-success btn-sm" (click)="downloadPdf()"
+                                [disabled]="filteredStudents.length === 0" aria-label="Download PDF">
+                                <i class="mdi mdi-file-pdf"></i>
+                            </button>
+                            <button class="btn btn-outline-primary btn-sm" (click)="downloadExcel()"
+                                [disabled]="filteredStudents.length === 0" aria-label="Download Excel">
+                                <i class="mdi mdi-file-excel"></i>
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -80,92 +78,90 @@
                                     <th>Applied Role</th>
                                     <th>Question Set</th>
                                     <th>Difficulty</th>
-                                    <th>Status</th>
+                                    <th>Interview Status</th>
                                     <th>Marks</th>
                                     <th>Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr *ngFor="let assessment of paginateData; let i = index; trackBy: trackById">
+                                <tr *ngFor="let student of paginateData; let i = index; trackBy: trackById">
                                     <td>{{ (page - 1) * pageSize + i + 1 }}</td>
-                                    <td>{{ assessment.student.name }}</td>
-                                    <td>{{ assessment.student.studentid }}</td>
-                                    <td>{{ assessment.student.email }}</td>
-                                    <td>{{ assessment.student.institute }}</td>
-                                    <td>{{ assessment.student.appliedrole | slice:0:8 }}</td>
-                                    <td>{{ assessment.questionset.type }} </td>
-                                    <!-- Difficulty Column with Icon -->
+                                    <td>{{ student.firstname + ' ' + student.lastname }}</td>
+                                    <td>{{ student.studentid }}</td>
+                                    <td>{{ student.email }}</td>
+                                    <td>{{ student.institute }}</td>
+                                    <td>{{ student.appliedrole | slice:0:8 }}</td>
+                                    <td>{{ student.type }}</td>
                                     <td>
                                         <span [ngClass]="{
-                                            'text-success': assessment.questionset.difficulty?.toLowerCase() === 'easy',
-                                            'text-warning': assessment.questionset.difficulty?.toLowerCase() === 'medium',
-                                            'text-danger': assessment.questionset.difficulty?.toLowerCase() === 'hard'
-                                        }">
+                      'text-success': student.difficulty?.toLowerCase() === 'easy',
+                      'text-warning': student.difficulty?.toLowerCase() === 'medium',
+                      'text-danger': student.difficulty?.toLowerCase() === 'hard'
+                    }">
                                             <i class="mdi me-1" [ngClass]="{
-                                                   'mdi-thumb-up': assessment.questionset.difficulty?.toLowerCase() === 'easy',
-                                                   'mdi-minus-circle': assessment.questionset.difficulty?.toLowerCase() === 'medium',
-                                                   'mdi-thumb-down': assessment.questionset.difficulty?.toLowerCase() === 'hard'
-                                               }"></i>
-                                            {{ assessment.questionset.difficulty }}
+                        'mdi-thumb-up': student.difficulty?.toLowerCase() === 'easy',
+                        'mdi-minus-circle': student.difficulty?.toLowerCase() === 'medium',
+                        'mdi-thumb-down': student.difficulty?.toLowerCase() === 'hard'
+                      }"></i>
+                                            {{ student.difficulty }}
                                         </span>
                                     </td>
-                                    <!-- Status Column with Icon -->
                                     <td [ngClass]="{
-                                        'text-warning': assessment.status === assessmentStatus.Pending,
-                                        'text-success': assessment.status === assessmentStatus.Approved,
-                                        'text-danger': assessment.status === assessmentStatus.Rejected,
-                                        'text-secondary': assessment.status !== assessmentStatus.Pending && assessment.status !== assessmentStatus.Approved && assessment.status !== assessmentStatus.Rejected
-                                    }">
+                    'text-warning': student.interviewround === interviewStatus.Pending,
+                    'text-success': student.interviewround === interviewStatus.Hired,
+                    'text-danger': student.interviewround === interviewStatus.Rejected
+                  }">
                                         <i class="mdi me-1" [ngClass]="{
-                                               'mdi-clock-outline': assessment.status === assessmentStatus.Pending,
-                                               'mdi-check-circle': assessment.status === assessmentStatus.Approved,
-                                               'mdi-close-circle': assessment.status === assessmentStatus.Rejected
-                                           }"></i>
-                                        <!-- {{ assessment.status | titlecase }} -->
+                      'mdi-clock-outline': student.interviewround === interviewStatus.Pending,
+                      'mdi-check-circle': student.interviewround === interviewStatus.Hired,
+                      'mdi-close-circle': student.interviewround === interviewStatus.Rejected
+                    }"></i>
+                                        {{ student.interviewround | titlecase }}
                                     </td>
-                                    <td>{{ assessment.obtained_marks }} / {{ assessment.total_marks }}</td>
-                                    <!-- Actions Column with Icons Only -->
+
+                                    <td>{{ student.obtained_marks }} / {{ student.total_marks }}</td>
                                     <td class="text-nowrap">
                                         <button class="btn btn-primary btn-sm me-1"
-                                            (click)="openPreviewModal(previewModal, assessment)"
-                                            aria-label="Preview assessment">
+                                            (click)="openPreviewModal(previewModal, student)"
+                                            aria-label="Preview student">
                                             <i class="mdi mdi-eye"></i>
                                         </button>
                                         <button class="btn btn-success btn-sm me-1"
-                                            *ngIf="assessment.status === assessmentStatus.Pending"
-                                            (click)="approveAssessment(assessment.assessment_id)"
-                                            [disabled]="isApproving" aria-label="Approve assessment">
+                                            *ngIf="student.interviewround === interviewStatus.Pending"
+                                            (click)="hireStudent(student.id)" [disabled]="isHiring"
+                                            aria-label="Hire student">
                                             <i class="mdi mdi-check"></i>
                                         </button>
                                         <button class="btn btn-danger btn-sm me-1"
-                                            *ngIf="assessment.status === assessmentStatus.Pending"
-                                            (click)="rejectAssessment(assessment.assessment_id)"
-                                            [disabled]="isRejecting" aria-label="Reject assessment">
+                                            *ngIf="student.interviewround === interviewStatus.Pending"
+                                            (click)="rejectStudent(student.id)" [disabled]="isRejecting"
+                                            aria-label="Reject student">
                                             <i class="mdi mdi-close"></i>
                                         </button>
                                         <button class="btn btn-outline-danger btn-sm"
-                                            (click)="removeAssessment(assessment.student.id)" [disabled]="isRemoving"
-                                            aria-label="Remove assessment">
+                                            (click)="removeStudent(student.id)" [disabled]="isRemoving"
+                                            aria-label="Remove student">
                                             <i class="mdi mdi-delete"></i>
                                         </button>
                                     </td>
                                 </tr>
                                 <tr *ngIf="!paginateData?.length">
-                                    <td colspan="11" class="text-center">No assessments found</td>
+                                    <td colspan="11" class="text-center">No approved students found</td>
                                 </tr>
                             </tbody>
                         </table>
                     </div>
                 </div>
                 <ngb-pagination [collectionSize]="collectionSize" [pageSize]="pageSize" [(page)]="page"
-                    (pageChange)="getPagination(paginateData)" class="d-flex justify-content-end"></ngb-pagination>
+                    (pageChange)="getPagination(filteredStudents)" class="d-flex justify-content-end"></ngb-pagination>
             </div>
         </div>
     </div>
 
     <ng-template #previewModal let-modal>
         <div class="modal-header">
-            <h5 class="modal-title">Assessment Details: {{ selectedAssessment?.student?.name || 'Loading...' }}</h5>
+            <h5 class="modal-title">Student Details: {{ selectedStudent?.firstname + ' ' + selectedStudent?.lastname ||
+                'Loading...' }}</h5>
             <button type="button" class="btn-close" (click)="closeModal()" aria-label="Close"></button>
         </div>
         <div class="modal-body">
@@ -174,55 +170,47 @@
                     <span class="visually-hidden">Loading...</span>
                 </div>
             </div>
-            <div *ngIf="selectedAssessment" class="row g-4">
+            <div *ngIf="selectedStudent" class="row g-4">
                 <!-- Student Details -->
                 <div class="col-12 col-xl-5">
                     <h6 class="mb-3">Student Details</h6>
                     <div class="card mb-3">
                         <div class="card-body">
-                            <p><strong>Name:</strong> {{ selectedAssessment.student.name || 'N/A' }}</p>
-                            <p><strong>Student ID:</strong> {{ selectedAssessment.student.studentid || 'N/A' }}</p>
-                            <p><strong>Email:</strong> {{ selectedAssessment.student.email || 'N/A' }}</p>
-                            <p><strong>Institute:</strong> {{ selectedAssessment.student.institute || 'N/A' }}</p>
-                            <p><strong>Applied Role:</strong> {{ selectedAssessment.student.appliedrole || 'N/A' }}</p>
-                            <p><strong>Question Set:</strong> {{ selectedAssessment.questionset.type }} - {{
-                                selectedAssessment.questionset.category || 'N/A' }}</p>
-                            <p><strong>Difficulty:</strong> {{ selectedAssessment.questionset.difficulty || 'N/A' }}</p>
-                            <p><strong>Year:</strong> {{ selectedAssessment.questionset.year || 'N/A' }}</p>
-                            <p><strong>Status:</strong>
-                                <span class="badge" [ngClass]="{
-                                'badge-warning': selectedAssessment.status === assessmentStatus.Pending,
-                                'badge-success': selectedAssessment.status === assessmentStatus.Approved,
-                                'badge-danger': selectedAssessment.status === assessmentStatus.Rejected,
-                                'badge-secondary': selectedAssessment.status !== assessmentStatus.Pending && selectedAssessment.status !== assessmentStatus.Approved && selectedAssessment.status !== assessmentStatus.Rejected
-                            }">{{ selectedAssessment.status | titlecase }}</span>
+                            <p><strong>Name:</strong> {{ selectedStudent.firstname + ' ' + selectedStudent.lastname ||
+                                'N/A' }}</p>
+                            <p><strong>Student ID:</strong> {{ selectedStudent.studentid || 'N/A' }}</p>
+                            <p><strong>Email:</strong> {{ selectedStudent.email || 'N/A' }}</p>
+                            <p><strong>Institute:</strong> {{ selectedStudent.institute || 'N/A' }}</p>
+                            <p><strong>Applied Role:</strong> {{ selectedStudent.appliedrole || 'N/A' }}</p>
+                            <p><strong>Question Set:</strong> {{ selectedStudent.type || 'N/A' }}</p>
+                            <p><strong>Difficulty:</strong> {{ selectedStudent.difficulty || 'N/A' }}</p>
+                            <p><strong>Year:</strong> {{ selectedStudent.year || 'N/A' }}</p>
+                            <p><strong>Assessment Status:</strong>
+                                <span class="badge badge-success">{{ selectedStudent.status | titlecase }}</span>
                             </p>
-                            <p><strong>Total Time:</strong> {{ selectedAssessment.questionset.totaltime ?
-                                (selectedAssessment.questionset.totaltime | number:'1.0-0') + ' min' : 'N/A' }}</p>
-                            <p><strong>Remaining Time:</strong> {{ selectedAssessment.remaining_time ?
-                                (selectedAssessment.remaining_time / 60 | number:'1.0-0') + ' min' : 'N/A' }}</p>
-                            <p><strong>Marks:</strong> {{ selectedAssessment.obtained_marks }} / {{
-                                selectedAssessment.total_marks }}</p>
-                            <p><strong>Created Date:</strong> {{ selectedAssessment.createddate | date:'medium' || 'N/A'
-                                }}</p>
+                            <p><strong>Interview Status:</strong>
+                                <span class="badge" [ngClass]="{
+                  'badge-warning': selectedStudent.interviewround === interviewStatus.Pending,
+                  'badge-success': selectedStudent.interviewround === interviewStatus.Hired,
+                  'badge-danger': selectedStudent.interviewround === interviewStatus.Rejected
+                }">{{ selectedStudent.interviewround | titlecase }}</span>
+                            </p>
+                            <p><strong>Marks:</strong> {{ selectedStudent.obtained_marks }} / {{
+                                selectedStudent.total_marks }}</p>
+                            <p><strong>Remarks:</strong> {{ selectedStudent.remarks || 'N/A' }}</p>
+                            <p><strong>Created Date:</strong> {{ selectedStudent.createddate | date:'medium' || 'N/A' }}
+                            </p>
                         </div>
                     </div>
-
-                    <div class="d-flex gap-2 mt-3" *ngIf="selectedAssessment.student.resume">
-                        <a class="btn btn-primary btn-sm" [href]="selectedAssessment.student.resume" target="_blank"
+                    <div class="d-flex gap-2 mt-3" *ngIf="selectedStudent.resume">
+                        <a class="btn btn-primary btn-sm" [href]="selectedStudent.resume" target="_blank"
                             rel="noopener">
                             Open Resume in New Tab
                         </a>
-                        <a class="btn btn-outline-primary btn-sm" [href]="selectedAssessment.student.resume" download>
+                        <a class="btn btn-outline-primary btn-sm" [href]="selectedStudent.resume" download>
                             Download Resume
                         </a>
                     </div>
-                    <!-- <div class="d-flex gap-2 mt-3">
-                        <button class="btn btn-outline-danger btn-sm"
-                            (click)="removeAssessment(selectedAssessment.student.is)" [disabled]="isRemoving">
-                            <i class="mdi mdi-delete"></i> {{ isRemoving ? 'Removing...' : 'Remove Assessment' }}
-                        </button>
-                    </div> -->
                 </div>
 
                 <!-- Resume Preview -->
@@ -248,15 +236,14 @@
                 <!-- Question Set Preview -->
                 <div class="col-12">
                     <div class="d-flex justify-content-between align-items-center">
-                        <h5 class="modal-title mt-0">Form Type: {{ selectedAssessment.questionset.type || 'N/A' }}</h5>
-                        <h5 class="modal-title mt-0">Year: {{ selectedAssessment.questionset.year || 'N/A' }}</h5>
-                        <h5 class="modal-title mt-0">Difficulty: {{ selectedAssessment.questionset.difficulty || 'N/A'
-                            }}</h5>
+                        <h5 class="modal-title mt-0">Form Type: {{ selectedStudent.type || 'N/A' }}</h5>
+                        <h5 class="modal-title mt-0">Year: {{ selectedStudent.year || 'N/A' }}</h5>
+                        <h5 class="modal-title mt-0">Difficulty: {{ selectedStudent.difficulty || 'N/A' }}</h5>
                     </div>
                     <h5 class="title text-center mb-3">Question List</h5>
                     <div class="row">
                         <div class="col-12">
-                            <div class="card" *ngFor="let data of selectedAssessment.answers; let i = index">
+                            <div class="card" *ngFor="let data of selectedStudent.answers; let i = index">
                                 <div class="card-body overflow-hidden position-relative">
                                     <div class="faq-count">
                                         <div class="d-flex justify-content-between align-items-center gap-2">
@@ -346,27 +333,14 @@
                                             </div>
                                             <div class="form-group mt-3" *ngIf="data.answer">
                                                 <label>Correctness</label>
-                                                <div>
-                                                    <button class="btn btn-success btn-sm me-2"
-                                                        (click)="setCorrect(data.question_id, 1)"
-                                                        [disabled]="data.is_correct === 1 || isLoadingPreview">
-                                                        Mark Correct
-                                                    </button>
-                                                    <button class="btn btn-danger btn-sm me-2"
-                                                        (click)="setCorrect(data.question_id, 0)"
-                                                        [disabled]="data.is_correct === 0 || isLoadingPreview">
-                                                        Mark Incorrect
-                                                    </button>
-                                                    <span *ngIf="data.is_correct !== null">{{ data.is_correct === 1 ?
-                                                        'Correct' : 'Incorrect' }}</span>
-                                                    <span *ngIf="data.is_correct === null">Not evaluated</span>
-                                                </div>
+                                                <span>{{ data.is_correct === 1 ? 'Correct' : data.is_correct === 0 ?
+                                                    'Incorrect' : 'Not evaluated' }}</span>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                            <div *ngIf="!selectedAssessment.answers?.length" class="alert alert-info">
+                            <div *ngIf="!selectedStudent.answers?.length" class="alert alert-info">
                                 No answers submitted for this assessment.
                             </div>
                         </div>

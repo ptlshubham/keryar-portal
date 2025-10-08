@@ -169,5 +169,16 @@ export class PlacementService {
     updateAnswerCorrectness(placementFormId: string, questionSetId: string, questionId: string, isCorrect: number): Observable<any> {
         return this.httpClient.post(ApiService.updateAnswerCorrectnessURL, { placementFormId, questionSetId, questionId, isCorrect });
     }
+    getApprovedStudents(): Observable<any> {
+        return this.httpClient.get(ApiService.getApprovedStudentsURL);
+    }
+
+    updateInterviewStatus(data: { id: string; interviewround: string }): Observable<any> {
+        return this.httpClient.post(ApiService.updateInterviewStatusURL, data);
+    }
+
+    removeInterviewStudent(id: string): Observable<any> {
+        return this.httpClient.post(ApiService.removeInterviewStudentURL, { id });
+    }
 
 }
