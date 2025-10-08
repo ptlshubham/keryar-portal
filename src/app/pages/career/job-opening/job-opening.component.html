@@ -184,11 +184,14 @@
                                 </div>
                             </div>
 
-                            <div class="col-lg-2 mb-2">
+                            <div class="col-lg-4 mb-2">
                                 <div class="form-group mb-3">
                                     <label for="name">Upload Job Opening Image</label>
+                                    <p style="color: red;">
+                                        Please Upload only 200 X 200px image.
+                                    </p>
                                     <div class="custom-avatar-uploader">
-                                        <div class="d-flex justify-content-center">
+                                        <div class="d-flex ">
                                             <label class="custom-upload-box" *ngIf="!imageUrl" tooltip="Upload Image"
                                                 tooltipPosition="above">
                                                 <input type="file" accept="image/*" (change)="uploadImageFile($event)"

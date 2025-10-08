@@ -145,33 +145,36 @@ export class JobOpeningComponent {
     if (file) {
       this.uploading = true;
       const reader = new FileReader();
-
+      reader.readAsDataURL(file);
       reader.onload = () => {
-        const interval = setInterval(() => {
-          if (this.uploadProgress >= 100) {
-            clearInterval(interval);
-            this.uploading = false;
-            this.imageUrl = reader.result as string;
-
-            // API upload logic
+        const image = new Image();
+        image.src = reader.result as string;
+        image.onload = () => {
+          if (image.width === 200 && image.height === 200) {
+            this.imageUrl = reader.result;
             const imgBase64Path = reader.result;
             this.cardImageBase64 = imgBase64Path;
             const formdata = new FormData();
             formdata.append('file', file);
             this.careerService.uploadJobOpeningImg(formdata).subscribe((response) => {
               this.toastr.success('Image Uploaded Successfully', 'Uploaded', { timeOut: 3000 });
-              this.jobopeningimage = response; // e.g. '/public/jobopening/xyz.png'
-              this.validationForm.patchValue({ jobopeningimage: response }); // <-- keep form in sync
+              this.jobopeningimage = response;
+              this.validationForm.patchValue({ jobopeningimage: response });
+              this.uploading = false;
+              this.uploadProgress = 0;
+            }, (error) => {
+              this.toastr.error('Failed to upload image', 'Error', { timeOut: 3000 });
+              this.uploading = false;
+              this.uploadProgress = 0;
+              console.error(error);
             });
-
-
           } else {
-            this.uploadProgress += 10;
+            this.toastr.error('Please upload an image with dimensions of 200x200px', 'Invalid Dimension', { timeOut: 3000 });
+            this.uploading = false;
+            this.uploadProgress = 0;
           }
-        }, 100);
+        };
       };
-
-      reader.readAsDataURL(file);
     }
   }
   removeUploadedImage(img: any) {
