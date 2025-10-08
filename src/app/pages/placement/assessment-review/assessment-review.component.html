@@ -67,10 +67,11 @@
                             </button>
                         </div>
                     </div>
-
+                </div>
+                <div class="card-body">
                     <div class="table-responsive">
-                        <table class="table table-striped table-hover">
-                            <thead>
+                        <table class="table mb-0  table-hover">
+                            <thead class="table-light">
                                 <tr>
                                     <th>#</th>
                                     <th>Student Name</th>
@@ -81,8 +82,6 @@
                                     <th>Question Set</th>
                                     <th>Difficulty</th>
                                     <th>Status</th>
-                                    <th>Total Time</th>
-                                    <th>Remaining Time</th>
                                     <th>Marks</th>
                                     <th>Actions</th>
                                 </tr>
@@ -95,7 +94,8 @@
                                     <td>{{ assessment.student.email }}</td>
                                     <td>{{ assessment.student.institute }}</td>
                                     <td>{{ assessment.student.appliedrole }}</td>
-                                    <td>{{ assessment.questionset.type }} - {{ assessment.questionset.category }}</td>
+                                    <td>{{ assessment.questionset.type }} - {{ assessment.questionset.category }}
+                                    </td>
                                     <td>{{ assessment.questionset.difficulty }}</td>
                                     <td [ngClass]="{
                                         'text-warning': assessment.status === assessmentStatus.Pending,
@@ -103,10 +103,7 @@
                                         'text-danger': assessment.status === assessmentStatus.Rejected,
                                         'text-secondary': assessment.status !== assessmentStatus.Pending && assessment.status !== assessmentStatus.Approved && assessmentStatus.Rejected
                                     }">{{ assessment.status | titlecase }}</td>
-                                    <td>{{ assessment.questionset.totaltime ? (assessment.questionset.totaltime |
-                                        number:'1.0-0') + ' min' : 'N/A' }}</td>
-                                    <td>{{ assessment.remaining_time ? (assessment.remaining_time / 60 | number:'1.0-0')
-                                        + ' min' : 'N/A' }}</td>
+
                                     <td>{{ assessment.obtained_marks }} / {{ assessment.total_marks }}</td>
                                     <td>
                                         <button class="btn btn-primary btn-sm"
@@ -117,17 +114,20 @@
                                             *ngIf="assessment.status === assessmentStatus.Pending"
                                             (click)="approveAssessment(assessment.assessment_id)"
                                             [disabled]="isApproving">
-                                            <i class="mdi mdi-check"></i> {{ isApproving ? 'Approving...' : 'Approve' }}
+                                            <i class="mdi mdi-check"></i> {{ isApproving ? 'Approving...' :
+                                            'Approve' }}
                                         </button>
                                         <button class="btn btn-danger btn-sm"
                                             *ngIf="assessment.status === assessmentStatus.Pending"
                                             (click)="rejectAssessment(assessment.assessment_id)"
                                             [disabled]="isRejecting">
-                                            <i class="mdi mdi-close"></i> {{ isRejecting ? 'Rejecting...' : 'Reject' }}
+                                            <i class="mdi mdi-close"></i> {{ isRejecting ? 'Rejecting...' : 'Reject'
+                                            }}
                                         </button>
                                         <button class="btn btn-outline-danger btn-sm"
                                             (click)="removeAssessment(assessment.student.id)" [disabled]="isRemoving">
-                                            <i class="mdi mdi-delete"></i> {{ isRemoving ? 'Removing...' : 'Remove' }}
+                                            <i class="mdi mdi-delete"></i> {{ isRemoving ? 'Removing...' : 'Remove'
+                                            }}
                                         </button>
                                     </td>
                                 </tr>
@@ -137,10 +137,9 @@
                             </tbody>
                         </table>
                     </div>
-
-                    <ngb-pagination [collectionSize]="collectionSize" [pageSize]="pageSize" [(page)]="page"
-                        (pageChange)="getPagination(paginateData)" class="d-flex justify-content-end"></ngb-pagination>
                 </div>
+                <ngb-pagination [collectionSize]="collectionSize" [pageSize]="pageSize" [(page)]="page"
+                    (pageChange)="getPagination(paginateData)" class="d-flex justify-content-end"></ngb-pagination>
             </div>
         </div>
     </div>

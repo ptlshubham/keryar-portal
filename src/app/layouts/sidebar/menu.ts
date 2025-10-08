@@ -45,8 +45,8 @@ export const MENU: MenuItem[] = [
     },
     {
         id: 4,
-        label: 'Placement',
-        icon: 'mdi mdi-account-search',
+        label: 'Quetions Set',
+        icon: 'mdi mdi-briefcase-outline',
         subItems: [
             {
                 id: 9,
@@ -60,34 +60,9 @@ export const MENU: MenuItem[] = [
                 link: '/placement/quetions',
                 parentId: 8
             },
-            {
-                id: 10,
-                label: 'student-list',
-                link: '/placement/student-list',
-                parentId: 10
-            },
-            {
-                id: 11,
-                label: 'assessment-review',
-                link: '/placement/assessment-review',
-                parentId: 11
-            },
-            {
-                id: 11,
-                label: 'college',
-                link: '/placement/college',
-                parentId: 11
-            },
-            {
-                id: 11,
-                label: 'college-mapping',
-                link: '/placement/college-mapping',
-                parentId: 11
-            },
-
-
         ]
     },
+
     {
         id: 5,
         label: 'blog',
@@ -99,25 +74,23 @@ export const MENU: MenuItem[] = [
                 link: '/blog/add-blog',
                 parentId: 3
             },
-
-
         ]
     },
+    // {
+    //     id: 6,
+    //     label: 'career',
+    //     icon: 'mdi mdi-briefcase-outline',
+    //     subItems: [
+    //         {
+    //             id: 10,
+    //             label: 'Job Opening',
+    //             link: '/career/job-opening',
+    //             parentId: 10
+    //         },
+    //     ]
+    // },
     {
         id: 6,
-        label: 'career',
-        icon: 'mdi mdi-briefcase-outline',
-        subItems: [
-            {
-                id: 10,
-                label: 'Job Opening',
-                link: '/career/job-opening',
-                parentId: 10
-            },
-        ]
-    },
-    {
-        id: 7,
         label: 'Connect',
         icon: 'mdi mdi-briefcase-outline',
         subItems: [
@@ -133,6 +106,46 @@ export const MENU: MenuItem[] = [
                 link: '/connect/contact-us',
                 parentId: 12
             },
+        ]
+    },
+    {
+        id: 7,
+        label: 'Campus Hiring',
+        icon: 'mdi mdi-account-search',
+        subItems: [
+            // {
+            //     id: 10,
+            //     label: 'student-list',
+            //     link: '/placement/student-list',
+            //     parentId: 10
+            // },
+            {
+                id: 10,
+                label: 'Campus Job Opening',
+                link: '/career/job-opening',
+                parentId: 10
+            },
+            {
+                id: 11,
+                label: 'college-List',
+                link: '/placement/college',
+                parentId: 11
+            },
+            {
+                id: 11,
+                label: 'Generate-Test-Link',
+                link: '/placement/college-mapping',
+                parentId: 11
+            },
+            {
+                id: 11,
+                label: 'assessment-review',
+                link: '/placement/assessment-review',
+                parentId: 11
+            },
+
+
+
         ]
     },
 ];
