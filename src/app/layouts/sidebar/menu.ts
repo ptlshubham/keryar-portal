@@ -64,7 +64,7 @@ export const MENU: MenuItem[] = [
     },
 
     {
-        id: 5,
+        id: 4,
         label: 'blog',
         icon: 'mdi mdi-briefcase-outline',
         subItems: [
@@ -89,14 +89,15 @@ export const MENU: MenuItem[] = [
     //         },
     //     ]
     // },
+
     {
-        id: 6,
+        id: 5,
         label: 'Connect',
         icon: 'mdi mdi-briefcase-outline',
         subItems: [
             {
                 id: 11,
-                label: 'internship Form List',
+                label: 'Internship Form List',
                 link: '/connect/internship',
                 parentId: 11
             },
@@ -105,6 +106,25 @@ export const MENU: MenuItem[] = [
                 label: 'Contact us',
                 link: '/connect/contact-us',
                 parentId: 12
+            },
+        ]
+    },
+    {
+        id: 6,
+        label: 'Quetions Set',
+        icon: 'mdi mdi-briefcase-outline',
+        subItems: [
+            {
+                id: 9,
+                label: 'Category',
+                link: '/placement/category',
+                parentId: 8
+            },
+            {
+                id: 9,
+                label: 'Quetions',
+                link: '/placement/quetions',
+                parentId: 8
             },
         ]
     },
@@ -127,7 +147,7 @@ export const MENU: MenuItem[] = [
             },
             {
                 id: 11,
-                label: 'college-List',
+                label: 'College-List',
                 link: '/placement/college',
                 parentId: 11
             },
@@ -139,7 +159,7 @@ export const MENU: MenuItem[] = [
             },
             {
                 id: 11,
-                label: 'assessment-review',
+                label: 'Assessment-review',
                 link: '/placement/assessment-review',
                 parentId: 11
             },

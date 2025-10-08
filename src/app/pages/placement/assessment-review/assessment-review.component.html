@@ -70,7 +70,7 @@
                 </div>
                 <div class="card-body">
                     <div class="table-responsive">
-                        <table class="table mb-0  table-hover">
+                        <table class="table mb-0 table-hover">
                             <thead class="table-light">
                                 <tr>
                                     <th>#</th>
@@ -93,46 +93,67 @@
                                     <td>{{ assessment.student.studentid }}</td>
                                     <td>{{ assessment.student.email }}</td>
                                     <td>{{ assessment.student.institute }}</td>
-                                    <td>{{ assessment.student.appliedrole }}</td>
-                                    <td>{{ assessment.questionset.type }} - {{ assessment.questionset.category }}
+                                    <td>{{ assessment.student.appliedrole | slice:0:8 }}</td>
+                                    <td>{{ assessment.questionset.type }} </td>
+                                    <!-- - {{ assessment.questionset.category }} -->
+                                    <!-- Difficulty Column with Icon -->
+                                    <td>
+                                        <span [ngClass]="{
+                                            'text-success': assessment.questionset.difficulty?.toLowerCase() === 'easy',
+                                            'text-warning': assessment.questionset.difficulty?.toLowerCase() === 'medium',
+                                            'text-danger': assessment.questionset.difficulty?.toLowerCase() === 'hard'
+                                        }">
+                                            <i class="mdi me-1" [ngClass]="{
+                                                   'mdi-thumb-up': assessment.questionset.difficulty?.toLowerCase() === 'easy',
+                                                   'mdi-minus-circle': assessment.questionset.difficulty?.toLowerCase() === 'medium',
+                                                   'mdi-thumb-down': assessment.questionset.difficulty?.toLowerCase() === 'hard'
+                                               }"></i>
+                                            {{ assessment.questionset.difficulty }}
+                                        </span>
                                     </td>
-                                    <td>{{ assessment.questionset.difficulty }}</td>
+                                    <!-- Status Column with Icon -->
                                     <td [ngClass]="{
                                         'text-warning': assessment.status === assessmentStatus.Pending,
                                         'text-success': assessment.status === assessmentStatus.Approved,
                                         'text-danger': assessment.status === assessmentStatus.Rejected,
-                                        'text-secondary': assessment.status !== assessmentStatus.Pending && assessment.status !== assessmentStatus.Approved && assessmentStatus.Rejected
-                                    }">{{ assessment.status | titlecase }}</td>
-
+                                        'text-secondary': assessment.status !== assessmentStatus.Pending && assessment.status !== assessmentStatus.Approved && assessment.status !== assessmentStatus.Rejected
+                                    }">
+                                        <i class="mdi me-1" [ngClass]="{
+                                               'mdi-clock-outline': assessment.status === assessmentStatus.Pending,
+                                               'mdi-check-circle': assessment.status === assessmentStatus.Approved,
+                                               'mdi-close-circle': assessment.status === assessmentStatus.Rejected
+                                           }"></i>
+                                        <!-- {{ assessment.status | titlecase }} -->
+                                    </td>
                                     <td>{{ assessment.obtained_marks }} / {{ assessment.total_marks }}</td>
-                                    <td>
-                                        <button class="btn btn-primary btn-sm"
-                                            (click)="openPreviewModal(previewModal, assessment)">
-                                            <i class="mdi mdi-eye"></i> Preview
+                                    <!-- Actions Column with Icons Only -->
+                                    <td class="text-nowrap">
+                                        <button class="btn btn-primary btn-sm me-1"
+                                            (click)="openPreviewModal(previewModal, assessment)"
+                                            aria-label="Preview assessment">
+                                            <i class="mdi mdi-eye"></i>
                                         </button>
-                                        <button class="btn btn-success btn-sm"
+                                        <button class="btn btn-success btn-sm me-1"
                                             *ngIf="assessment.status === assessmentStatus.Pending"
                                             (click)="approveAssessment(assessment.assessment_id)"
-                                            [disabled]="isApproving">
-                                            <i class="mdi mdi-check"></i> {{ isApproving ? 'Approving...' :
-                                            'Approve' }}
+                                            [disabled]="isApproving" aria-label="Approve assessment">
+                                            <i class="mdi mdi-check"></i>
                                         </button>
-                                        <button class="btn btn-danger btn-sm"
+                                        <button class="btn btn-danger btn-sm me-1"
                                             *ngIf="assessment.status === assessmentStatus.Pending"
                                             (click)="rejectAssessment(assessment.assessment_id)"
-                                            [disabled]="isRejecting">
-                                            <i class="mdi mdi-close"></i> {{ isRejecting ? 'Rejecting...' : 'Reject'
-                                            }}
+                                            [disabled]="isRejecting" aria-label="Reject assessment">
+                                            <i class="mdi mdi-close"></i>
                                         </button>
                                         <button class="btn btn-outline-danger btn-sm"
-                                            (click)="removeAssessment(assessment.student.id)" [disabled]="isRemoving">
-                                            <i class="mdi mdi-delete"></i> {{ isRemoving ? 'Removing...' : 'Remove'
-                                            }}
+                                            (click)="removeAssessment(assessment.student.id)" [disabled]="isRemoving"
+                                            aria-label="Remove assessment">
+                                            <i class="mdi mdi-delete"></i>
                                         </button>
                                     </td>
                                 </tr>
                                 <tr *ngIf="!paginateData?.length">
-                                    <td colspan="13" class="text-center">No assessments found</td>
+                                    <td colspan="11" class="text-center">No assessments found</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -198,12 +219,12 @@
                             Download Resume
                         </a>
                     </div>
-                    <div class="d-flex gap-2 mt-3">
+                    <!-- <div class="d-flex gap-2 mt-3">
                         <button class="btn btn-outline-danger btn-sm"
                             (click)="removeAssessment(selectedAssessment.student.is)" [disabled]="isRemoving">
                             <i class="mdi mdi-delete"></i> {{ isRemoving ? 'Removing...' : 'Remove Assessment' }}
                         </button>
-                    </div>
+                    </div> -->
                 </div>
 
                 <!-- Resume Preview -->
