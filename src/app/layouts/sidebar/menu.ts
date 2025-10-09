@@ -43,25 +43,25 @@ export const MENU: MenuItem[] = [
             },
         ]
     },
-    {
-        id: 4,
-        label: 'Quetions Set',
-        icon: 'mdi mdi-briefcase-outline',
-        subItems: [
-            {
-                id: 9,
-                label: 'Category',
-                link: '/placement/category',
-                parentId: 8
-            },
-            {
-                id: 9,
-                label: 'Quetions',
-                link: '/placement/quetions',
-                parentId: 8
-            },
-        ]
-    },
+    // {
+    //     id: 4,
+    //     label: 'Quetions Set',
+    //     icon: 'mdi mdi-briefcase-outline',
+    //     subItems: [
+    //         {
+    //             id: 9,
+    //             label: 'Category',
+    //             link: '/placement/category',
+    //             parentId: 8
+    //         },
+    //         {
+    //             id: 9,
+    //             label: 'Quetions',
+    //             link: '/placement/quetions',
+    //             parentId: 8
+    //         },
+    //     ]
+    // },
 
     {
         id: 4,
