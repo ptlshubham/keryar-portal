@@ -16,7 +16,7 @@ export class CollegeListComponent {
   submitted = false;
   validationForm!: FormGroup;
 
-  serverPath: string = 'http://localhost:8300';
+  serverPath: string = 'https://api.fosterx.co';
   CollegeData: any = [];
   page = 1;
   pageSize = 10;

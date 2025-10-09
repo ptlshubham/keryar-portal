@@ -362,9 +362,9 @@ export class InterviewRoundComponent implements OnInit {
           if (resumeUrl) {
             let fullResumeUrl: string;
             if (resumeUrl.startsWith('/')) {
-              fullResumeUrl = `http://localhost:8300${resumeUrl}`;
+              fullResumeUrl = `https://api.fosterx.co${resumeUrl}`;
             } else {
-              fullResumeUrl = `http://localhost:8300${resumeUrl}`;
+              fullResumeUrl = `https://api.fosterx.co${resumeUrl}`;
             }
 
             this.safeResumeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(fullResumeUrl);

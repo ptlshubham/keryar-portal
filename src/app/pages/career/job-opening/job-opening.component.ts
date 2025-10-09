@@ -40,7 +40,7 @@ export class JobOpeningComponent {
   isProgress: boolean = false;
   uploading: boolean = false;
   uploadProgress: number = 0;
-  serverPath: string = 'http://localhost:8300';
+  serverPath: string = 'https://api.fosterx.co';
 
 
   experienceOptions = [
