@@ -183,6 +183,13 @@
                             <p><strong>Email:</strong> {{ selectedStudent.email || 'N/A' }}</p>
                             <p><strong>Institute:</strong> {{ selectedStudent.institute || 'N/A' }}</p>
                             <p><strong>Applied Role:</strong> {{ selectedStudent.appliedrole || 'N/A' }}</p>
+                            <p><strong>Portfolio URL:</strong>
+                                <a [href]="selectedStudent.student.portfoliourl" target="_blank" rel="noopener"
+                                    *ngIf="selectedStudent.student.portfoliourl">{{
+                                    selectedStudent.student.portfoliourl }}</a>
+                                <span *ngIf="!selectedStudent.student.portfoliourl">N/A</span>
+                            </p>
+                            <p><strong>Cover Letter:</strong> {{ selectedStudent.student.cover_letter || 'N/A' }}</p>
                             <p><strong>Question Set:</strong> {{ selectedStudent.type || 'N/A' }}</p>
                             <p><strong>Difficulty:</strong> {{ selectedStudent.difficulty || 'N/A' }}</p>
                             <p><strong>Year:</strong> {{ selectedStudent.year || 'N/A' }}</p>

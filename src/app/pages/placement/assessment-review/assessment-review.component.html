@@ -94,7 +94,6 @@
                                     <td>{{ assessment.student.institute }}</td>
                                     <td>{{ assessment.student.appliedrole | slice:0:8 }}</td>
                                     <td>{{ assessment.questionset.type }} </td>
-                                    <!-- Difficulty Column with Icon -->
                                     <td>
                                         <span [ngClass]="{
                                             'text-success': assessment.questionset.difficulty?.toLowerCase() === 'easy',
@@ -109,7 +108,6 @@
                                             {{ assessment.questionset.difficulty }}
                                         </span>
                                     </td>
-                                    <!-- Status Column with Icon -->
                                     <td [ngClass]="{
                                         'text-warning': assessment.status === assessmentStatus.Pending,
                                         'text-success': assessment.status === assessmentStatus.Approved,
@@ -121,10 +119,8 @@
                                                'mdi-check-circle': assessment.status === assessmentStatus.Approved,
                                                'mdi-close-circle': assessment.status === assessmentStatus.Rejected
                                            }"></i>
-                                        <!-- {{ assessment.status | titlecase }} -->
                                     </td>
                                     <td>{{ assessment.obtained_marks }} / {{ assessment.total_marks }}</td>
-                                    <!-- Actions Column with Icons Only -->
                                     <td class="text-nowrap">
                                         <button class="btn btn-primary btn-sm me-1"
                                             (click)="openPreviewModal(previewModal, assessment)"
@@ -185,6 +181,13 @@
                             <p><strong>Email:</strong> {{ selectedAssessment.student.email || 'N/A' }}</p>
                             <p><strong>Institute:</strong> {{ selectedAssessment.student.institute || 'N/A' }}</p>
                             <p><strong>Applied Role:</strong> {{ selectedAssessment.student.appliedrole || 'N/A' }}</p>
+                            <p><strong>Portfolio URL:</strong>
+                                <a [href]="selectedAssessment.student.portfoliourl" target="_blank" rel="noopener"
+                                    *ngIf="selectedAssessment.student.portfoliourl">{{
+                                    selectedAssessment.student.portfoliourl }}</a>
+                                <span *ngIf="!selectedAssessment.student.portfoliourl">N/A</span>
+                            </p>
+                            <p><strong>Cover Letter:</strong> {{ selectedAssessment.student.cover_letter || 'N/A' }}</p>
                             <p><strong>Question Set:</strong> {{ selectedAssessment.questionset.type }} - {{
                                 selectedAssessment.questionset.category || 'N/A' }}</p>
                             <p><strong>Difficulty:</strong> {{ selectedAssessment.questionset.difficulty || 'N/A' }}</p>
@@ -217,12 +220,6 @@
                             Download Resume
                         </a>
                     </div>
-                    <!-- <div class="d-flex gap-2 mt-3">
-                        <button class="btn btn-outline-danger btn-sm"
-                            (click)="removeAssessment(selectedAssessment.student.is)" [disabled]="isRemoving">
-                            <i class="mdi mdi-delete"></i> {{ isRemoving ? 'Removing...' : 'Remove Assessment' }}
-                        </button>
-                    </div> -->
                 </div>
 
                 <!-- Resume Preview -->

@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { ToastrService } from 'ngx-toastr';
 import { PlacementService } from 'src/app/core/services/placement.service';
-import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import { DomSanitizer, SafeResourceUrl, SafeHtml } from '@angular/platform-browser';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import * as XLSX from 'xlsx';
@@ -66,7 +66,17 @@ export class HiredStudentsComponent implements OnInit {
               ...item,
               index: index + 1,
               obtained_marks: item.obtained_marks ?? 0,
-              total_marks: item.total_marks ?? 0
+              total_marks: item.total_marks ?? 0,
+              student: { // Preserve nested student object
+                firstname: item.firstname,
+                lastname: item.lastname,
+                studentid: item.studentid,
+                email: item.email,
+                institute: item.institute,
+                appliedrole: item.appliedrole,
+                portfoliourl: item.portfoliourl || item.student?.portfoliourl || '',
+                cover_letter: item.cover_letter || item.student?.cover_letter || ''
+              }
             }));
           this.colleges = [...new Set(this.students.map(student => student.institute).filter(institute => institute))].sort();
           this.applyFilters();
@@ -86,15 +96,15 @@ export class HiredStudentsComponent implements OnInit {
     if (this.searchTerm) {
       const searchLower = this.searchTerm.toLowerCase();
       filteredStudents = filteredStudents.filter(student =>
-        (student.firstname + ' ' + student.lastname).toLowerCase().includes(searchLower) ||
-        student.email.toLowerCase().includes(searchLower) ||
-        student.studentid.toLowerCase().includes(searchLower)
+        (student.student.firstname + ' ' + student.student.lastname).toLowerCase().includes(searchLower) ||
+        student.student.email.toLowerCase().includes(searchLower) ||
+        student.student.studentid.toLowerCase().includes(searchLower)
       );
     }
 
     if (this.filterCollege) {
       filteredStudents = filteredStudents.filter(student =>
-        student.institute.toLowerCase() === this.filterCollege.toLowerCase()
+        student.student.institute?.toLowerCase() === this.filterCollege.toLowerCase()
       );
     }
 
@@ -186,7 +196,7 @@ export class HiredStudentsComponent implements OnInit {
 
     addHeader();
 
-    // Table data (excluding Remarks)
+    // Table data
     const headers = [
       '#',
       'Student Name',
@@ -194,17 +204,19 @@ export class HiredStudentsComponent implements OnInit {
       'Email',
       'Applied Role',
       'Total Marks',
-      'Obtained Marks'
+      'Obtained Marks',
+      'Remarks'
     ];
 
     const body = this.filteredStudents.map((student, index) => [
       index + 1,
-      `${student.firstname} ${student.lastname}` || 'N/A',
-      student.studentid || 'N/A',
-      student.email || 'N/A',
-      student.appliedrole || 'N/A',
+      `${student.student.firstname} ${student.student.lastname}` || 'N/A',
+      student.student.studentid || 'N/A',
+      student.student.email || 'N/A',
+      student.student.appliedrole || 'N/A',
       student.total_marks || 0,
-      student.obtained_marks || 0
+      student.obtained_marks || 0,
+      student.remarks || 'N/A'
     ]);
 
     autoTable(doc, {
@@ -234,7 +246,8 @@ export class HiredStudentsComponent implements OnInit {
         3: { cellWidth: 50 },
         4: { cellWidth: 40 },
         5: { cellWidth: 30 },
-        6: { cellWidth: 30 }
+        6: { cellWidth: 30 },
+        7: { cellWidth: 40 }
       },
       didDrawPage: () => {
         addHeader();
@@ -254,10 +267,10 @@ export class HiredStudentsComponent implements OnInit {
 
     const worksheetData: WorksheetRow[] = this.filteredStudents.map((student, index) => ({
       '#': index + 1,
-      'Student Name': `${student.firstname} ${student.lastname}` || 'N/A',
-      'Student ID': student.studentid || 'N/A',
-      Email: student.email || 'N/A',
-      'Applied Role': student.appliedrole || 'N/A',
+      'Student Name': `${student.student.firstname} ${student.student.lastname}` || 'N/A',
+      'Student ID': student.student.studentid || 'N/A',
+      Email: student.student.email || 'N/A',
+      'Applied Role': student.student.appliedrole || 'N/A',
       'Total Marks': student.total_marks || 0,
       'Obtained Marks': student.obtained_marks || 0,
       'Remarks': student.remarks || 'N/A'
@@ -318,17 +331,25 @@ export class HiredStudentsComponent implements OnInit {
 
     this.placementService.getAssessmentPreview(student.id).subscribe({
       next: (response) => {
-        if (response.success) {
+        if (response.success && response.data) {
           this.selectedStudent = {
             ...student,
-            answers: response.data.answers,
-            obtained_marks: response.data.obtained_marks ?? 0,
-            total_marks: response.data.total_marks ?? 0
+            student: response.data.student || {}, // Preserve nested student object
+            answers: response.data.answers || [],
+            obtained_marks: response.data.obtained_marks ?? student.obtained_marks ?? 0,
+            total_marks: response.data.total_marks ?? student.total_marks ?? 0,
+            type: response.data.questionset?.type || student.type || 'N/A',
+            difficulty: response.data.questionset?.difficulty || student.difficulty || 'N/A',
+            year: response.data.questionset?.year || student.year || 'N/A',
+            status: response.data.status || student.status || 'approved',
+            remarks: response.data.remarks || student.remarks || 'N/A',
+            resume: response.data.student?.resume || student.resume
           };
 
+          // Sanitize resume URL
           const resumeUrl: string | null =
-            this.selectedStudent?.resume && typeof this.selectedStudent.resume === 'string'
-              ? this.selectedStudent.resume
+            this.selectedStudent?.student?.resume && typeof this.selectedStudent.student.resume === 'string'
+              ? this.selectedStudent.student.resume
               : null;
 
           if (resumeUrl) {
@@ -336,13 +357,13 @@ export class HiredStudentsComponent implements OnInit {
             if (resumeUrl.startsWith('/')) {
               fullResumeUrl = `https://api.fosterx.co${resumeUrl}`;
             } else {
-              fullResumeUrl = `https://api.fosterx.co${resumeUrl}`;
+              fullResumeUrl = resumeUrl;
             }
-
             this.safeResumeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(fullResumeUrl);
             this.selectedStudent.resume = fullResumeUrl;
           }
 
+          // Open the modal
           this.modalRef = this.modalService.open(modal, {
             size: 'xl',
             centered: true,
@@ -355,10 +376,15 @@ export class HiredStudentsComponent implements OnInit {
       },
       error: (err) => {
         this.toastr.error('Error loading preview: ' + (err.error?.message || err.message));
+      },
+      complete: () => {
+        this.isLoadingPreview = false;
       }
-    }).add(() => {
-      this.isLoadingPreview = false;
     });
+  }
+
+  sanitizeHtml(html: string): SafeHtml {
+    return this.sanitizer.bypassSecurityTrustHtml(html || '');
   }
 
   closeModal() {
