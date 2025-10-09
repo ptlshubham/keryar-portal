@@ -3,7 +3,7 @@ import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { ToastrService } from 'ngx-toastr';
 import { PlacementService } from 'src/app/core/services/placement.service';
 import Swal from 'sweetalert2';
-import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import { DomSanitizer, SafeResourceUrl, SafeHtml } from '@angular/platform-browser';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import * as XLSX from 'xlsx';
@@ -53,6 +53,7 @@ export class InterviewRoundComponent implements OnInit {
   private modalRef?: NgbModalRef;
   interviewStatus = InterviewStatus;
   safeResumeUrl?: SafeResourceUrl;
+  safePortfolioImages: { [key: string]: SafeResourceUrl } = {};
 
   constructor(
     private modalService: NgbModal,
@@ -209,7 +210,7 @@ export class InterviewRoundComponent implements OnInit {
 
     addHeader();
 
-    // Table data (excluding Remarks)
+    // Table data
     const headers = [
       '#',
       'Student Name',
@@ -218,7 +219,8 @@ export class InterviewRoundComponent implements OnInit {
       'Applied Role',
       'Total Marks',
       'Obtained Marks',
-      'Interview Status'
+      'Interview Status',
+      'Remarks'
     ];
 
     const body = this.filteredStudents.map((student, index) => [
@@ -229,7 +231,8 @@ export class InterviewRoundComponent implements OnInit {
       student.appliedrole || 'N/A',
       student.total_marks || 0,
       student.obtained_marks || 0,
-      student.interviewround ? student.interviewround.charAt(0).toUpperCase() + student.interviewround.slice(1) : 'Pending'
+      student.interviewround ? student.interviewround.charAt(0).toUpperCase() + student.interviewround.slice(1) : 'Pending',
+      student.remarks || 'N/A'
     ]);
 
     autoTable(doc, {
@@ -260,7 +263,8 @@ export class InterviewRoundComponent implements OnInit {
         4: { cellWidth: 40 },
         5: { cellWidth: 30 },
         6: { cellWidth: 30 },
-        7: { cellWidth: 30 }
+        7: { cellWidth: 30 },
+        8: { cellWidth: 40 }
       },
       didDrawPage: () => {
         addHeader();
@@ -343,17 +347,23 @@ export class InterviewRoundComponent implements OnInit {
     this.isLoadingPreview = true;
     this.selectedStudent = null;
     this.safeResumeUrl = undefined;
+    this.safePortfolioImages = {};
 
     this.placementService.getAssessmentPreview(student.id).subscribe({
       next: (response) => {
         if (response.success) {
           this.selectedStudent = {
             ...student,
-            answers: response.data.answers,
-            obtained_marks: response.data.obtained_marks ?? 0,
-            total_marks: response.data.total_marks ?? 0
+            ...response.data, // Merge API response with existing student data
+            cover_letter: response.data.cover_letter || student.cover_letter || '', // Ensure cover_letter is included
+            portfoliourl: response.data.portfoliourl || student.portfoliourl || '', // Ensure portfoliourl is included
+            portfolios: response.data.portfolios || [], // Ensure portfolios is included
+            answers: response.data.answers || [],
+            obtained_marks: response.data.obtained_marks ?? student.obtained_marks ?? 0,
+            total_marks: response.data.total_marks ?? student.total_marks ?? 0
           };
 
+          // Sanitize resume URL
           const resumeUrl: string | null =
             this.selectedStudent?.resume && typeof this.selectedStudent.resume === 'string'
               ? this.selectedStudent.resume
@@ -364,11 +374,22 @@ export class InterviewRoundComponent implements OnInit {
             if (resumeUrl.startsWith('/')) {
               fullResumeUrl = `http://localhost:8300${resumeUrl}`;
             } else {
-              fullResumeUrl = `http://localhost:8300${resumeUrl}`;
+              fullResumeUrl = resumeUrl;
             }
-
             this.safeResumeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(fullResumeUrl);
             this.selectedStudent.resume = fullResumeUrl;
+          }
+
+          // Sanitize portfolio image URLs
+          if (this.selectedStudent?.portfolios?.length) {
+            this.selectedStudent.portfolios.forEach((portfolio: any) => {
+              if (portfolio.coverimage) {
+                const fullImageUrl = portfolio.coverimage.startsWith('/')
+                  ? `http://localhost:8300${portfolio.coverimage}`
+                  : portfolio.coverimage;
+                this.safePortfolioImages[portfolio.id] = this.sanitizer.bypassSecurityTrustResourceUrl(fullImageUrl);
+              }
+            });
           }
 
           this.modalRef = this.modalService.open(modal, {
@@ -389,11 +410,16 @@ export class InterviewRoundComponent implements OnInit {
     });
   }
 
+  sanitizeHtml(html: string): SafeHtml {
+    return this.sanitizer.bypassSecurityTrustHtml(html || '');
+  }
+
   closeModal() {
     this.modalRef?.close();
     this.selectedStudent = null;
     this.isLoadingPreview = false;
     this.safeResumeUrl = undefined;
+    this.safePortfolioImages = {};
   }
 
   saveRemarks() {
