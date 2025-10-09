@@ -28,6 +28,7 @@ interface WorksheetRow {
 
 @Component({
   selector: 'app-assessment-review',
+  standalone:false,
   templateUrl: './assessment-review.component.html',
   styleUrls: ['./assessment-review.component.scss']
 })
@@ -514,5 +515,25 @@ export class AssessmentReviewComponent implements OnInit {
 
   trackById(_: number, item: any) {
     return item.assessment_id;
+  }
+
+  // Helper method to check if a checkbox option is selected
+  isOptionSelected(answer: any, optionIndex: number, optionValue: any): boolean {
+    if (!answer) return false;
+    
+    // Handle both array of indices and array of values
+    if (Array.isArray(answer)) {
+      return answer.includes(optionIndex) || answer.includes(optionValue) || answer.includes(optionIndex.toString());
+    }
+    
+    return false;
+  }
+
+  // Helper method to check if a radio option is selected
+  isRadioSelected(answer: any, optionIndex: number, optionValue: any): boolean {
+    if (answer === null || answer === undefined) return false;
+    
+    // Handle both index and value comparisons
+    return answer === optionIndex || answer === optionValue || answer === optionIndex.toString();
   }
 }
