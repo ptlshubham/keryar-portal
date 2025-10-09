@@ -193,12 +193,15 @@
                             <p><strong>Difficulty:</strong> {{ selectedAssessment.questionset.difficulty || 'N/A' }}</p>
                             <p><strong>Year:</strong> {{ selectedAssessment.questionset.year || 'N/A' }}</p>
                             <p><strong>Status:</strong>
-                                <span class="badge" [ngClass]="{
-                                'badge-warning': selectedAssessment.status === assessmentStatus.Pending,
-                                'badge-success': selectedAssessment.status === assessmentStatus.Approved,
-                                'badge-danger': selectedAssessment.status === assessmentStatus.Rejected,
-                                'badge-secondary': selectedAssessment.status !== assessmentStatus.Pending && selectedAssessment.status !== assessmentStatus.Approved && selectedAssessment.status !== assessmentStatus.Rejected
-                            }">{{ selectedAssessment.status | titlecase }}</span>
+                                <span [ngClass]="{
+        'text-warning': selectedAssessment.status === assessmentStatus.Pending,
+        'text-success': selectedAssessment.status === assessmentStatus.Approved,
+        'text-danger': selectedAssessment.status === assessmentStatus.Rejected,
+        'text-secondary': selectedAssessment.status !== assessmentStatus.Pending && selectedAssessment.status !== assessmentStatus.Approved && selectedAssessment.status !== assessmentStatus.Rejected
+    }">
+
+                                    {{ selectedAssessment.status | titlecase }}
+                                </span>
                             </p>
                             <p><strong>Total Time:</strong> {{ selectedAssessment.questionset.totaltime ?
                                 (selectedAssessment.questionset.totaltime | number:'1.0-0') + ' min' : 'N/A' }}</p>
