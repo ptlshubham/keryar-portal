@@ -65,20 +65,26 @@ export class HiredStudentsComponent implements OnInit {
             .map((item: any, index: number) => ({
               ...item,
               index: index + 1,
-              obtained_marks: item.obtained_marks ?? 0,
+              calculated_marks: item.obtained_marks ?? 0,
               total_marks: item.total_marks ?? 0,
-              student: { // Preserve nested student object
-                firstname: item.firstname,
-                lastname: item.lastname,
-                studentid: item.studentid,
-                email: item.email,
-                institute: item.institute,
-                appliedrole: item.appliedrole,
-                portfoliourl: item.portfoliourl || item.student?.portfoliourl || '',
-                cover_letter: item.cover_letter || item.student?.cover_letter || ''
-              }
+              portfoliourl: item.portfoliourl || '',
+              cover_letter: item.cover_letter || ''
             }));
           this.colleges = [...new Set(this.students.map(student => student.institute).filter(institute => institute))].sort();
+          // Fetch detailed assessment data to calculate marks
+          this.students.forEach(student => {
+            this.placementService.getAssessmentPreview(student.id).subscribe({
+              next: (previewResponse) => {
+                if (previewResponse.success) {
+                  student.answers = previewResponse.data.answers || [];
+                  this.calculateQuestionMarks(student);
+                }
+              },
+              error: (err) => {
+                console.error('Error fetching preview for student:', student.id, err);
+              }
+            });
+          });
           this.applyFilters();
         } else {
           this.toastr.error(response.message || 'Failed to fetch hired students');
@@ -96,15 +102,15 @@ export class HiredStudentsComponent implements OnInit {
     if (this.searchTerm) {
       const searchLower = this.searchTerm.toLowerCase();
       filteredStudents = filteredStudents.filter(student =>
-        (student.student.firstname + ' ' + student.student.lastname).toLowerCase().includes(searchLower) ||
-        student.student.email.toLowerCase().includes(searchLower) ||
-        student.student.studentid.toLowerCase().includes(searchLower)
+        (student.firstname + ' ' + student.lastname).toLowerCase().includes(searchLower) ||
+        student.email.toLowerCase().includes(searchLower) ||
+        student.studentid.toLowerCase().includes(searchLower)
       );
     }
 
     if (this.filterCollege) {
       filteredStudents = filteredStudents.filter(student =>
-        student.student.institute?.toLowerCase() === this.filterCollege.toLowerCase()
+        student.institute?.toLowerCase() === this.filterCollege.toLowerCase()
       );
     }
 
@@ -202,21 +208,15 @@ export class HiredStudentsComponent implements OnInit {
       'Student Name',
       'Student ID',
       'Email',
-      'Applied Role',
-      'Total Marks',
-      'Obtained Marks',
-      'Remarks'
+      'Applied Role'
     ];
 
     const body = this.filteredStudents.map((student, index) => [
       index + 1,
-      `${student.student.firstname} ${student.student.lastname}` || 'N/A',
-      student.student.studentid || 'N/A',
-      student.student.email || 'N/A',
-      student.student.appliedrole || 'N/A',
-      student.total_marks || 0,
-      student.obtained_marks || 0,
-      student.remarks || 'N/A'
+      `${student.firstname} ${student.lastname}` || 'N/A',
+      student.studentid || 'N/A',
+      student.email || 'N/A',
+      student.appliedrole || 'N/A'
     ]);
 
     autoTable(doc, {
@@ -241,13 +241,10 @@ export class HiredStudentsComponent implements OnInit {
       margin: { left: 14, right: 14 },
       columnStyles: {
         0: { cellWidth: 15 },
-        1: { cellWidth: 40 },
-        2: { cellWidth: 30 },
-        3: { cellWidth: 50 },
-        4: { cellWidth: 40 },
-        5: { cellWidth: 30 },
-        6: { cellWidth: 30 },
-        7: { cellWidth: 40 }
+        1: { cellWidth: 50 },
+        2: { cellWidth: 40 },
+        3: { cellWidth: 60 },
+        4: { cellWidth: 50 }
       },
       didDrawPage: () => {
         addHeader();
@@ -267,12 +264,12 @@ export class HiredStudentsComponent implements OnInit {
 
     const worksheetData: WorksheetRow[] = this.filteredStudents.map((student, index) => ({
       '#': index + 1,
-      'Student Name': `${student.student.firstname} ${student.student.lastname}` || 'N/A',
-      'Student ID': student.student.studentid || 'N/A',
-      Email: student.student.email || 'N/A',
-      'Applied Role': student.student.appliedrole || 'N/A',
+      'Student Name': `${student.firstname} ${student.lastname}` || 'N/A',
+      'Student ID': student.studentid || 'N/A',
+      Email: student.email || 'N/A',
+      'Applied Role': student.appliedrole || 'N/A',
       'Total Marks': student.total_marks || 0,
-      'Obtained Marks': student.obtained_marks || 0,
+      'Obtained Marks': student.calculated_marks || 0,
       'Remarks': student.remarks || 'N/A'
     }));
 
@@ -324,6 +321,41 @@ export class HiredStudentsComponent implements OnInit {
     return today.toISOString().split('T')[0];
   }
 
+  calculateQuestionMarks(student: any) {
+    if (!student || !student.answers) {
+      student.calculated_marks = 0;
+      return;
+    }
+
+    let totalObtainedMarks = 0;
+
+    student.answers = student.answers.map((answer: any) => {
+      let questionMarks = 0;
+
+      if (answer.option_type === 'Checkbox') {
+        if (Array.isArray(answer.answer)) {
+          questionMarks = answer.optionsArr
+            .filter((opt: any, index: number) => this.isOptionSelected(answer.answer, index, opt.value))
+            .reduce((sum: number, opt: any) => sum + Number(opt.value || 0), 0);
+        }
+      } else if (answer.option_type === 'Radio') {
+        const selectedOption = answer.optionsArr.find((opt: any, index: number) =>
+          this.isRadioSelected(answer.answer, index, opt.value)
+        );
+        questionMarks = selectedOption ? Number(selectedOption.value || 0) : 0;
+      } else if (answer.option_type === 'Input' || answer.option_type === 'Textarea') {
+        questionMarks = answer.is_correct === 1 ? Number(answer.weight || 0) : 0;
+      }
+
+      answer.calculatedMarks = questionMarks;
+      totalObtainedMarks += questionMarks;
+
+      return answer;
+    });
+
+    student.calculated_marks = totalObtainedMarks;
+  }
+
   openPreviewModal(modal: any, student: any) {
     this.isLoadingPreview = true;
     this.selectedStudent = null;
@@ -334,22 +366,24 @@ export class HiredStudentsComponent implements OnInit {
         if (response.success && response.data) {
           this.selectedStudent = {
             ...student,
-            student: response.data.student || {}, // Preserve nested student object
             answers: response.data.answers || [],
-            obtained_marks: response.data.obtained_marks ?? student.obtained_marks ?? 0,
+            calculated_marks: student.calculated_marks ?? response.data.obtained_marks ?? 0,
             total_marks: response.data.total_marks ?? student.total_marks ?? 0,
             type: response.data.questionset?.type || student.type || 'N/A',
             difficulty: response.data.questionset?.difficulty || student.difficulty || 'N/A',
             year: response.data.questionset?.year || student.year || 'N/A',
             status: response.data.status || student.status || 'approved',
             remarks: response.data.remarks || student.remarks || 'N/A',
-            resume: response.data.student?.resume || student.resume
+            resume: response.data.student?.resume || student.resume,
+            portfoliourl: response.data.student?.portfoliourl || student.portfoliourl || '',
+            cover_letter: response.data.student?.cover_letter || student.cover_letter || ''
           };
 
-          // Sanitize resume URL
+          this.calculateQuestionMarks(this.selectedStudent);
+
           const resumeUrl: string | null =
-            this.selectedStudent?.student?.resume && typeof this.selectedStudent.student.resume === 'string'
-              ? this.selectedStudent.student.resume
+            this.selectedStudent?.resume && typeof this.selectedStudent.resume === 'string'
+              ? this.selectedStudent.resume
               : null;
 
           if (resumeUrl) {
@@ -363,7 +397,6 @@ export class HiredStudentsComponent implements OnInit {
             this.selectedStudent.resume = fullResumeUrl;
           }
 
-          // Open the modal
           this.modalRef = this.modalService.open(modal, {
             size: 'xl',
             centered: true,
@@ -405,7 +438,7 @@ export class HiredStudentsComponent implements OnInit {
       next: (response) => {
         if (response.success) {
           this.toastr.success(response.message || 'Remarks saved successfully');
-          this.loadHiredStudents(); // Reload to update table
+          this.loadHiredStudents();
         } else {
           this.toastr.error(response.message || 'Failed to save remarks');
         }
@@ -421,5 +454,21 @@ export class HiredStudentsComponent implements OnInit {
 
   trackById(_: number, item: any) {
     return item.id;
+  }
+
+  isOptionSelected(answer: any, optionIndex: number, optionValue: any): boolean {
+    if (!answer) return false;
+
+    if (Array.isArray(answer)) {
+      return answer.includes(optionIndex) || answer.includes(optionValue) || answer.includes(optionIndex.toString());
+    }
+
+    return false;
+  }
+
+  isRadioSelected(answer: any, optionIndex: number, optionValue: any): boolean {
+    if (answer === null || answer === undefined) return false;
+
+    return answer === optionIndex || answer === optionValue || answer === optionIndex.toString();
   }
 }

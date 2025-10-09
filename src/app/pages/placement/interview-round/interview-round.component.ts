@@ -77,10 +77,24 @@ export class InterviewRoundComponent implements OnInit {
           this.students = response.data.map((item: any, index: number) => ({
             ...item,
             index: index + 1,
-            obtained_marks: item.obtained_marks ?? 0,
+            calculated_marks: item.obtained_marks ?? 0,
             total_marks: item.total_marks ?? 0
           }));
           this.colleges = [...new Set(this.students.map(student => student.institute).filter(institute => institute))].sort();
+          // Fetch detailed assessment data to calculate marks
+          this.students.forEach(student => {
+            this.placementService.getAssessmentPreview(student.id).subscribe({
+              next: (previewResponse) => {
+                if (previewResponse.success) {
+                  student.answers = previewResponse.data.answers || [];
+                  this.calculateQuestionMarks(student);
+                }
+              },
+              error: (err) => {
+                console.error('Error fetching preview for student:', student.id, err);
+              }
+            });
+          });
           this.applyFilters();
         } else {
           this.toastr.error(response.message || 'Failed to fetch approved students');
@@ -230,7 +244,7 @@ export class InterviewRoundComponent implements OnInit {
       student.email || 'N/A',
       student.appliedrole || 'N/A',
       student.total_marks || 0,
-      student.obtained_marks || 0,
+      student.calculated_marks || 0,
       student.interviewround ? student.interviewround.charAt(0).toUpperCase() + student.interviewround.slice(1) : 'Pending',
       student.remarks || 'N/A'
     ]);
@@ -290,7 +304,7 @@ export class InterviewRoundComponent implements OnInit {
       'Applied Role': student.appliedrole || 'N/A',
       'Interview Status': student.interviewround ? student.interviewround.charAt(0).toUpperCase() + student.interviewround.slice(1) : 'Pending',
       'Total Marks': student.total_marks || 0,
-      'Obtained Marks': student.obtained_marks || 0,
+      'Obtained Marks': student.calculated_marks || 0,
       'Remarks': student.remarks || 'N/A'
     }));
 
@@ -343,6 +357,41 @@ export class InterviewRoundComponent implements OnInit {
     return today.toISOString().split('T')[0];
   }
 
+  calculateQuestionMarks(student: any) {
+    if (!student || !student.answers) {
+      student.calculated_marks = 0;
+      return;
+    }
+
+    let totalObtainedMarks = 0;
+
+    student.answers = student.answers.map((answer: any) => {
+      let questionMarks = 0;
+
+      if (answer.option_type === 'Checkbox') {
+        if (Array.isArray(answer.answer)) {
+          questionMarks = answer.optionsArr
+            .filter((opt: any, index: number) => this.isOptionSelected(answer.answer, index, opt.value))
+            .reduce((sum: number, opt: any) => sum + Number(opt.value || 0), 0);
+        }
+      } else if (answer.option_type === 'Radio') {
+        const selectedOption = answer.optionsArr.find((opt: any, index: number) =>
+          this.isRadioSelected(answer.answer, index, opt.value)
+        );
+        questionMarks = selectedOption ? Number(selectedOption.value || 0) : 0;
+      } else if (answer.option_type === 'Input' || answer.option_type === 'Textarea') {
+        questionMarks = answer.is_correct === 1 ? Number(answer.weight || 0) : 0;
+      }
+
+      answer.calculatedMarks = questionMarks;
+      totalObtainedMarks += questionMarks;
+
+      return answer;
+    });
+
+    student.calculated_marks = totalObtainedMarks;
+  }
+
   openPreviewModal(modal: any, student: any) {
     this.isLoadingPreview = true;
     this.selectedStudent = null;
@@ -354,16 +403,17 @@ export class InterviewRoundComponent implements OnInit {
         if (response.success) {
           this.selectedStudent = {
             ...student,
-            ...response.data, // Merge API response with existing student data
-            cover_letter: response.data.cover_letter || student.cover_letter || '', // Ensure cover_letter is included
-            portfoliourl: response.data.portfoliourl || student.portfoliourl || '', // Ensure portfoliourl is included
-            portfolios: response.data.portfolios || [], // Ensure portfolios is included
+            ...response.data,
+            cover_letter: response.data.cover_letter || student.cover_letter || '',
+            portfoliourl: response.data.portfoliourl || student.portfoliourl || '',
+            portfolios: response.data.portfolios || [],
             answers: response.data.answers || [],
-            obtained_marks: response.data.obtained_marks ?? student.obtained_marks ?? 0,
+            calculated_marks: student.calculated_marks ?? response.data.obtained_marks ?? 0,
             total_marks: response.data.total_marks ?? student.total_marks ?? 0
           };
 
-          // Sanitize resume URL
+          this.calculateQuestionMarks(this.selectedStudent);
+
           const resumeUrl: string | null =
             this.selectedStudent?.resume && typeof this.selectedStudent.resume === 'string'
               ? this.selectedStudent.resume
@@ -380,7 +430,6 @@ export class InterviewRoundComponent implements OnInit {
             this.selectedStudent.resume = fullResumeUrl;
           }
 
-          // Sanitize portfolio image URLs
           if (this.selectedStudent?.portfolios?.length) {
             this.selectedStudent.portfolios.forEach((portfolio: any) => {
               if (portfolio.coverimage) {
@@ -433,7 +482,7 @@ export class InterviewRoundComponent implements OnInit {
       next: (response) => {
         if (response.success) {
           this.toastr.success(response.message || 'Remarks saved successfully');
-          this.loadApprovedStudents(); // Reload to update table
+          this.loadApprovedStudents();
         } else {
           this.toastr.error(response.message || 'Failed to save remarks');
         }
@@ -548,5 +597,21 @@ export class InterviewRoundComponent implements OnInit {
 
   trackById(_: number, item: any) {
     return item.id;
+  }
+
+  isOptionSelected(answer: any, optionIndex: number, optionValue: any): boolean {
+    if (!answer) return false;
+
+    if (Array.isArray(answer)) {
+      return answer.includes(optionIndex) || answer.includes(optionValue) || answer.includes(optionIndex.toString());
+    }
+
+    return false;
+  }
+
+  isRadioSelected(answer: any, optionIndex: number, optionValue: any): boolean {
+    if (answer === null || answer === undefined) return false;
+
+    return answer === optionIndex || answer === optionValue || answer === optionIndex.toString();
   }
 }

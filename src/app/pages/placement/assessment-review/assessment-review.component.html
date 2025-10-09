@@ -119,8 +119,9 @@
                                                'mdi-check-circle': assessment.status === assessmentStatus.Approved,
                                                'mdi-close-circle': assessment.status === assessmentStatus.Rejected
                                            }"></i>
+                                        {{ assessment.status | titlecase }}
                                     </td>
-                                    <td>{{ assessment.obtained_marks }} / {{ assessment.total_marks }}</td>
+                                    <td>{{ assessment.calculated_marks }} / {{ assessment.total_marks }}</td>
                                     <td class="text-nowrap">
                                         <button class="btn btn-primary btn-sm me-1"
                                             (click)="openPreviewModal(previewModal, assessment)"
@@ -194,12 +195,11 @@
                             <p><strong>Year:</strong> {{ selectedAssessment.questionset.year || 'N/A' }}</p>
                             <p><strong>Status:</strong>
                                 <span [ngClass]="{
-        'text-warning': selectedAssessment.status === assessmentStatus.Pending,
-        'text-success': selectedAssessment.status === assessmentStatus.Approved,
-        'text-danger': selectedAssessment.status === assessmentStatus.Rejected,
-        'text-secondary': selectedAssessment.status !== assessmentStatus.Pending && selectedAssessment.status !== assessmentStatus.Approved && selectedAssessment.status !== assessmentStatus.Rejected
-    }">
-
+                                    'text-warning': selectedAssessment.status === assessmentStatus.Pending,
+                                    'text-success': selectedAssessment.status === assessmentStatus.Approved,
+                                    'text-danger': selectedAssessment.status === assessmentStatus.Rejected,
+                                    'text-secondary': selectedAssessment.status !== assessmentStatus.Pending && selectedAssessment.status !== assessmentStatus.Approved && selectedAssessment.status !== assessmentStatus.Rejected
+                                }">
                                     {{ selectedAssessment.status | titlecase }}
                                 </span>
                             </p>
@@ -207,9 +207,10 @@
                                 (selectedAssessment.questionset.totaltime | number:'1.0-0') + ' min' : 'N/A' }}</p>
                             <p><strong>Remaining Time:</strong> {{ selectedAssessment.remaining_time ?
                                 (selectedAssessment.remaining_time / 60 | number:'1.0-0') + ' min' : 'N/A' }}</p>
-                            <p><strong>Marks:</strong> {{ selectedAssessment.obtained_marks }} / {{
+                            <p><strong>Marks:</strong> {{ selectedAssessment.calculated_marks }} / {{
                                 selectedAssessment.total_marks }}</p>
-                            <p><strong>Created Date:</strong> {{ selectedAssessment.createddate ? (selectedAssessment.createddate | date:'medium') : 'N/A' }}</p>
+                            <p><strong>Created Date:</strong> {{ selectedAssessment.createddate ?
+                                (selectedAssessment.createddate | date:'medium') : 'N/A' }}</p>
                         </div>
                     </div>
 
@@ -265,6 +266,8 @@
                                                     data.weight }}</h5>
                                                 <h5 class="badge bg-secondary" style="font-size:medium;">Time: {{
                                                     data.time }} min</h5>
+                                                <h5 class="badge bg-success" style="font-size:medium;">Marks: {{
+                                                    data.calculatedMarks || 0 }}</h5>
                                             </div>
                                         </div>
                                         <div *ngIf="data.option_type === 'Checkbox' || data.option_type === 'Radio'">

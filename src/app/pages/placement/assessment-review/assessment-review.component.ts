@@ -14,7 +14,6 @@ enum AssessmentStatus {
   Rejected = 'rejected'
 }
 
-// Interface for Excel worksheet data
 interface WorksheetRow {
   '#': number;
   'Student Name': string;
@@ -28,7 +27,7 @@ interface WorksheetRow {
 
 @Component({
   selector: 'app-assessment-review',
-  standalone:false,
+  standalone: false,
   templateUrl: './assessment-review.component.html',
   styleUrls: ['./assessment-review.component.scss']
 })
@@ -78,6 +77,20 @@ export class AssessmentReviewComponent implements OnInit {
             index: index + 1
           }));
           this.colleges = [...new Set(this.assessments.map(assessment => assessment.student.institute).filter(institute => institute))].sort();
+          // Fetch detailed assessment data to calculate marks
+          this.assessments.forEach(assessment => {
+            this.placementService.getAssessmentPreview(assessment.assessment_id).subscribe({
+              next: (previewResponse) => {
+                if (previewResponse.success) {
+                  assessment.answers = previewResponse.data.answers;
+                  this.calculateQuestionMarks(assessment);
+                }
+              },
+              error: (err) => {
+                console.error('Error fetching preview for assessment:', assessment.assessment_id, err);
+              }
+            });
+          });
           this.applyFilters();
         } else {
           this.toastr.error(response.message || 'Failed to fetch assessments');
@@ -165,7 +178,7 @@ export class AssessmentReviewComponent implements OnInit {
     const doc = new jsPDF('l', 'mm', 'a4');
     const pageWidth = doc.internal.pageSize.width;
     const pageHeight = doc.internal.pageSize.height;
-    const today = new Date('2025-10-07T15:47:00+05:30');
+    const today = new Date();
     const instituteName = this.filterCollege || 'All Institutes';
 
     // Cover Page
@@ -226,7 +239,7 @@ export class AssessmentReviewComponent implements OnInit {
       assessment.student.email || 'N/A',
       assessment.student.appliedrole || 'N/A',
       assessment.total_marks || 'N/A',
-      assessment.obtained_marks || '0',
+      assessment.calculated_marks || '0',
       assessment.status ? assessment.status.charAt(0).toUpperCase() + assessment.status.slice(1) : 'N/A'
     ]);
 
@@ -284,7 +297,7 @@ export class AssessmentReviewComponent implements OnInit {
       'Applied Role': assessment.student.appliedrole || 'N/A',
       Status: assessment.status ? assessment.status.charAt(0).toUpperCase() + assessment.status.slice(1) : 'N/A',
       'Total Marks': assessment.total_marks || 'N/A',
-      'Obtained Marks': assessment.obtained_marks || '0'
+      'Obtained Marks': assessment.calculated_marks || '0'
     }));
 
     const worksheet = XLSX.utils.json_to_sheet(worksheetData);
@@ -307,7 +320,7 @@ export class AssessmentReviewComponent implements OnInit {
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, 'Assessments');
 
-    const today = new Date('2025-10-07T15:47:00+05:30');
+    const today = new Date();
     const summaryData = [
       { Field: 'Report Title', Value: 'Student Assessment Report' },
       { Field: 'Institute', Value: this.filterCollege || 'All Institutes' },
@@ -332,7 +345,7 @@ export class AssessmentReviewComponent implements OnInit {
   }
 
   private getCurrentDateString(): string {
-    const today = new Date('2025-10-07T15:47:00+05:30');
+    const today = new Date();
     return today.toISOString().split('T')[0];
   }
 
@@ -345,6 +358,7 @@ export class AssessmentReviewComponent implements OnInit {
       next: (response) => {
         if (response.success) {
           this.selectedAssessment = response.data;
+          this.calculateQuestionMarks(this.selectedAssessment);
 
           const resumeUrl: string | null =
             this.selectedAssessment?.student?.resume && typeof this.selectedAssessment.student.resume === 'string'
@@ -487,6 +501,41 @@ export class AssessmentReviewComponent implements OnInit {
     });
   }
 
+  calculateQuestionMarks(assessment: any) {
+    if (!assessment || !assessment.answers) {
+      assessment.calculated_marks = 0;
+      return;
+    }
+
+    let totalObtainedMarks = 0;
+
+    assessment.answers = assessment.answers.map((answer: any) => {
+      let questionMarks = 0;
+
+      if (answer.option_type === 'Checkbox') {
+        if (Array.isArray(answer.answer)) {
+          questionMarks = answer.optionsArr
+            .filter((opt: any, index: number) => this.isOptionSelected(answer.answer, index, opt.value))
+            .reduce((sum: number, opt: any) => sum + Number(opt.value || 0), 0);
+        }
+      } else if (answer.option_type === 'Radio') {
+        const selectedOption = answer.optionsArr.find((opt: any, index: number) =>
+          this.isRadioSelected(answer.answer, index, opt.value)
+        );
+        questionMarks = selectedOption ? Number(selectedOption.value || 0) : 0;
+      } else if (answer.option_type === 'Input' || answer.option_type === 'Textarea') {
+        questionMarks = answer.is_correct === 1 ? Number(answer.weight || 0) : 0;
+      }
+
+      answer.calculatedMarks = questionMarks;
+      totalObtainedMarks += questionMarks;
+
+      return answer;
+    });
+
+    assessment.calculated_marks = totalObtainedMarks;
+  }
+
   setCorrect(questionId: string, isCorrect: number) {
     if (!this.selectedAssessment) return;
     const pfId = this.selectedAssessment.student.id;
@@ -498,9 +547,7 @@ export class AssessmentReviewComponent implements OnInit {
           const answer = this.selectedAssessment.answers.find((a: any) => a.question_id === questionId);
           if (answer) {
             answer.is_correct = isCorrect;
-            this.selectedAssessment.obtained_marks = this.selectedAssessment.answers.reduce(
-              (sum: number, a: any) => sum + (a.is_correct === 1 ? Number(a.weight) : 0), 0
-            );
+            this.calculateQuestionMarks(this.selectedAssessment);
           }
           this.loadAssessments();
         } else {
@@ -517,23 +564,19 @@ export class AssessmentReviewComponent implements OnInit {
     return item.assessment_id;
   }
 
-  // Helper method to check if a checkbox option is selected
   isOptionSelected(answer: any, optionIndex: number, optionValue: any): boolean {
     if (!answer) return false;
-    
-    // Handle both array of indices and array of values
+
     if (Array.isArray(answer)) {
       return answer.includes(optionIndex) || answer.includes(optionValue) || answer.includes(optionIndex.toString());
     }
-    
+
     return false;
   }
 
-  // Helper method to check if a radio option is selected
   isRadioSelected(answer: any, optionIndex: number, optionValue: any): boolean {
     if (answer === null || answer === undefined) return false;
-    
-    // Handle both index and value comparisons
+
     return answer === optionIndex || answer === optionValue || answer === optionIndex.toString();
   }
 }
