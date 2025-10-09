@@ -1,13 +1,5 @@
 
 
-/*
-Template Name: Minia - Admin & Dashboard Template
-Author: Themesbrand
-Website: https://themesbrand.com/
-Contact: themesbrand@gmail.com
-File: Toastr init js
-*/
-
 // alert
 document.getElementById("alert").addEventListener("click", function() {
     alertify.alert('Alert Title', 'Alert Message!', function(){ alertify.success('Ok'); });
