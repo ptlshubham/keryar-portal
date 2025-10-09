@@ -1,10 +1,3 @@
-/*
-Template Name: Minia - Admin & Dashboard Template
-Author: Themesbrand
-Website: https://themesbrand.com/
-Contact: themesbrand@gmail.com
-File: Material design Init Js File
-*/
 
 // icons
 function isNew(icon) {

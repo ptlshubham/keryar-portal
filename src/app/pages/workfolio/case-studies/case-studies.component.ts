@@ -40,7 +40,7 @@ export class CaseStudiesComponent {
   galleryUploaders: { images: string[]; img?: any }[] = [{ images: [] }];
   galleryMultiImage: any[] = [];
 
-  serverPath: string = 'http://localhost:8300';
+  serverPath: string = 'https://api.fosterx.co';
   isOpen: boolean = true;
 
   caseStudyData: any = [];

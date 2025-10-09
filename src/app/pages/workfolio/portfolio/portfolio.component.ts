@@ -42,7 +42,7 @@ export class PortfolioComponent {
   galleryUploadProgress: number = 0;
   galleryUploaders: { images: string[]; img?: any }[] = [{ images: [] }];
 
-  serverPath: string = 'http://localhost:8300';
+  serverPath: string = 'https://api.fosterx.co';
   galleryMultiImage: any[] = [];
 
   isOpen: boolean = true;

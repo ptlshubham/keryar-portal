@@ -20,7 +20,7 @@ export class CollegeJobMappingComponent implements OnInit {
   pageSize = 10;
   collectionSize = 0;
   paginateData: any[] = [];
-  serverPath: string = 'http://localhost:4500/'; // Updated to match backend port
+  serverPath: string = 'https://keryar.com/'; // Updated to match backend port
   addingCollege = false;
 
   constructor(

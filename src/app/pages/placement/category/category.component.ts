@@ -15,7 +15,7 @@ export class CategoryComponent implements OnInit {
 
   submitted = false;
   validationForm!: FormGroup;
-  serverPath: string = 'http://localhost:8300';
+  serverPath: string = 'https://api.fosterx.co';
 
   page = 1;
   pageSize = 10;

@@ -24,7 +24,7 @@ export class ClientsComponent {
   uploading: boolean = false;
   uploadProgress: number = 0;
 
-  serverPath: string = 'http://localhost:8300';
+  serverPath: string = 'https://api.fosterx.co';
   clientsData: any = [];
   album: Array<{ src: string; caption: string; thumb: string }> = [];
   page = 1;

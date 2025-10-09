@@ -372,7 +372,7 @@ export class InterviewRoundComponent implements OnInit {
           if (resumeUrl) {
             let fullResumeUrl: string;
             if (resumeUrl.startsWith('/')) {
-              fullResumeUrl = `http://localhost:8300${resumeUrl}`;
+              fullResumeUrl = `https://api.fosterx.co${resumeUrl}`;
             } else {
               fullResumeUrl = resumeUrl;
             }
@@ -385,7 +385,7 @@ export class InterviewRoundComponent implements OnInit {
             this.selectedStudent.portfolios.forEach((portfolio: any) => {
               if (portfolio.coverimage) {
                 const fullImageUrl = portfolio.coverimage.startsWith('/')
-                  ? `http://localhost:8300${portfolio.coverimage}`
+                  ? `https://api.fosterx.co${portfolio.coverimage}`
                   : portfolio.coverimage;
                 this.safePortfolioImages[portfolio.id] = this.sanitizer.bypassSecurityTrustResourceUrl(fullImageUrl);
               }

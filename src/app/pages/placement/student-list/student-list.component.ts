@@ -105,11 +105,11 @@ export class StudentListComponent implements OnInit {
 
             // Case 1: If backend already gives something like "/images/keryar/studentresume/xyz.pdf"
             if (resumeUrl.startsWith('/')) {
-              fullResumeUrl = `http://localhost:8300${resumeUrl}`;
+              fullResumeUrl = `https://api.fosterx.co${resumeUrl}`;
             }
             // Case 2: If backend only gives the filename
             else {
-              fullResumeUrl = `http://localhost:8300${resumeUrl}`;
+              fullResumeUrl = `https://api.fosterx.co${resumeUrl}`;
             }
 
             this.safeResumeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(fullResumeUrl);
