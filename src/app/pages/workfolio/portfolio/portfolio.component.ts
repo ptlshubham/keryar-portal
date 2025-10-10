@@ -282,8 +282,10 @@ export class PortfolioComponent {
 
   getAllPortfolio() {
     this.workfolioService.getAllPortfolioData().subscribe((res: any) => {
-      console.log('getAllPortfolio - portfolioData:', res);
       this.portfolioData = res;
+      const uniqueCategories = [...new Set(this.portfolioData.map((item: any) => item.category))];
+      this.categories = uniqueCategories.map(category => ({ category: category }));
+
       this.album = this.portfolioData.map((s: any) => ({
         src: this.serverPath + s.coverimage,
         caption: `${s.name}`,

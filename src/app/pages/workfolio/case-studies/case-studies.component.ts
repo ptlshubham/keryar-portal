@@ -51,6 +51,7 @@ export class CaseStudiesComponent {
   pageSize = 10;
   collectionSize = 0;
   paginateData: any = [];
+  portfolioData: any = [];
 
   constructor(
     public router: Router,
@@ -59,6 +60,7 @@ export class CaseStudiesComponent {
     public toastr: ToastrService,
     private _lightbox: Lightbox
   ) {
+    this.getAllPortfolio();
     this.getAllCaseStudies();
   }
 
@@ -104,6 +106,14 @@ export class CaseStudiesComponent {
     this.currentCaseStudyId = null;
   }
 
+
+  getAllPortfolio() {
+    this.workfolioService.getAllPortfolioData().subscribe((res: any) => {
+      this.portfolioData = res;
+      const uniqueCategories = [...new Set(this.portfolioData.map((item: any) => item.category))];
+      this.categories = uniqueCategories.map(category => ({ category: category }));
+    });
+  }
   getClients() {
     this.workfolioService.getAllClients().subscribe((res: any) => {
       this.clientsData = res;
