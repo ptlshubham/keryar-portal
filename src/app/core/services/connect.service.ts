@@ -23,6 +23,8 @@ export class ConnectService {
     removeContactusFormDetails(id: any) {
         return this.httpClient.get(ApiService.removeContactusFormDetailsURL + id);
     }
-
+    sendInternshipLink(data: any): Observable<any> {
+        return this.httpClient.post(ApiService.sendInternshipLinkURL, data);
+    }
 
 }

@@ -135,4 +135,6 @@ export class ApiService {
 
 
   public static updateRemarksURL: string = ApiService.HOST_URL + '/keryar/UpdateRemarks';
+  public static sendInternshipLinkURL: string = ApiService.HOST_URL + '/keryar/sendInternshipLink';
+
 }

@@ -1,8 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { ConnectService } from 'src/app/core/services/connect.service';
 import { ToastrService } from 'ngx-toastr';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap'; // ⬅️ add this
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import Swal from 'sweetalert2';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { PlacementService } from 'src/app/core/services/placement.service';
 
 @Component({
   selector: 'app-internship',
@@ -16,15 +18,24 @@ export class InternshipComponent implements OnInit {
   paginateData: any = [];
   internshipFormDetails: any = [];
   selectedClient: any = null;
+  collegeJobMappings: any[] = [];
+  sendLinkForm: FormGroup;
 
   constructor(
     public connectService: ConnectService,
+    public placementService: PlacementService,
     public toastr: ToastrService,
-    private modalService: NgbModal // ⬅️ add this
-  ) { }
+    private modalService: NgbModal,
+    private fb: FormBuilder
+  ) {
+    this.sendLinkForm = this.fb.group({
+      link_name: ['', Validators.required]
+    });
+  }
 
   ngOnInit(): void {
     this.getInternshipDetails();
+    this.getCollegeJobMappings();
   }
 
   getPagintaion() {
@@ -32,7 +43,6 @@ export class InternshipComponent implements OnInit {
       .slice((this.page - 1) * this.pageSize, (this.page - 1) * this.pageSize + this.pageSize);
   }
 
-  // ⬇️ New: open preview
   openPreview(client: any, modalTpl: any) {
     this.selectedClient = client;
     this.modalService.open(modalTpl, {
@@ -40,6 +50,57 @@ export class InternshipComponent implements OnInit {
       backdrop: 'static',
       keyboard: true,
       centered: true
+    });
+  }
+
+  openSendLinkModal(client: any, modalTpl: any) {
+    this.selectedClient = client;
+    this.sendLinkForm.reset();
+    this.modalService.open(modalTpl, {
+      size: 'md',
+      backdrop: 'static',
+      keyboard: true,
+      centered: true
+    });
+  }
+
+  sendLink() {
+    if (this.sendLinkForm.invalid) {
+      this.toastr.error('Please select a link.', 'Validation Error', { timeOut: 3000 });
+      return;
+    }
+
+    const selectedLink = this.collegeJobMappings.find(mapping => mapping.link_name === this.sendLinkForm.value.link_name);
+    if (!selectedLink) {
+      this.toastr.error('Selected link not found.', 'Error', { timeOut: 3000 });
+      return;
+    }
+
+    if (!this.selectedClient.email || !selectedLink.college_id) {
+      this.toastr.error('Invalid data: Missing email or college ID.', 'Error', { timeOut: 3000 });
+      return;
+    }
+
+    const linkData = {
+      email: this.selectedClient.email,
+      college_id: selectedLink.college_id, // Use college_id from collegeJobMappings
+      link_name: selectedLink.link_name
+    };
+
+
+    this.connectService.sendInternshipLink(linkData).subscribe({
+      next: (res: any) => {
+        if (res.success) {
+          this.toastr.success(res.message || 'Email sent successfully!', 'Success', { timeOut: 3000 });
+          this.modalService.dismissAll();
+        } else {
+          this.toastr.error(res.message || 'Failed to send email.', 'Error', { timeOut: 3000 });
+        }
+      },
+      error: (err) => {
+        console.error('Send Link API Error:', err); // Detailed error logging
+        this.toastr.error(err.message || 'Network error while sending email.', 'Error', { timeOut: 3000 });
+      }
     });
   }
 
@@ -73,7 +134,7 @@ export class InternshipComponent implements OnInit {
               timer: 3000,
               showConfirmButton: false
             });
-            this.getInternshipDetails(); // Refresh data
+            this.getInternshipDetails();
           },
           error: (err) => {
             console.error('Delete API Error:', err);
@@ -93,11 +154,55 @@ export class InternshipComponent implements OnInit {
   getInternshipDetails() {
     this.connectService.getInternshipFormDetails().subscribe((res: any) => {
       this.internshipFormDetails = res;
+      console.log(res)
       for (let i = 0; i < this.internshipFormDetails.length; i++) {
         this.internshipFormDetails[i].index = i + 1;
       }
       this.collectionSize = this.internshipFormDetails.length;
       this.getPagintaion();
     });
+  }
+
+  getCollegeJobMappings() {
+    this.placementService.getAllCollegeJobMappings().subscribe({
+      next: (res: any) => {
+        if (res.success) {
+          this.collegeJobMappings = this.groupMappingsByCollege(res.data);
+        } else {
+          this.toastr.error(res.message || 'Failed to fetch college-job mappings.', 'Error', { timeOut: 3000 });
+        }
+      },
+      error: (err) => {
+        console.error('Get College Job Mappings Error:', err);
+        this.toastr.error('Network error while fetching mappings.', 'Error', { timeOut: 3000 });
+      }
+    });
+  }
+
+  groupMappingsByCollege(mappings: any[]): any[] {
+    const grouped = new Map<string, any>();
+    mappings.forEach(mapping => {
+      const key = `${mapping.college_id}|${mapping.link_name}`;
+      if (!grouped.has(key)) {
+        grouped.set(key, {
+          college_id: mapping.college_id,
+          college_name: mapping.college_name,
+          link_name: mapping.link_name,
+          jobtitles: [mapping.jobtitle],
+          link_active: mapping.link_active,
+          ids: [mapping.id]
+        });
+      } else {
+        const existing = grouped.get(key)!;
+        existing.jobtitles.push(mapping.jobtitle);
+        existing.ids.push(mapping.id);
+        existing.link_active = existing.link_active || mapping.link_active;
+      }
+    });
+
+    return Array.from(grouped.values()).map(group => ({
+      ...group,
+      jobtitle: group.jobtitles.join(', ')
+    }));
   }
 }
