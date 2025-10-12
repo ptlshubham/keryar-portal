@@ -68,13 +68,47 @@ export class QuetionsComponent implements OnInit {
   get isQuestionValid(): boolean {
     const enteredQuestions = this.questionData.filter(q => q.question_text && q.question_text.trim().length > 0);
     if (enteredQuestions.length === 0) return false;
-    return enteredQuestions.every(q =>
-      q.weight !== null && q.weight !== undefined && q.weight !== '' && Number(q.weight) > 0 &&
-      q.time !== null && q.time !== undefined && q.time !== '' && Number(q.time) > 0 && // Validate time in minutes
-      (q.option_type === 'Checkbox' || q.option_type === 'Radio' ? q.optionsArr.length > 0 : true) &&
-      (q.option_type === 'Radio' ? q.correctAnswer !== null && q.correctAnswer !== undefined : true) &&
-      (q.option_type === 'Input' || q.option_type === 'Textarea' ? q.correctAnswer !== null && q.correctAnswer?.trim().length > 0 : true)
-    );
+
+    return enteredQuestions.every(q => {
+      // Basic validation for weight and time - allow 0 for weight
+      const hasValidWeight = q.weight !== null && q.weight !== undefined && q.weight !== '' && Number(q.weight) >= 0;
+      const hasValidTime = q.time !== null && q.time !== undefined && q.time !== '' && Number(q.time) > 0;
+
+      if (!hasValidWeight || !hasValidTime) return false;
+
+      // Validation based on option type
+      if (q.option_type === 'Checkbox') {
+        // For checkbox: must have options with text and values, at least one must be correct
+        const validOptions = q.optionsArr.filter((opt: any) =>
+          opt.options && opt.options.trim().length > 0 &&
+          opt.value !== null && opt.value !== undefined && opt.value !== ''
+        );
+
+        // Check if at least one option is marked as correct
+        const hasCorrectOption = q.optionsArr.some((opt: any) => {
+          return opt.isCorrect === true || opt.isCorrect === 'true' || opt.isCorrect === 1;
+        });
+
+        return validOptions.length > 0 && hasCorrectOption;
+      }
+
+      if (q.option_type === 'Radio') {
+        // For radio: must have options with text and values, one must be selected as correct
+        const validOptions = q.optionsArr.filter((opt: any) =>
+          opt.options && opt.options.trim().length > 0 &&
+          opt.value !== null && opt.value !== undefined && opt.value !== ''
+        );
+        return validOptions.length > 0 && q.correctAnswer !== null && q.correctAnswer !== undefined;
+      }
+
+      if (q.option_type === 'Input' || q.option_type === 'Textarea') {
+        // For input/textarea: must have correct answer
+        return q.correctAnswer !== null && q.correctAnswer?.trim().length > 0;
+      }
+
+      // If no option type selected, it's invalid
+      return q.option_type && q.option_type.trim().length > 0;
+    });
   }
 
   get isFormValid(): boolean {
@@ -246,13 +280,37 @@ export class QuetionsComponent implements OnInit {
   }
 
   onOptionValueChange(qIndex: number, optIndex: number, value: any) {
-    // Ensure value is never negative
+    // Ensure value is never negative and is a valid number
     const numValue = Number(value);
     if (numValue < 0 || isNaN(numValue)) {
       this.questionData[qIndex].optionsArr[optIndex].value = 0;
     } else {
       this.questionData[qIndex].optionsArr[optIndex].value = numValue;
     }
+  }
+
+  onCheckboxChange(qIndex: number, optIndex: number, isChecked: boolean) {
+    this.questionData[qIndex].optionsArr[optIndex].isCorrect = isChecked;
+  }
+
+  onlyNumbers(event: KeyboardEvent): boolean {
+    const charCode = event.which ? event.which : event.keyCode;
+    // Allow: backspace, delete, tab, escape, enter, home, end, left, right, up, down
+    if ([8, 9, 27, 13, 46, 35, 36, 37, 39, 38, 40].indexOf(charCode) !== -1 ||
+      // Allow Ctrl+A, Ctrl+C, Ctrl+V, Ctrl+X, Ctrl+Z
+      (charCode === 65 && event.ctrlKey === true) || // Ctrl+A
+      (charCode === 67 && event.ctrlKey === true) || // Ctrl+C
+      (charCode === 86 && event.ctrlKey === true) || // Ctrl+V
+      (charCode === 88 && event.ctrlKey === true) || // Ctrl+X
+      (charCode === 90 && event.ctrlKey === true)) { // Ctrl+Z
+      return true;
+    }
+    // Ensure that it is a number and stop the keypress
+    if ((charCode < 48 || charCode > 57)) {
+      event.preventDefault();
+      return false;
+    }
+    return true;
   }
 
   getTotalMarks(questionSet: any): number {
@@ -263,6 +321,74 @@ export class QuetionsComponent implements OnInit {
       return total + (Number(question.weight) || 0);
     }, 0);
   }
+
+  getValidationErrors(): string[] {
+    const errors: string[] = [];
+
+    if (!this.validationForm.valid) {
+      if (this.validationForm.get('type')?.invalid) errors.push('Type is required');
+      if (this.validationForm.get('year')?.invalid) errors.push('Year is required');
+      if (this.validationForm.get('category')?.invalid) errors.push('Category is required');
+      if (this.validationForm.get('subcategory')?.invalid) errors.push('Subcategory is required');
+      if (this.validationForm.get('subtosubcategory')?.invalid) errors.push('Sub-to-subcategory is required');
+      if (this.validationForm.get('difficulty')?.invalid) errors.push('Difficulty is required');
+    }
+
+    const enteredQuestions = this.questionData.filter(q => q.question_text && q.question_text.trim().length > 0);
+    if (enteredQuestions.length === 0) {
+      errors.push('At least one question is required');
+    } else {
+      enteredQuestions.forEach((q, index) => {
+        // Allow weight to be 0 or greater
+        if (q.weight === null || q.weight === undefined || q.weight === '' || Number(q.weight) < 0) {
+          errors.push(`Question ${index + 1}: Weight must be 0 or greater`);
+        }
+        if (!q.time || Number(q.time) <= 0) {
+          errors.push(`Question ${index + 1}: Time must be greater than 0`);
+        }
+        if (!q.option_type) {
+          errors.push(`Question ${index + 1}: Option type is required`);
+        } else if (q.option_type === 'Checkbox') {
+          const validOptions = q.optionsArr.filter((opt: any) =>
+            opt.options && opt.options.trim().length > 0 &&
+            opt.value !== null && opt.value !== undefined && opt.value !== ''
+          );
+
+          const hasCorrectOption = q.optionsArr.some((opt: any) => {
+            return opt.isCorrect === true || opt.isCorrect === 'true' || opt.isCorrect === 1;
+          });
+
+          if (validOptions.length === 0) {
+            errors.push(`Question ${index + 1}: At least one option with text and value is required`);
+          }
+          if (!hasCorrectOption) {
+            errors.push(`Question ${index + 1}: At least one correct option must be selected`);
+          }
+        } else if (q.option_type === 'Radio') {
+          const validOptions = q.optionsArr.filter((opt: any) =>
+            opt.options && opt.options.trim().length > 0 &&
+            opt.value !== null && opt.value !== undefined && opt.value !== ''
+          );
+          if (validOptions.length === 0) {
+            errors.push(`Question ${index + 1}: At least one option with text and value is required`);
+          }
+          if (q.correctAnswer === null || q.correctAnswer === undefined) {
+            errors.push(`Question ${index + 1}: One correct answer must be selected`);
+          }
+        } else if (q.option_type === 'Input' || q.option_type === 'Textarea') {
+          if (!q.correctAnswer || q.correctAnswer.trim().length === 0) {
+            errors.push(`Question ${index + 1}: Correct answer is required`);
+          }
+        }
+      });
+    }
+
+    return errors;
+  }
+
+
+
+
 
   saveQuestionList() {
     if (this.isFormValid) {
@@ -461,49 +587,56 @@ export class QuetionsComponent implements OnInit {
   }
 
   updateSelfQuestionSet() {
-    // Calculate total time
-    const totalTime = this.questionData
-      .filter(q => q.question_text && q.question_text.trim().length > 0)
-      .reduce((sum, q) => sum + (Number(q.time) || 0), 0);
-
-    const data = {
-      id: this.questionModel.id,
-      type: this.validationForm.value.type,
-      categoriesid: this.validationForm.value.category,
-      subcategoriesid: this.validationForm.value.subcategory,
-      subtosubcategoriesid: this.validationForm.value.subtosubcategory,
-      difficulty: this.validationForm.value.difficulty,
-      totalTime: totalTime, // Add totalTime
-      questions: this.questionData
+    if (this.isFormValid) {
+      // Calculate total time
+      const totalTime = this.questionData
         .filter(q => q.question_text && q.question_text.trim().length > 0)
-        .map(q => ({
-          queid: q.queid,
-          question_text: q.question_text,
-          option_type: q.option_type,
-          weight: q.weight,
-          time: q.time,
-          optionsArr: q.optionsArr?.map((opt: any) => ({
-            id: opt.id,
-            options: opt.options,
-            value: opt.value,
-            isCorrect: opt.isCorrect
-          })) || [],
-          correctAnswer: q.correctAnswer
-        })),
-      year: this.validationForm.value.year ? this.validationForm.value.year.split('-')[0] : new Date().getFullYear().toString()
-    };
+        .reduce((sum, q) => sum + (Number(q.time) || 0), 0);
 
-    this.placementService.updateSelfAssessmentQuestionSetDetails(data).subscribe({
-      next: (res: any) => {
-        this.toastr.success('Question set updated successfully.');
-        this.loadAllData();
-        this.formReset();
-        this.isOpen = false;
-        this.isUpdate = false;
-      },
-      error: (err) => {
-        this.toastr.error('Error updating question set: ' + (err.error?.message || err.message), 'Error');
-      }
-    });
+      const data = {
+        id: this.questionModel.id,
+        type: this.validationForm.value.type,
+        categoriesid: this.validationForm.value.category,
+        subcategoriesid: this.validationForm.value.subcategory,
+        subtosubcategoriesid: this.validationForm.value.subtosubcategory,
+        difficulty: this.validationForm.value.difficulty,
+        totalTime: totalTime, // Add totalTime
+        questions: this.questionData
+          .filter(q => q.question_text && q.question_text.trim().length > 0)
+          .map(q => ({
+            queid: q.queid,
+            question_text: q.question_text,
+            option_type: q.option_type,
+            weight: q.weight,
+            time: q.time,
+            optionsArr: q.optionsArr?.map((opt: any) => ({
+              id: opt.id,
+              options: opt.options,
+              value: opt.value,
+              isCorrect: opt.isCorrect
+            })) || [],
+            correctAnswer: q.correctAnswer
+          })),
+        year: this.validationForm.value.year ? this.validationForm.value.year.split('-')[0] : new Date().getFullYear().toString()
+      };
+
+      this.placementService.updateSelfAssessmentQuestionSetDetails(data).subscribe({
+        next: (res: any) => {
+          this.toastr.success('Question set updated successfully.');
+          this.loadAllData();
+          this.formReset();
+          this.isOpen = false;
+          this.isUpdate = false;
+        },
+        error: (err) => {
+          this.toastr.error('Error updating question set: ' + (err.error?.message || err.message), 'Error');
+        }
+      });
+    } else {
+      // Show validation errors
+      const errors = this.getValidationErrors();
+      console.log('Validation errors:', errors);
+      this.toastr.error('Please fix the following errors:\n' + errors.join('\n'), 'Validation Error');
+    }
   }
 }
