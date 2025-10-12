@@ -147,33 +147,23 @@ export class JobOpeningComponent {
       const reader = new FileReader();
       reader.readAsDataURL(file);
       reader.onload = () => {
-        const image = new Image();
-        image.src = reader.result as string;
-        image.onload = () => {
-          if (image.width === 200 && image.height === 200) {
-            this.imageUrl = reader.result;
-            const imgBase64Path = reader.result;
-            this.cardImageBase64 = imgBase64Path;
-            const formdata = new FormData();
-            formdata.append('file', file);
-            this.careerService.uploadJobOpeningImg(formdata).subscribe((response) => {
-              this.toastr.success('Image Uploaded Successfully', 'Uploaded', { timeOut: 3000 });
-              this.jobopeningimage = response;
-              this.validationForm.patchValue({ jobopeningimage: response });
-              this.uploading = false;
-              this.uploadProgress = 0;
-            }, (error) => {
-              this.toastr.error('Failed to upload image', 'Error', { timeOut: 3000 });
-              this.uploading = false;
-              this.uploadProgress = 0;
-              console.error(error);
-            });
-          } else {
-            this.toastr.error('Please upload an image with dimensions of 200x200px', 'Invalid Dimension', { timeOut: 3000 });
-            this.uploading = false;
-            this.uploadProgress = 0;
-          }
-        };
+        this.imageUrl = reader.result;
+        const imgBase64Path = reader.result;
+        this.cardImageBase64 = imgBase64Path;
+        const formdata = new FormData();
+        formdata.append('file', file);
+        this.careerService.uploadJobOpeningImg(formdata).subscribe((response) => {
+          this.toastr.success('Image Uploaded Successfully', 'Uploaded', { timeOut: 3000 });
+          this.jobopeningimage = response;
+          this.validationForm.patchValue({ jobopeningimage: response });
+          this.uploading = false;
+          this.uploadProgress = 0;
+        }, (error) => {
+          this.toastr.error('Failed to upload image', 'Error', { timeOut: 3000 });
+          this.uploading = false;
+          this.uploadProgress = 0;
+          console.error(error);
+        });
       };
     }
   }
