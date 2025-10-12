@@ -21,11 +21,11 @@ export class QuetionsComponent implements OnInit {
   paginateData: any = [];
 
   questionData: any[] = [{
-    question_text: null,
+    question_text: '',
     option_type: '',
     weight: null,
-    time: null, // Time in minutes
-    optionsArr: [{ options: '', value: null, isCorrect: false }],
+    time: null,
+    optionsArr: [{ options: '', value: 0, isCorrect: false }],
     correctAnswer: null
   }];
   questionModel: any = {};
@@ -35,6 +35,10 @@ export class QuetionsComponent implements OnInit {
   subcategories: any[] = [];
   subtosubcategories: any[] = [];
   questionsSetData: any = [];
+
+  // Store original data for lookups
+  allSubcategories: any[] = [];
+  allSubtosubcategories: any[] = [];
 
   constructor(
     private fb: FormBuilder,
@@ -65,8 +69,8 @@ export class QuetionsComponent implements OnInit {
     const enteredQuestions = this.questionData.filter(q => q.question_text && q.question_text.trim().length > 0);
     if (enteredQuestions.length === 0) return false;
     return enteredQuestions.every(q =>
-      q.weight !== null && q.weight !== undefined && q.weight.toString().trim().length > 0 &&
-      q.time !== null && q.time !== undefined && q.time.toString().trim().length > 0 && q.time >= 0 && // Validate time in minutes
+      q.weight !== null && q.weight !== undefined && q.weight !== '' && Number(q.weight) > 0 &&
+      q.time !== null && q.time !== undefined && q.time !== '' && Number(q.time) > 0 && // Validate time in minutes
       (q.option_type === 'Checkbox' || q.option_type === 'Radio' ? q.optionsArr.length > 0 : true) &&
       (q.option_type === 'Radio' ? q.correctAnswer !== null && q.correctAnswer !== undefined : true) &&
       (q.option_type === 'Input' || q.option_type === 'Textarea' ? q.correctAnswer !== null && q.correctAnswer?.trim().length > 0 : true)
@@ -75,6 +79,22 @@ export class QuetionsComponent implements OnInit {
 
   get isFormValid(): boolean {
     return this.validationForm.valid && this.isQuestionValid;
+  }
+
+  get totalWeight(): number {
+    return this.questionData
+      .filter(q => q.question_text && q.question_text.trim().length > 0 && q.weight !== null && q.weight !== '')
+      .reduce((sum, q) => sum + (Number(q.weight) || 0), 0);
+  }
+
+  get totalTime(): number {
+    return this.questionData
+      .filter(q => q.question_text && q.question_text.trim().length > 0 && q.time !== null && q.time !== '')
+      .reduce((sum, q) => sum + (Number(q.time) || 0), 0);
+  }
+
+  get validQuestionsCount(): number {
+    return this.questionData.filter(q => q.question_text && q.question_text.trim().length > 0).length;
   }
 
   fromCharCode(code: number): string {
@@ -98,6 +118,7 @@ export class QuetionsComponent implements OnInit {
   loadSubcategories() {
     this.placementService.getAllActiveSubCategory().subscribe({
       next: (res: any) => {
+        this.allSubcategories = res.data; // Store original data
         this.subcategories = res.data;
         console.log('Fetched subcategories:', this.subcategories);
         this.loadSubToSubcategories();
@@ -112,11 +133,12 @@ export class QuetionsComponent implements OnInit {
   loadSubToSubcategories() {
     this.placementService.getAllActiveSubToSubCategory().subscribe({
       next: (res: any) => {
-        this.subtosubcategories = res.data.map((ssc: any) => ({
+        this.allSubtosubcategories = res.data.map((ssc: any) => ({
           id: ssc.id,
           name: ssc.name,
           subcategoriesid: ssc.subcategoriesid
-        }));
+        })); // Store original data
+        this.subtosubcategories = [...this.allSubtosubcategories];
         console.log('Fetched sub-to-sub categories:', this.subtosubcategories);
         this.getAllSelfQuestionSetDetails();
       },
@@ -133,12 +155,14 @@ export class QuetionsComponent implements OnInit {
   }
 
   getSubcategoryName(subcategoryId: string): string {
-    const subcategory = this.subcategories.find(sub => sub.id === subcategoryId);
+    // Use allSubcategories for lookup to avoid N/A when arrays are filtered
+    const subcategory = this.allSubcategories.find(sub => sub.id === subcategoryId);
     return subcategory ? subcategory.name : 'N/A';
   }
 
   getSubToSubcategoryName(subtosubcategoryId: string): string {
-    const subtosubcategory = this.subtosubcategories.find(subsub => subsub.id === subtosubcategoryId);
+    // Use allSubtosubcategories for lookup to avoid N/A when arrays are filtered
+    const subtosubcategory = this.allSubtosubcategories.find(subsub => subsub.id === subtosubcategoryId);
     return subtosubcategory ? subtosubcategory.name : 'N/A';
   }
 
@@ -150,19 +174,12 @@ export class QuetionsComponent implements OnInit {
     this.validationForm.get('subtosubcategory')?.disable();
 
     if (categoryId) {
-      this.placementService.getAllActiveSubCategory().subscribe({
-        next: (res: any) => {
-          this.subcategories = res.data.filter((sc: any) => sc.categoriesid === categoryId);
-          console.log('Filtered subcategories:', this.subcategories);
-          if (this.subcategories.length > 0) {
-            this.validationForm.get('subcategory')?.enable();
-          }
-        },
-        error: (err) => {
-          this.toastr.error('Failed to fetch subcategories', 'Error');
-          console.error('Error fetching subcategories:', err);
-        }
-      });
+      // Filter from allSubcategories instead of making API call
+      this.subcategories = this.allSubcategories.filter((sc: any) => sc.categoriesid === categoryId);
+      console.log('Filtered subcategories:', this.subcategories);
+      if (this.subcategories.length > 0) {
+        this.validationForm.get('subcategory')?.enable();
+      }
     }
   }
 
@@ -172,24 +189,17 @@ export class QuetionsComponent implements OnInit {
     this.validationForm.get('subtosubcategory')?.disable();
 
     if (subcategoryId) {
-      this.placementService.getAllActiveSubToSubCategory().subscribe({
-        next: (res: any) => {
-          this.subtosubcategories = res.data
-            .filter((ssc: any) => ssc.subcategoriesid === subcategoryId)
-            .map((ssc: any) => ({
-              id: ssc.id,
-              name: ssc.name
-            }));
-          console.log('Filtered sub-to-sub categories:', this.subtosubcategories);
-          if (this.subtosubcategories.length > 0) {
-            this.validationForm.get('subtosubcategory')?.enable();
-          }
-        },
-        error: (err) => {
-          this.toastr.error('Failed to fetch sub-to-sub categories', 'Error');
-          console.error('Error fetching sub-to-sub categories:', err);
-        }
-      });
+      // Filter from allSubtosubcategories instead of making API call
+      this.subtosubcategories = this.allSubtosubcategories
+        .filter((ssc: any) => ssc.subcategoriesid === subcategoryId)
+        .map((ssc: any) => ({
+          id: ssc.id,
+          name: ssc.name
+        }));
+      console.log('Filtered sub-to-sub categories:', this.subtosubcategories);
+      if (this.subtosubcategories.length > 0) {
+        this.validationForm.get('subtosubcategory')?.enable();
+      }
     }
   }
 
@@ -207,11 +217,11 @@ export class QuetionsComponent implements OnInit {
 
   addQuestion() {
     this.questionData.push({
-      question_text: null,
+      question_text: '',
       option_type: '',
       weight: null,
-      time: null, // Time in minutes
-      optionsArr: [{ options: '', value: null, isCorrect: false }],
+      time: null,
+      optionsArr: [{ options: '', value: 0, isCorrect: false }],
       correctAnswer: null
     });
   }
@@ -226,7 +236,7 @@ export class QuetionsComponent implements OnInit {
     if (!this.questionData[qIndex].optionsArr) {
       this.questionData[qIndex].optionsArr = [];
     }
-    this.questionData[qIndex].optionsArr.push({ options: '', value: null, isCorrect: false });
+    this.questionData[qIndex].optionsArr.push({ options: '', value: 0, isCorrect: false });
   }
 
   removeOption(qIndex: number, optIndex: number) {
@@ -235,12 +245,31 @@ export class QuetionsComponent implements OnInit {
     }
   }
 
+  onOptionValueChange(qIndex: number, optIndex: number, value: any) {
+    // Ensure value is never negative
+    const numValue = Number(value);
+    if (numValue < 0 || isNaN(numValue)) {
+      this.questionData[qIndex].optionsArr[optIndex].value = 0;
+    } else {
+      this.questionData[qIndex].optionsArr[optIndex].value = numValue;
+    }
+  }
+
+  getTotalMarks(questionSet: any): number {
+    if (!questionSet.questions || questionSet.questions.length === 0) {
+      return 0;
+    }
+    return questionSet.questions.reduce((total: number, question: any) => {
+      return total + (Number(question.weight) || 0);
+    }, 0);
+  }
+
   saveQuestionList() {
     if (this.isFormValid) {
       // Calculate total time
       const totalTime = this.questionData
         .filter(q => q.question_text && q.question_text.trim().length > 0)
-        .reduce((sum, q) => sum + (parseInt(q.time) || 0), 0);
+        .reduce((sum, q) => sum + (Number(q.time) || 0), 0);
 
       let data = {
         type: this.validationForm.value.type,
@@ -300,15 +329,16 @@ export class QuetionsComponent implements OnInit {
     this.validationForm.get('subcategory')?.disable();
     this.validationForm.get('subtosubcategory')?.disable();
     this.questionData = [{
-      question_text: null,
+      question_text: '',
       option_type: '',
       weight: null,
-      time: null, // Time in minutes
-      optionsArr: [{ options: '', value: null, isCorrect: false }],
+      time: null,
+      optionsArr: [{ options: '', value: 0, isCorrect: false }],
       correctAnswer: null
     }];
-    this.subcategories = [];
-    this.subtosubcategories = [];
+    // Restore original data instead of clearing arrays
+    this.subcategories = [...this.allSubcategories];
+    this.subtosubcategories = [...this.allSubtosubcategories];
   }
 
   getAllSelfQuestionSetDetails() {
@@ -365,14 +395,15 @@ export class QuetionsComponent implements OnInit {
 
   editQuestionSet(data: any) {
     this.questionModel = { ...data };
+
+    // Set basic form values first
     this.validationForm.patchValue({
       type: data.type,
       year: data.year ? `${data.year}-01` : '',
       category: data.categoriesid,
-      subcategory: data.subcategoriesid,
-      subtosubcategory: data.subtosubcategoriesid,
       difficulty: data.difficulty
     });
+
     this.questionData = data.questions.map((q: any) => ({
       queid: q.id,
       question_text: q.question_text,
@@ -387,43 +418,45 @@ export class QuetionsComponent implements OnInit {
       })) || [],
       correctAnswer: q.correctAnswer
     }));
+
     this.isUpdate = true;
     this.isOpen = true;
 
+    // Load subcategories for the selected category
     if (data.categoriesid) {
-      this.placementService.getAllActiveSubCategory().subscribe({
-        next: (res: any) => {
-          this.subcategories = res.data.filter((sc: any) => sc.categoriesid === data.categoriesid);
-          console.log('Filtered subcategories:', this.subcategories);
-          if (this.subcategories.length > 0) {
-            this.validationForm.get('subcategory')?.enable();
-            this.validationForm.patchValue({ subcategory: data.subcategoriesid });
+      // Filter from allSubcategories instead of making API call
+      this.subcategories = this.allSubcategories.filter((sc: any) => sc.categoriesid === data.categoriesid);
+      console.log('Filtered subcategories for edit:', this.subcategories);
+
+      if (this.subcategories.length > 0) {
+        this.validationForm.get('subcategory')?.enable();
+
+        // Set the subcategory value after subcategories are loaded
+        setTimeout(() => {
+          this.validationForm.patchValue({ subcategory: data.subcategoriesid });
+        }, 100);
+
+        // Load sub-to-sub categories for the selected subcategory
+        if (data.subcategoriesid) {
+          // Filter from allSubtosubcategories instead of making API call
+          this.subtosubcategories = this.allSubtosubcategories
+            .filter((ssc: any) => ssc.subcategoriesid === data.subcategoriesid)
+            .map((ssc: any) => ({
+              id: ssc.id,
+              name: ssc.name
+            }));
+          console.log('Filtered sub-to-sub categories for edit:', this.subtosubcategories);
+
+          if (this.subtosubcategories.length > 0) {
+            this.validationForm.get('subtosubcategory')?.enable();
+
+            // Set the sub-to-sub category value after data is loaded
+            setTimeout(() => {
+              this.validationForm.patchValue({ subtosubcategory: data.subtosubcategoriesid });
+            }, 150);
           }
-          if (data.subcategoriesid) {
-            this.placementService.getAllActiveSubToSubCategory().subscribe({
-              next: (res: any) => {
-                this.subtosubcategories = res.data
-                  .filter((ssc: any) => ssc.subcategoriesid === data.subcategoriesid)
-                  .map((ssc: any) => ({
-                    id: ssc.id,
-                    name: ssc.name
-                  }));
-                console.log('Filtered sub-to-sub categories:', this.subtosubcategories);
-                if (this.subtosubcategories.length > 0) {
-                  this.validationForm.get('subtosubcategory')?.enable();
-                  this.validationForm.patchValue({ subtosubcategory: data.subtosubcategoriesid });
-                }
-              },
-              error: (err) => {
-                this.toastr.error('Failed to fetch sub-to-sub categories', 'Error');
-              }
-            });
-          }
-        },
-        error: (err) => {
-          this.toastr.error('Failed to fetch subcategories', 'Error');
         }
-      });
+      }
     }
   }
 
@@ -431,7 +464,7 @@ export class QuetionsComponent implements OnInit {
     // Calculate total time
     const totalTime = this.questionData
       .filter(q => q.question_text && q.question_text.trim().length > 0)
-      .reduce((sum, q) => sum + (parseInt(q.time) || 0), 0);
+      .reduce((sum, q) => sum + (Number(q.time) || 0), 0);
 
     const data = {
       id: this.questionModel.id,

@@ -110,6 +110,30 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- Total Weight and Time Display -->
+                <div class="row mb-3">
+                    <div class="col-12">
+                        <div class="alert alert-info d-flex justify-content-between align-items-center">
+                            <div class="d-flex gap-4">
+                                <div>
+                                    <i class="bx bx-weight font-size-18 me-2"></i>
+                                    <strong>Total Weight:</strong>
+                                    <span class="badge bg-primary ms-2 font-size-14">{{ totalWeight }}</span>
+                                </div>
+                                <div>
+                                    <i class="bx bx-time-five font-size-18 me-2"></i>
+                                    <strong>Total Time:</strong>
+                                    <span class="badge bg-success ms-2 font-size-14">{{ totalTime }} minutes</span>
+                                </div>
+                            </div>
+                            <div class="text-muted">
+                                <small>Based on {{ validQuestionsCount }} question(s)</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <hr class="my-4">
                 <div class="row" *ngFor="let i of questionData; let ind = index">
                     <div class="col-xl-1 col-lg-1 col-md-1 d-flex align-items-center justify-content-center">
@@ -140,22 +164,16 @@
                         <div class="form-group mb-3">
                             <label>Question Weight</label>
                             <input type="number" class="form-control" placeholder="Enter Weight" required
-                                [(ngModel)]="i.weight" [ngModelOptions]="{standalone: true}" id="weight{{ind}}">
+                                [(ngModel)]="i.weight" [ngModelOptions]="{standalone: true}" id="weight{{ind}}" min="1"
+                                step="1">
                         </div>
                     </div>
                     <div class="col-xl-2 col-md-2">
                         <div class="form-group mb-3">
                             <label>Time (minutes)</label>
                             <input type="number" class="form-control" placeholder="Enter Time" required
-                                [(ngModel)]="i.time" [ngModelOptions]="{standalone: true}" id="time{{ind}}" min="0">
-                        </div>
-                    </div>
-                    <div class="col-xl-1 col-lg-1 col-md-1 d-flex align-items-center justify-content-center">
-                        <div class="form-group mb-3" style="margin-right: 10px;">
-                            <i class="bx bx-plus c-icon" (click)="addQuestion()"></i>
-                        </div>
-                        <div class="form-group mb-3" *ngIf="questionData.length > 1">
-                            <i class="bx bx-trash-alt c-icon" (click)="removeQuestion(ind)"></i>
+                                [(ngModel)]="i.time" [ngModelOptions]="{standalone: true}" id="time{{ind}}" min="1"
+                                step="1">
                         </div>
                     </div>
                     <div class="col-12 mt-2" *ngIf="i.option_type === 'Checkbox' || i.option_type === 'Radio'">
@@ -171,7 +189,8 @@
                             <div class="col-xl-3 col-md-3">
                                 <input type="number" class="form-control" placeholder="Enter Value" required
                                     [(ngModel)]="opt.value" [ngModelOptions]="{standalone: true}"
-                                    [id]="'value'+ind+optInd">
+                                    [id]="'value'+ind+optInd" min="0" step="1"
+                                    (ngModelChange)="onOptionValueChange(ind, optInd, $event)">
                             </div>
                             <div class="col-xl-3 col-md-3">
                                 <div *ngIf="i.option_type === 'Checkbox'">
@@ -215,6 +234,21 @@
                                 [ngModelOptions]="{standalone: true}" [id]="'correctAnswer'+ind">
                         </div>
                     </div>
+
+                    <!-- Question Action Buttons - Moved to bottom right -->
+                    <div class="col-12">
+                        <div class="d-flex justify-content-end gap-2 mb-3">
+                            <button type="button" class="btn btn-outline-success btn-sm" (click)="addQuestion()"
+                                title="Add New Question">
+                                <i class="bx bx-plus"></i> Add Question
+                            </button>
+                            <button type="button" class="btn btn-outline-danger btn-sm" *ngIf="questionData.length > 1"
+                                (click)="removeQuestion(ind)" title="Remove This Question">
+                                <i class="bx bx-trash-alt"></i> Remove
+                            </button>
+                        </div>
+                    </div>
+
                     <hr class="my-4" *ngIf="ind < questionData.length - 1">
                 </div>
                 <div class="form-group">
@@ -254,7 +288,8 @@
                             <th class="text-center">Subcategory</th>
                             <th class="text-center">Sub-to-subcategory</th>
                             <th class="text-center">Question Count</th>
-                            <th class="text-center">Total Time (min)</th> <!-- New Column -->
+                            <th class="text-center">Total Marks</th> <!-- New Column -->
+                            <th class="text-center">Total Time (min)</th>
                             <th class="text-end">Action</th>
                         </tr>
                     </thead>
@@ -276,6 +311,9 @@
                             <td class="text-center">{{ getSubToSubcategoryName(c.subtosubcategoriesid) }}</td>
                             <td class="text-center">
                                 <span class="badge bg-info">{{ c.questions?.length ?? 0 }}</span>
+                            </td>
+                            <td class="text-center">
+                                <span class="badge bg-success">{{ getTotalMarks(c) }}</span>
                             </td>
                             <td class="text-center">{{ c.totaltime ?? 0 }}</td> <!-- Display Total Time -->
                             <td class="text-end">
