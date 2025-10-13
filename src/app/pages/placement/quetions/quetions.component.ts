@@ -404,15 +404,17 @@ export class QuetionsComponent implements OnInit {
         subtosubcategoriesid: this.validationForm.value.subtosubcategory,
         difficulty: this.validationForm.value.difficulty,
         totalTime: totalTime, // Add totalTime
-        questions: this.questionData.filter(q => q.question_text && q.question_text.trim().length > 0).map(q => ({
+        questions: this.questionData.filter(q => q.question_text && q.question_text.trim().length > 0).map((q, qIndex) => ({
           question_text: q.question_text,
           option_type: q.option_type,
           weight: q.weight,
           time: q.time,
-          optionsArr: q.optionsArr?.map((opt: any) => ({
+          sequence: qIndex + 1, // Add sequence for backend
+          optionsArr: q.optionsArr?.map((opt: any, optIndex: number) => ({
             options: opt.options,
             value: opt.value,
-            isCorrect: opt.isCorrect
+            isCorrect: opt.isCorrect,
+            option_sequence: optIndex + 1 // Add option sequence
           })) || [],
           correctAnswer: q.correctAnswer
         })),
@@ -472,6 +474,18 @@ export class QuetionsComponent implements OnInit {
       next: (res: any) => {
         for (let i = 0; i < res.data.length; i++) {
           res.data[i].index = i + 1;
+
+          // Ensure proper ordering of questions and options
+          if (res.data[i].questions) {
+            // Questions are already ordered by sequence in the backend API
+            res.data[i].questions = res.data[i].questions.map((q: any) => ({
+              ...q,
+              // Ensure optionsArr is properly sorted by value (as done in backend)
+              optionsArr: q.optionsArr ? q.optionsArr.sort((a: any, b: any) => {
+                return parseInt(a.value) - parseInt(b.value);
+              }) : []
+            }));
+          }
         }
         this.questionsSetData = res.data;
         this.collectionSize = this.questionsSetData.length;
@@ -489,6 +503,7 @@ export class QuetionsComponent implements OnInit {
   }
 
   openQuestionList(exlargeModal: any, data: any) {
+    // Backend already provides data in correct sequence order
     this.viewQuestions = { ...data };
     this.modalService.open(exlargeModal, { size: 'lg', windowClass: 'modal-holder', centered: true });
   }
@@ -530,6 +545,7 @@ export class QuetionsComponent implements OnInit {
       difficulty: data.difficulty
     });
 
+    // Backend already provides questions in correct sequence order
     this.questionData = data.questions.map((q: any) => ({
       queid: q.id,
       question_text: q.question_text,
@@ -603,17 +619,19 @@ export class QuetionsComponent implements OnInit {
         totalTime: totalTime, // Add totalTime
         questions: this.questionData
           .filter(q => q.question_text && q.question_text.trim().length > 0)
-          .map(q => ({
+          .map((q, qIndex) => ({
             queid: q.queid,
             question_text: q.question_text,
             option_type: q.option_type,
             weight: q.weight,
             time: q.time,
-            optionsArr: q.optionsArr?.map((opt: any) => ({
+            sequence: qIndex + 1, // Add sequence for backend
+            optionsArr: q.optionsArr?.map((opt: any, optIndex: number) => ({
               id: opt.id,
               options: opt.options,
               value: opt.value,
-              isCorrect: opt.isCorrect
+              isCorrect: opt.isCorrect,
+              option_sequence: optIndex + 1 // Add option sequence
             })) || [],
             correctAnswer: q.correctAnswer
           })),
