@@ -478,13 +478,13 @@ export class QuetionsComponent implements OnInit {
           // Ensure proper ordering of questions and options
           if (res.data[i].questions) {
             // Questions are already ordered by sequence in the backend API
-            res.data[i].questions = res.data[i].questions.map((q: any) => ({
-              ...q,
-              // Ensure optionsArr is properly sorted by value (as done in backend)
-              optionsArr: q.optionsArr ? q.optionsArr.sort((a: any, b: any) => {
-                return parseInt(a.value) - parseInt(b.value);
-              }) : []
-            }));
+            res.data[i].questions = res.data[i].questions.map((q: any) => {
+              // Don't sort optionsArr - keep the original sequence order from backend
+              return {
+                ...q,
+                optionsArr: q.optionsArr || []
+              };
+            });
           }
         }
         this.questionsSetData = res.data;
@@ -503,8 +503,8 @@ export class QuetionsComponent implements OnInit {
   }
 
   openQuestionList(exlargeModal: any, data: any) {
-    // Backend already provides data in correct sequence order
-    this.viewQuestions = { ...data };
+    // Backend already provides data in correct sequence order - don't modify it
+    this.viewQuestions = JSON.parse(JSON.stringify(data)); // Deep copy to avoid reference issues
     this.modalService.open(exlargeModal, { size: 'lg', windowClass: 'modal-holder', centered: true });
   }
 
@@ -552,13 +552,13 @@ export class QuetionsComponent implements OnInit {
       option_type: q.option_type,
       weight: q.weight,
       time: q.time, // Time in minutes
-      optionsArr: q.optionsArr?.map((opt: any) => ({
+      optionsArr: q.optionsArr?.map((opt: any, optIndex: number) => ({
         id: opt.id,
         options: opt.options,
         value: opt.value,
         isCorrect: opt.isCorrect
       })) || [],
-      correctAnswer: q.correctAnswer
+      correctAnswer: q.option_type === 'Radio' ? q.correctAnswer : q.correctAnswer
     }));
 
     this.isUpdate = true;
