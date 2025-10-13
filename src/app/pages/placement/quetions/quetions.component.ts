@@ -403,18 +403,18 @@ export class QuetionsComponent implements OnInit {
         subcategoriesid: this.validationForm.value.subcategory,
         subtosubcategoriesid: this.validationForm.value.subtosubcategory,
         difficulty: this.validationForm.value.difficulty,
-        totalTime: totalTime, // Add totalTime
+        totalTime: totalTime,
         questions: this.questionData.filter(q => q.question_text && q.question_text.trim().length > 0).map((q, qIndex) => ({
           question_text: q.question_text,
           option_type: q.option_type,
           weight: q.weight,
           time: q.time,
-          sequence: qIndex + 1, // Add sequence for backend
+          sequence: qIndex + 1,
           optionsArr: q.optionsArr?.map((opt: any, optIndex: number) => ({
-            options: opt.options,
+            options: opt.options, // Changed from option_text to options
             value: opt.value,
             isCorrect: opt.isCorrect,
-            option_sequence: optIndex + 1 // Add option sequence
+            option_sequence: optIndex + 1
           })) || [],
           correctAnswer: q.correctAnswer
         })),
@@ -616,7 +616,7 @@ export class QuetionsComponent implements OnInit {
         subcategoriesid: this.validationForm.value.subcategory,
         subtosubcategoriesid: this.validationForm.value.subtosubcategory,
         difficulty: this.validationForm.value.difficulty,
-        totalTime: totalTime, // Add totalTime
+        totalTime: totalTime,
         questions: this.questionData
           .filter(q => q.question_text && q.question_text.trim().length > 0)
           .map((q, qIndex) => ({
@@ -625,13 +625,13 @@ export class QuetionsComponent implements OnInit {
             option_type: q.option_type,
             weight: q.weight,
             time: q.time,
-            sequence: qIndex + 1, // Add sequence for backend
+            sequence: qIndex + 1,
             optionsArr: q.optionsArr?.map((opt: any, optIndex: number) => ({
               id: opt.id,
-              options: opt.options,
+              options: opt.options, // Changed from option_text to options
               value: opt.value,
               isCorrect: opt.isCorrect,
-              option_sequence: optIndex + 1 // Add option sequence
+              option_sequence: optIndex + 1
             })) || [],
             correctAnswer: q.correctAnswer
           })),
