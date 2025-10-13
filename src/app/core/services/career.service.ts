@@ -31,8 +31,8 @@ export class CareerService {
         return this.httpClient.post(ApiService.updateJobOpeningURL, data);
     }
 
-    deleteJobOpening(id: string): Observable<any> {
-        return this.httpClient.post(ApiService.deleteJobOpeningURL, { id });
+    deleteJobOpening(id: any): Observable<any> {
+        return this.httpClient.get(ApiService.deleteJobOpeningURL + id);
     }
 
     uploadJobOpeningImg(data: any) {
