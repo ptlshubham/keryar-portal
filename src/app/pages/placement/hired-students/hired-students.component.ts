@@ -126,11 +126,11 @@ export class HiredStudentsComponent implements OnInit {
 
     this.filteredStudents = filteredStudents;
     this.collectionSize = filteredStudents.length;
-    this.getPagination(filteredStudents);
+    this.getPagination();
   }
 
-  getPagination(filteredStudents: any[] = this.filteredStudents) {
-    this.paginateData = filteredStudents.slice(
+  getPagination() {
+    this.paginateData = this.filteredStudents.slice(
       (this.page - 1) * this.pageSize,
       this.page * this.pageSize
     );
