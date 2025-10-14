@@ -111,7 +111,7 @@ export const MENU: MenuItem[] = [
     },
     {
         id: 6,
-        label: 'Quetions Set',
+        label: 'Questions Set',
         icon: 'mdi mdi-briefcase-outline',
         subItems: [
             {
@@ -122,8 +122,8 @@ export const MENU: MenuItem[] = [
             },
             {
                 id: 9,
-                label: 'Quetions',
-                link: '/placement/quetions',
+                label: 'Questions',
+                link: '/placement/questions',
                 parentId: 8
             },
         ]

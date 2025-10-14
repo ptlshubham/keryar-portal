@@ -30,7 +30,7 @@ const routes: Routes = [
     component: CategoryTabComponent
   },
   {
-    path: 'quetions',
+    path: 'questions',
     component: QuetionsComponent
   },
   {
