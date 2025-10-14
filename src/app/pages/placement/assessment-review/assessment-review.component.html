@@ -22,17 +22,17 @@
                 <div class="card-body">
                     <div class="card-body">
                         <div class="row mb-3 align-items-end">
-                            <div class="col-md-2">
+                            <div class="col-lg-2 col-md-3 col-sm-6 mb-2">
                                 <label for="searchTerm" class="form-label">Search</label>
                                 <input id="searchTerm" type="text" class="form-control" [(ngModel)]="searchTerm"
                                     (ngModelChange)="onSearchChange()" placeholder="Search by name, email, or ID">
                             </div>
-                            <div class="col-md-2">
+                            <div class="col-lg-2 col-md-3 col-sm-6 mb-2">
                                 <label for="selectedDate" class="form-label">Selected Date</label>
                                 <input id="selectedDate" type="date" class="form-control" [(ngModel)]="selectedDate"
                                     (ngModelChange)="onDateChange()" placeholder="dd/mm/yyyy">
                             </div>
-                            <div class="col-md-2">
+                            <div class="col-lg-2 col-md-3 col-sm-6 mb-2">
                                 <label for="statusFilter" class="form-label">Filter by Status</label>
                                 <select id="statusFilter" class="form-select" [(ngModel)]="filterStatus"
                                     (change)="filterByStatus(filterStatus)">
@@ -42,7 +42,7 @@
                                     <option [value]="assessmentStatus.Rejected">Rejected</option>
                                 </select>
                             </div>
-                            <div class="col-md-2">
+                            <div class="col-lg-2 col-md-3 col-sm-6 mb-2">
                                 <label for="collegeFilter" class="form-label">Filter by College</label>
                                 <select id="collegeFilter" class="form-select" [(ngModel)]="filterCollege"
                                     (change)="onCollegeChange()">
@@ -50,19 +50,34 @@
                                     <option *ngFor="let college of colleges" [value]="college">{{ college }}</option>
                                 </select>
                             </div>
-                            <div class="col-md-4 d-flex justify-content-end gap-2">
-                                <button class="btn btn-primary btn-sm" (click)="loadAssessments()"
-                                    aria-label="Refresh assessments">
-                                    <i class="mdi mdi-refresh"></i>
-                                </button>
-                                <button class="btn btn-outline-success btn-sm" (click)="downloadPdf()"
-                                    [disabled]="filteredAssessments.length === 0" aria-label="Download PDF">
-                                    <i class="mdi mdi-file-pdf"></i>
-                                </button>
-                                <button class="btn btn-outline-primary btn-sm" (click)="downloadExcel()"
-                                    [disabled]="filteredAssessments.length === 0" aria-label="Download Excel">
-                                    <i class="mdi mdi-file-excel"></i>
-                                </button>
+                            <div class="col-lg-2 col-md-3 col-sm-6 mb-2">
+                                <label for="marksFilter" class="form-label">Filter by Marks</label>
+                                <select id="marksFilter" class="form-select" [(ngModel)]="filterMarks"
+                                    (change)="onMarksChange()">
+                                    <option value="">All Marks</option>
+                                    <option value="high">High (≥70%)</option>
+                                    <option value="medium">Medium (40-69%)</option>
+                                    <option value="low">Low (&lt;40%)</option>
+                                </select>
+                            </div>
+                            <div class="col-lg-2 col-md-3 col-sm-6 mb-2 d-flex flex-column">
+                                <label class="form-label opacity-0">Actions</label>
+                                <div class="d-flex gap-1 justify-content-end">
+                                    <button class="btn btn-primary btn-sm" (click)="loadAssessments()"
+                                        aria-label="Refresh assessments" title="Refresh">
+                                        <i class="mdi mdi-refresh"></i>
+                                    </button>
+                                    <button class="btn btn-outline-success btn-sm" (click)="downloadPdf()"
+                                        [disabled]="filteredAssessments.length === 0" aria-label="Download PDF"
+                                        title="Download PDF">
+                                        <i class="mdi mdi-file-pdf"></i>
+                                    </button>
+                                    <button class="btn btn-outline-primary btn-sm" (click)="downloadExcel()"
+                                        [disabled]="filteredAssessments.length === 0" aria-label="Download Excel"
+                                        title="Download Excel">
+                                        <i class="mdi mdi-file-excel"></i>
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>

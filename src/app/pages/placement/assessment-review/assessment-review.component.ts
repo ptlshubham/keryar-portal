@@ -42,6 +42,7 @@ export class AssessmentReviewComponent implements OnInit {
   filterCollege: string = '';
   colleges: string[] = [];
   selectedDate: string = '';
+  filterMarks: string = '';
   page = 1;
   pageSize = 10;
   collectionSize = 0;
@@ -136,6 +137,22 @@ export class AssessmentReviewComponent implements OnInit {
       );
     }
 
+    if (this.filterMarks) {
+      filteredAssessments = filteredAssessments.filter(assessment => {
+        const percentage = assessment.total_marks > 0 ?
+          (assessment.calculated_marks / assessment.total_marks) * 100 : 0;
+
+        if (this.filterMarks === 'high') {
+          return percentage >= 70; // High marks: 70% and above
+        } else if (this.filterMarks === 'medium') {
+          return percentage >= 40 && percentage < 70; // Medium marks: 40-69%
+        } else if (this.filterMarks === 'low') {
+          return percentage < 40; // Low marks: below 40%
+        }
+        return true;
+      });
+    }
+
     this.filteredAssessments = filteredAssessments;
     this.collectionSize = filteredAssessments.length;
     this.getPagination();
@@ -165,6 +182,11 @@ export class AssessmentReviewComponent implements OnInit {
   }
 
   onDateChange() {
+    this.page = 1;
+    this.applyFilters();
+  }
+
+  onMarksChange() {
     this.page = 1;
     this.applyFilters();
   }
@@ -341,6 +363,7 @@ export class AssessmentReviewComponent implements OnInit {
     if (this.filterCollege) filters.push(`Institute: ${this.filterCollege}`);
     if (this.selectedDate) filters.push(`Date: ${this.selectedDate}`);
     if (this.filterStatus) filters.push(`Status: ${this.filterStatus}`);
+    if (this.filterMarks) filters.push(`Marks: ${this.filterMarks.charAt(0).toUpperCase() + this.filterMarks.slice(1)}`);
     return filters.length > 0 ? `${filters.join(', ')}` : 'No filters applied';
   }
 
