@@ -50,17 +50,8 @@
                                     <option *ngFor="let college of colleges" [value]="college">{{ college }}</option>
                                 </select>
                             </div>
-                            <div class="col-lg-2 col-md-3 col-sm-6 mb-2">
-                                <label for="marksFilter" class="form-label">Filter by Marks</label>
-                                <select id="marksFilter" class="form-select" [(ngModel)]="filterMarks"
-                                    (change)="onMarksChange()">
-                                    <option value="">All Marks</option>
-                                    <option value="high">High (≥70%)</option>
-                                    <option value="medium">Medium (40-69%)</option>
-                                    <option value="low">Low (&lt;40%)</option>
-                                </select>
-                            </div>
-                            <div class="col-lg-2 col-md-3 col-sm-6 mb-2 d-flex flex-column">
+
+                            <div class="col-lg-4 col-md-6 col-sm-12 mb-2 d-flex flex-column">
                                 <label class="form-label opacity-0">Actions</label>
                                 <div class="d-flex gap-1 justify-content-end">
                                     <button class="btn btn-primary btn-sm" (click)="loadAssessments()"
@@ -88,15 +79,51 @@
                             <thead class="table-light">
                                 <tr>
                                     <th>#</th>
-                                    <th>Student Name</th>
-                                    <th>Student ID</th>
-                                    <th>Email</th>
-                                    <th>College</th>
-                                    <th>Applied Role</th>
-                                    <th>Question Set</th>
-                                    <th>Difficulty</th>
-                                    <th>Status</th>
-                                    <th>Marks</th>
+                                    <th class="sortable" [class.active]="sortColumn === 'name'" (click)="sortBy('name')"
+                                        style="cursor: pointer;">
+                                        Student Name
+                                        <i class="mdi ms-1" [ngClass]="getSortIcon('name')"></i>
+                                    </th>
+                                    <th class="sortable" [class.active]="sortColumn === 'studentid'"
+                                        (click)="sortBy('studentid')" style="cursor: pointer;">
+                                        Student ID
+                                        <i class="mdi ms-1" [ngClass]="getSortIcon('studentid')"></i>
+                                    </th>
+                                    <th class="sortable" [class.active]="sortColumn === 'email'"
+                                        (click)="sortBy('email')" style="cursor: pointer;">
+                                        Email
+                                        <i class="mdi ms-1" [ngClass]="getSortIcon('email')"></i>
+                                    </th>
+                                    <th class="sortable" [class.active]="sortColumn === 'college'"
+                                        (click)="sortBy('college')" style="cursor: pointer;">
+                                        College
+                                        <i class="mdi ms-1" [ngClass]="getSortIcon('college')"></i>
+                                    </th>
+                                    <th class="sortable" [class.active]="sortColumn === 'role'" (click)="sortBy('role')"
+                                        style="cursor: pointer;">
+                                        Applied Role
+                                        <i class="mdi ms-1" [ngClass]="getSortIcon('role')"></i>
+                                    </th>
+                                    <th class="sortable" [class.active]="sortColumn === 'questionset'"
+                                        (click)="sortBy('questionset')" style="cursor: pointer;">
+                                        Question Set
+                                        <i class="mdi ms-1" [ngClass]="getSortIcon('questionset')"></i>
+                                    </th>
+                                    <th class="sortable" [class.active]="sortColumn === 'difficulty'"
+                                        (click)="sortBy('difficulty')" style="cursor: pointer;">
+                                        Difficulty
+                                        <i class="mdi ms-1" [ngClass]="getSortIcon('difficulty')"></i>
+                                    </th>
+                                    <th class="sortable" [class.active]="sortColumn === 'status'"
+                                        (click)="sortBy('status')" style="cursor: pointer;">
+                                        Status
+                                        <i class="mdi ms-1" [ngClass]="getSortIcon('status')"></i>
+                                    </th>
+                                    <th class="sortable" [class.active]="sortColumn === 'marks'"
+                                        (click)="sortBy('marks')" style="cursor: pointer;">
+                                        Marks
+                                        <i class="mdi ms-1" [ngClass]="getSortIcon('marks')"></i>
+                                    </th>
                                     <th>Actions</th>
                                 </tr>
                             </thead>

@@ -42,7 +42,8 @@ export class AssessmentReviewComponent implements OnInit {
   filterCollege: string = '';
   colleges: string[] = [];
   selectedDate: string = '';
-  filterMarks: string = '';
+  sortColumn: string = '';
+  sortDirection: 'asc' | 'desc' = 'asc';
   page = 1;
   pageSize = 10;
   collectionSize = 0;
@@ -137,19 +138,62 @@ export class AssessmentReviewComponent implements OnInit {
       );
     }
 
-    if (this.filterMarks) {
-      filteredAssessments = filteredAssessments.filter(assessment => {
-        const percentage = assessment.total_marks > 0 ?
-          (assessment.calculated_marks / assessment.total_marks) * 100 : 0;
+    // Apply sorting
+    if (this.sortColumn) {
+      filteredAssessments.sort((a, b) => {
+        let aValue: any, bValue: any;
 
-        if (this.filterMarks === 'high') {
-          return percentage >= 70; // High marks: 70% and above
-        } else if (this.filterMarks === 'medium') {
-          return percentage >= 40 && percentage < 70; // Medium marks: 40-69%
-        } else if (this.filterMarks === 'low') {
-          return percentage < 40; // Low marks: below 40%
+        switch (this.sortColumn) {
+          case 'name':
+            aValue = a.student.name?.toLowerCase() || '';
+            bValue = b.student.name?.toLowerCase() || '';
+            break;
+          case 'studentid':
+            aValue = a.student.studentid?.toLowerCase() || '';
+            bValue = b.student.studentid?.toLowerCase() || '';
+            break;
+          case 'email':
+            aValue = a.student.email?.toLowerCase() || '';
+            bValue = b.student.email?.toLowerCase() || '';
+            break;
+          case 'college':
+            aValue = a.student.institute?.toLowerCase() || '';
+            bValue = b.student.institute?.toLowerCase() || '';
+            break;
+          case 'role':
+            aValue = a.student.appliedrole?.toLowerCase() || '';
+            bValue = b.student.appliedrole?.toLowerCase() || '';
+            break;
+          case 'questionset':
+            aValue = a.questionset.type?.toLowerCase() || '';
+            bValue = b.questionset.type?.toLowerCase() || '';
+            break;
+          case 'difficulty':
+            const difficultyOrder: { [key: string]: number } = { 'easy': 1, 'medium': 2, 'hard': 3 };
+            aValue = difficultyOrder[a.questionset.difficulty?.toLowerCase()] || 0;
+            bValue = difficultyOrder[b.questionset.difficulty?.toLowerCase()] || 0;
+            break;
+          case 'status':
+            aValue = a.status?.toLowerCase() || '';
+            bValue = b.status?.toLowerCase() || '';
+            break;
+          case 'marks':
+            const aPercentage = a.total_marks > 0 ? (a.calculated_marks / a.total_marks) * 100 : 0;
+            const bPercentage = b.total_marks > 0 ? (b.calculated_marks / b.total_marks) * 100 : 0;
+            aValue = aPercentage;
+            bValue = bPercentage;
+            break;
+          default:
+            return 0;
         }
-        return true;
+
+        if (aValue < bValue) {
+          return this.sortDirection === 'asc' ? -1 : 1;
+        }
+        if (aValue > bValue) {
+          return this.sortDirection === 'asc' ? 1 : -1;
+        }
+        return 0;
       });
     }
 
@@ -186,9 +230,22 @@ export class AssessmentReviewComponent implements OnInit {
     this.applyFilters();
   }
 
-  onMarksChange() {
+  sortBy(column: string) {
+    if (this.sortColumn === column) {
+      this.sortDirection = this.sortDirection === 'asc' ? 'desc' : 'asc';
+    } else {
+      this.sortColumn = column;
+      this.sortDirection = 'asc';
+    }
     this.page = 1;
     this.applyFilters();
+  }
+
+  getSortIcon(column: string): string {
+    if (this.sortColumn !== column) {
+      return 'mdi-sort';
+    }
+    return this.sortDirection === 'asc' ? 'mdi-sort-ascending' : 'mdi-sort-descending';
   }
 
   downloadPdf() {
@@ -363,7 +420,7 @@ export class AssessmentReviewComponent implements OnInit {
     if (this.filterCollege) filters.push(`Institute: ${this.filterCollege}`);
     if (this.selectedDate) filters.push(`Date: ${this.selectedDate}`);
     if (this.filterStatus) filters.push(`Status: ${this.filterStatus}`);
-    if (this.filterMarks) filters.push(`Marks: ${this.filterMarks.charAt(0).toUpperCase() + this.filterMarks.slice(1)}`);
+    if (this.sortColumn) filters.push(`Sorted by: ${this.sortColumn} (${this.sortDirection})`);
     return filters.length > 0 ? `${filters.join(', ')}` : 'No filters applied';
   }
 

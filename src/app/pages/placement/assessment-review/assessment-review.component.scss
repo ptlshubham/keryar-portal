@@ -47,6 +47,36 @@
     color: white !important; /* White text for red background */
 }
 
+// Sortable table headers
+.sortable {
+    user-select: none;
+    transition: background-color 0.2s ease;
+
+    &:hover {
+        background-color: rgba(0, 0, 0, 0.05) !important;
+    }
+
+    .mdi {
+        opacity: 0.6;
+        font-size: 14px;
+        transition: opacity 0.2s ease;
+    }
+
+    &:hover .mdi {
+        opacity: 1;
+    }
+}
+
+// Active sort column styling
+.sortable.active {
+    background-color: rgba(0, 123, 255, 0.1) !important;
+
+    .mdi {
+        opacity: 1;
+        color: #007bff;
+    }
+}
+
 .bg-secondary {
     background-color: #6c757d !important;
     color: white !important; /* White text for gray background */
