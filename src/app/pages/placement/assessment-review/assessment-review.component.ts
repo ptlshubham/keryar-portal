@@ -138,11 +138,11 @@ export class AssessmentReviewComponent implements OnInit {
 
     this.filteredAssessments = filteredAssessments;
     this.collectionSize = filteredAssessments.length;
-    this.getPagination(filteredAssessments);
+    this.getPagination();
   }
 
-  getPagination(filteredAssessments: any[] = this.filteredAssessments) {
-    this.paginateData = filteredAssessments.slice(
+  getPagination() {
+    this.paginateData = this.filteredAssessments.slice(
       (this.page - 1) * this.pageSize,
       this.page * this.pageSize
     );
