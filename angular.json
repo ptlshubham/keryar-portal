@@ -31,7 +31,9 @@
             "inlineStyleLanguage": "scss",
             "assets": [
               "src/favicon.ico",
-              "src/assets"
+              "src/assets",
+              "src/.htaccess",
+              "src/web.config"
             ],
             "styles": [
               "node_modules/ngx-owl-carousel-o/lib/styles/prebuilt-themes/owl.carousel.min.css",
@@ -44,7 +46,6 @@
               "src/assets/scss/app.scss",
               "src/assets/scss/icons.scss",
               "node_modules/ngx-toastr/toastr.css"
-
             ],
             "allowedCommonJsDependencies": [
               "rxjs",
@@ -130,7 +131,9 @@
             "inlineStyleLanguage": "scss",
             "assets": [
               "src/favicon.ico",
-              "src/assets"
+              "src/assets",
+              "src/.htaccess",
+              "src/web.config"
             ],
             "styles": [
               "src/styles.scss"
