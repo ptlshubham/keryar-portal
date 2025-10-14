@@ -65,8 +65,8 @@ export const MENU: MenuItem[] = [
 
     {
         id: 4,
-        label: 'blog',
-        icon: 'mdi mdi-briefcase-outline',
+        label: 'Blog',
+        icon: 'mdi mdi-post-outline', // 📰 Blog section icon
         subItems: [
             {
                 id: 4,
@@ -93,7 +93,7 @@ export const MENU: MenuItem[] = [
     {
         id: 5,
         label: 'Connect',
-        icon: 'mdi mdi-briefcase-outline',
+        icon: 'mdi mdi-account-multiple-outline', // 🤝 Networking / Contact section
         subItems: [
             {
                 id: 11,
@@ -112,7 +112,7 @@ export const MENU: MenuItem[] = [
     {
         id: 6,
         label: 'Questions Set',
-        icon: 'mdi mdi-briefcase-outline',
+        icon: 'mdi mdi-help-circle-outline', // ❓Questions category
         subItems: [
             {
                 id: 9,
@@ -131,7 +131,7 @@ export const MENU: MenuItem[] = [
     {
         id: 7,
         label: 'Campus Hiring',
-        icon: 'mdi mdi-account-search',
+        icon: 'mdi mdi-domain', // 🏫 Campus/company related
         subItems: [
             // {
             //     id: 10,
@@ -147,25 +147,25 @@ export const MENU: MenuItem[] = [
             },
             {
                 id: 11,
-                label: 'College-List',
+                label: 'College List',
                 link: '/placement/college',
                 parentId: 11
             },
             {
                 id: 11,
-                label: 'Generate-Test-Link',
+                label: 'Generate Test Link',
                 link: '/placement/college-mapping',
                 parentId: 11
             },
             {
                 id: 11,
-                label: 'Assessment-review',
+                label: 'Assessment review',
                 link: '/placement/assessment-review',
                 parentId: 11
             },
             {
                 id: 12,
-                label: 'Interview-Round',
+                label: 'Interview Round',
                 link: '/placement/interview-round',
                 parentId: 12
             },
