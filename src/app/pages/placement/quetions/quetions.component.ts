@@ -3,6 +3,7 @@ import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ToastrService } from 'ngx-toastr';
 import { PlacementService } from 'src/app/core/services/placement.service';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import Swal from 'sweetalert2';
 
 @Component({
@@ -26,7 +27,8 @@ export class QuetionsComponent implements OnInit {
     weight: null,
     time: null,
     optionsArr: [{ options: '', value: 0, isCorrect: false }],
-    correctAnswer: null
+    correctAnswer: null,
+    showPreview: false
   }];
   questionModel: any = {};
   viewQuestions: any = {};
@@ -44,7 +46,8 @@ export class QuetionsComponent implements OnInit {
     private fb: FormBuilder,
     private modalService: NgbModal,
     private toastr: ToastrService,
-    private placementService: PlacementService
+    private placementService: PlacementService,
+    private sanitizer: DomSanitizer
   ) { }
 
   ngOnInit(): void {
@@ -256,7 +259,8 @@ export class QuetionsComponent implements OnInit {
       weight: null,
       time: null,
       optionsArr: [{ options: '', value: 0, isCorrect: false }],
-      correctAnswer: null
+      correctAnswer: null,
+      showPreview: false
     });
   }
 
@@ -462,7 +466,8 @@ export class QuetionsComponent implements OnInit {
       weight: null,
       time: null,
       optionsArr: [{ options: '', value: 0, isCorrect: false }],
-      correctAnswer: null
+      correctAnswer: null,
+      showPreview: false
     }];
     // Restore original data instead of clearing arrays
     this.subcategories = [...this.allSubcategories];
@@ -505,7 +510,7 @@ export class QuetionsComponent implements OnInit {
   openQuestionList(exlargeModal: any, data: any) {
     // Backend already provides data in correct sequence order - don't modify it
     this.viewQuestions = JSON.parse(JSON.stringify(data)); // Deep copy to avoid reference issues
-    this.modalService.open(exlargeModal, { size: 'lg', windowClass: 'modal-holder', centered: true });
+    this.modalService.open(exlargeModal, { size: 'xl', windowClass: 'modal-holder', centered: true, scrollable: true });
   }
 
   removeSelfAssessmentQuestionSet(id: string) {
@@ -558,7 +563,8 @@ export class QuetionsComponent implements OnInit {
         value: opt.value,
         isCorrect: opt.isCorrect
       })) || [],
-      correctAnswer: q.option_type === 'Radio' ? q.correctAnswer : q.correctAnswer
+      correctAnswer: q.option_type === 'Radio' ? q.correctAnswer : q.correctAnswer,
+      showPreview: false
     }));
 
     this.isUpdate = true;
@@ -656,5 +662,89 @@ export class QuetionsComponent implements OnInit {
       console.log('Validation errors:', errors);
       this.toastr.error('Please fix the following errors:\n' + errors.join('\n'), 'Validation Error');
     }
+  }
+
+  /**
+   * Toggle preview for a specific question
+   * @param questionIndex Index of the question to toggle preview for
+   */
+  togglePreview(questionIndex: number): void {
+    if (this.questionData[questionIndex]) {
+      this.questionData[questionIndex].showPreview = !this.questionData[questionIndex].showPreview;
+    }
+  }
+
+  /**
+   * Format question text to preserve line breaks and basic formatting
+   * @param questionText The raw question text
+   * @returns SafeHtml formatted text
+   */
+  formatQuestionText(questionText: string): SafeHtml {
+    if (!questionText || questionText.trim() === '') {
+      return this.sanitizer.bypassSecurityTrustHtml('<em class="text-muted">No question text entered</em>');
+    }
+
+    // Handle common formatting cases
+    let formattedText = questionText
+      // Preserve line breaks
+      .replace(/\n/g, '<br>')
+      // Handle code blocks (text between triple backticks)
+      .replace(/```([\s\S]*?)```/g, '<pre class="code-block"><code>$1</code></pre>')
+      // Handle inline code (single backticks)
+      .replace(/`([^`\n]+)`/g, '<code class="inline-code">$1</code>')
+      // Handle multiple spaces
+      .replace(/  +/g, (match) => '&nbsp;'.repeat(match.length))
+      // Handle tabs
+      .replace(/\t/g, '&nbsp;&nbsp;&nbsp;&nbsp;')
+      // Handle special characters to prevent XSS
+      .replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      // Restore the formatted elements
+      .replace(/&lt;br&gt;/g, '<br>')
+      .replace(/&lt;pre class="code-block"&gt;&lt;code&gt;/g, '<pre class="code-block"><code>')
+      .replace(/&lt;\/code&gt;&lt;\/pre&gt;/g, '</code></pre>')
+      .replace(/&lt;code class="inline-code"&gt;/g, '<code class="inline-code">')
+      .replace(/&lt;\/code&gt;/g, '</code>');
+
+    // Sanitize the HTML to prevent XSS attacks but allow safe formatting
+    return this.sanitizer.bypassSecurityTrustHtml(formattedText);
+  }
+
+  /**
+   * Format question text with question number prefix
+   * @param questionText The raw question text
+   * @param questionNumber The question number
+   * @returns SafeHtml formatted text with number prefix
+   */
+  formatQuestionTextWithNumber(questionText: string, questionNumber: number): SafeHtml {
+    if (!questionText || questionText.trim() === '') {
+      return this.sanitizer.bypassSecurityTrustHtml(`<strong>${questionNumber}.</strong> <em class="text-muted">No question text entered</em>`);
+    }
+
+    // Handle common formatting cases
+    let formattedText = questionText
+      // Preserve line breaks
+      .replace(/\n/g, '<br>')
+      // Handle code blocks (text between triple backticks)
+      .replace(/```([\s\S]*?)```/g, '<pre class="code-block"><code>$1</code></pre>')
+      // Handle inline code (single backticks)
+      .replace(/`([^`\n]+)`/g, '<code class="inline-code">$1</code>')
+      // Handle multiple spaces
+      .replace(/  +/g, (match) => '&nbsp;'.repeat(match.length))
+      // Handle tabs
+      .replace(/\t/g, '&nbsp;&nbsp;&nbsp;&nbsp;')
+      // Handle special characters to prevent XSS
+      .replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      // Restore the formatted elements
+      .replace(/&lt;br&gt;/g, '<br>')
+      .replace(/&lt;pre class="code-block"&gt;&lt;code&gt;/g, '<pre class="code-block"><code>')
+      .replace(/&lt;\/code&gt;&lt;\/pre&gt;/g, '</code></pre>')
+      .replace(/&lt;code class="inline-code"&gt;/g, '<code class="inline-code">')
+      .replace(/&lt;\/code&gt;/g, '</code>');
+
+    // Prepend question number and format
+    const finalText = `<strong>${questionNumber}.</strong> ${formattedText}`;
+
+    // Sanitize the HTML to prevent XSS attacks but allow safe formatting
+    return this.sanitizer.bypassSecurityTrustHtml(finalText);
   }
 }
