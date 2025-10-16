@@ -76,23 +76,14 @@ export class AssessmentReviewComponent implements OnInit {
         if (response.success) {
           this.assessments = response.data.map((item: any, index: number) => ({
             ...item,
-            index: index + 1
+            index: index + 1,
+            calculated_marks: 0 // Initialize calculated marks
           }));
           this.colleges = [...new Set(this.assessments.map(assessment => assessment.student.institute).filter(institute => institute))].sort();
-          // Fetch detailed assessment data to calculate marks
-          this.assessments.forEach(assessment => {
-            this.placementService.getAssessmentPreview(assessment.assessment_id).subscribe({
-              next: (previewResponse) => {
-                if (previewResponse.success) {
-                  assessment.answers = previewResponse.data.answers;
-                  this.calculateQuestionMarks(assessment);
-                }
-              },
-              error: (err) => {
-                console.error('Error fetching preview for assessment:', assessment.assessment_id, err);
-              }
-            });
-          });
+
+          // Fetch marks for each assessment
+          this.loadAssessmentMarks();
+
           this.applyFilters();
         } else {
           this.toastr.error(response.message || 'Failed to fetch assessments');
@@ -102,6 +93,67 @@ export class AssessmentReviewComponent implements OnInit {
         this.toastr.error('Error fetching assessments: ' + (err.error?.message || err.message));
       }
     });
+  }
+
+  private loadAssessmentMarks() {
+    this.assessments.forEach(assessment => {
+      this.placementService.getAssessmentPreview(assessment.assessment_id).subscribe({
+        next: (previewResponse) => {
+          if (previewResponse.success && previewResponse.data.answers) {
+            // Deduplicate questions based on question_id
+            const uniqueAnswers = new Map();
+            previewResponse.data.answers.forEach((answer: any) => {
+              if (!uniqueAnswers.has(answer.question_id)) {
+                uniqueAnswers.set(answer.question_id, answer);
+              }
+            });
+            const deduplicatedAnswers = Array.from(uniqueAnswers.values());
+
+            // Calculate marks for this assessment
+            const calculatedMarks = this.calculateMarksForAnswers(deduplicatedAnswers);
+            assessment.calculated_marks = calculatedMarks;
+
+            // Update the filtered assessments and pagination if needed
+            this.applyFilters();
+          }
+        },
+        error: (err) => {
+          console.error('Error fetching marks for assessment:', assessment.assessment_id, err);
+          assessment.calculated_marks = 0;
+        }
+      });
+    });
+  }
+
+  private calculateMarksForAnswers(answers: any[]): number {
+    if (!answers || !Array.isArray(answers)) {
+      return 0;
+    }
+
+    let totalObtainedMarks = 0;
+
+    answers.forEach((answer: any) => {
+      let questionMarks = 0;
+
+      if (answer.option_type === 'Checkbox') {
+        if (Array.isArray(answer.answer)) {
+          questionMarks = answer.optionsArr
+            .filter((opt: any, index: number) => this.isOptionSelected(answer.answer, index, opt.value))
+            .reduce((sum: number, opt: any) => sum + Number(opt.value || 0), 0);
+        }
+      } else if (answer.option_type === 'Radio') {
+        const selectedOption = answer.optionsArr.find((opt: any, index: number) =>
+          this.isRadioSelected(answer.answer, index, opt.value)
+        );
+        questionMarks = selectedOption ? Number(selectedOption.value || 0) : 0;
+      } else if (answer.option_type === 'Input' || answer.option_type === 'Textarea') {
+        questionMarks = answer.is_correct === 1 ? Number(answer.weight || 0) : 0;
+      }
+
+      totalObtainedMarks += questionMarks;
+    });
+
+    return totalObtainedMarks;
   }
 
   applyFilters() {
@@ -275,15 +327,22 @@ export class AssessmentReviewComponent implements OnInit {
 
     doc.addPage();
 
-    // Header on subsequent pages
-    const addHeader = () => {
+    // First page header (main header)
+    const addFirstPageHeader = () => {
       doc.setFont('helvetica', 'bold');
-      doc.setFontSize(14);
+      doc.setFontSize(16);
       doc.text('Student Assessment Report', 14, 20);
       doc.setFont('helvetica', 'normal');
-      doc.setFontSize(10);
-      doc.text(`Institute: ${instituteName}`, 14, 28);
+      doc.setFontSize(12);
+      doc.text(`Institute: ${instituteName}`, 14, 30);
       doc.text(`Date: ${today.toLocaleDateString('en-GB', { timeZone: 'Asia/Kolkata' })}`, pageWidth - 14, 20, { align: 'right' });
+    };
+
+    // Subsequent pages header (simple header)
+    const addSubsequentPageHeader = () => {
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(10);
+      doc.text(`Date: ${today.toLocaleDateString('en-GB', { timeZone: 'Asia/Kolkata' })}`, pageWidth - 14, 15, { align: 'right' });
     };
 
     // Footer with page number
@@ -297,7 +356,8 @@ export class AssessmentReviewComponent implements OnInit {
       }
     };
 
-    addHeader();
+    // Add first page header
+    addFirstPageHeader();
 
     // Table data
     const headers = [
@@ -322,10 +382,12 @@ export class AssessmentReviewComponent implements OnInit {
       assessment.status ? assessment.status.charAt(0).toUpperCase() + assessment.status.slice(1) : 'N/A'
     ]);
 
+    let isFirstTablePage = true;
+
     autoTable(doc, {
       head: [headers],
       body: body,
-      startY: 35,
+      startY: 40,
       theme: 'grid',
       styles: {
         font: 'helvetica',
@@ -352,8 +414,11 @@ export class AssessmentReviewComponent implements OnInit {
         6: { cellWidth: 30 },
         7: { cellWidth: 30 }
       },
-      didDrawPage: () => {
-        addHeader();
+      didDrawPage: (data) => {
+        if (!isFirstTablePage) {
+          addSubsequentPageHeader();
+        }
+        isFirstTablePage = false;
       }
     });
 
@@ -438,6 +503,18 @@ export class AssessmentReviewComponent implements OnInit {
       next: (response) => {
         if (response.success) {
           this.selectedAssessment = response.data;
+
+          // Deduplicate questions based on question_id
+          if (this.selectedAssessment.answers && Array.isArray(this.selectedAssessment.answers)) {
+            const uniqueAnswers = new Map();
+            this.selectedAssessment.answers.forEach((answer: any) => {
+              if (!uniqueAnswers.has(answer.question_id)) {
+                uniqueAnswers.set(answer.question_id, answer);
+              }
+            });
+            this.selectedAssessment.answers = Array.from(uniqueAnswers.values());
+          }
+
           this.calculateQuestionMarks(this.selectedAssessment);
 
           const resumeUrl: string | null =
@@ -628,8 +705,14 @@ export class AssessmentReviewComponent implements OnInit {
           if (answer) {
             answer.is_correct = isCorrect;
             this.calculateQuestionMarks(this.selectedAssessment);
+
+            // Update the marks in the main assessments list as well
+            const mainAssessment = this.assessments.find(a => a.assessment_id === this.selectedAssessment.assessment_id);
+            if (mainAssessment) {
+              mainAssessment.calculated_marks = this.selectedAssessment.calculated_marks;
+              this.applyFilters(); // Refresh the display
+            }
           }
-          this.loadAssessments();
         } else {
           this.toastr.error(response.message || 'Failed to update');
         }

@@ -5,6 +5,7 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import Swal from 'sweetalert2';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { PlacementService } from 'src/app/core/services/placement.service';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-internship',
@@ -20,13 +21,17 @@ export class InternshipComponent implements OnInit {
   selectedClient: any = null;
   collegeJobMappings: any[] = [];
   sendLinkForm: FormGroup;
+  selectedResumeUrl: string = '';
+  safeResumeUrl: SafeResourceUrl = '';
+  serverBaseUrl = 'https://api.fosterx.co';
 
   constructor(
     public connectService: ConnectService,
     public placementService: PlacementService,
     public toastr: ToastrService,
     private modalService: NgbModal,
-    private fb: FormBuilder
+    private fb: FormBuilder,
+    private sanitizer: DomSanitizer
   ) {
     this.sendLinkForm = this.fb.group({
       link_name: ['', Validators.required]
@@ -154,9 +159,14 @@ export class InternshipComponent implements OnInit {
   getInternshipDetails() {
     this.connectService.getInternshipFormDetails().subscribe((res: any) => {
       this.internshipFormDetails = res;
+      debugger
       console.log(res)
       for (let i = 0; i < this.internshipFormDetails.length; i++) {
         this.internshipFormDetails[i].index = i + 1;
+        // Construct full resume URL
+        if (this.internshipFormDetails[i].resume) {
+          this.internshipFormDetails[i].resume_url = this.serverBaseUrl + this.internshipFormDetails[i].resume;
+        }
       }
       this.collectionSize = this.internshipFormDetails.length;
       this.getPagintaion();
@@ -204,5 +214,43 @@ export class InternshipComponent implements OnInit {
       ...group,
       jobtitle: group.jobtitles.join(', ')
     }));
+  }
+
+  openResumeModal(client: any, modalTpl: any) {
+    this.selectedClient = client;
+    if (client.resume_url || client.resume) {
+      this.selectedResumeUrl = client.resume_url || (this.serverBaseUrl + client.resume);
+      this.safeResumeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(this.selectedResumeUrl);
+      this.modalService.open(modalTpl, {
+        size: 'xl',
+        backdrop: 'static',
+        keyboard: true,
+        centered: true
+      });
+    } else {
+      this.toastr.error('No resume available for this candidate.', 'Error', { timeOut: 3000 });
+    }
+  }
+
+  openResumeInNewTab(resumeUrl: string) {
+    if (resumeUrl) {
+      window.open(resumeUrl, '_blank');
+    } else {
+      this.toastr.error('Resume URL not available.', 'Error', { timeOut: 3000 });
+    }
+  }
+
+  downloadResume(client: any) {
+    const fullResumeUrl = client.resume_url || (client.resume ? this.serverBaseUrl + client.resume : null);
+    if (fullResumeUrl) {
+      const link = document.createElement('a');
+      link.href = fullResumeUrl;
+      link.download = `${client.firstname}_${client.lastname}_resume.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } else {
+      this.toastr.error('Resume not available for download.', 'Error', { timeOut: 3000 });
+    }
   }
 }
