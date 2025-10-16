@@ -8,7 +8,19 @@
             <div class="card-body">
                 <form [formGroup]="mappingForm">
                     <div class="row">
-                        <div class="col-md-3 mb-3">
+                        <div class="col-md-2 mb-3">
+                            <label class="form-label">Type</label>
+                            <select class="form-select" formControlName="type">
+                                <option value="">Select Type</option>
+                                <option value="placement">Placement</option>
+                                <option value="internship">Internship</option>
+                                <option value="career">Career</option>
+                            </select>
+                            <div class="text-danger mt-1" *ngIf="f['type'].touched && f['type'].invalid">
+                                Please select a type.
+                            </div>
+                        </div>
+                        <div class="col-md-2 mb-3">
                             <label class="form-label">College</label>
                             <ng-select [items]="colleges" bindLabel="name" bindValue="id" formControlName="college_id"
                                 placeholder="Select or add a college" [addTag]="addNewCollege"
@@ -21,7 +33,7 @@
                                 Please select or add a college.
                             </div>
                         </div>
-                        <div class="col-md-3 mb-3">
+                        <div class="col-md-2 mb-3">
                             <label class="form-label">Link Name</label>
                             <input type="text" class="form-control" formControlName="link_name"
                                 placeholder="Enter link name">
@@ -29,7 +41,7 @@
                                 Link name is required.
                             </div>
                         </div>
-                        <div class="col-md-3 mb-3">
+                        <div class="col-md-4 mb-3">
                             <label class="form-label">Job Openings</label>
                             <ng-select [items]="jobOpenings" bindLabel="jobtitle" bindValue="id"
                                 formControlName="jobopening_ids" [multiple]="true" placeholder="Select job openings">
@@ -39,7 +51,7 @@
                                 Please select at least one job opening.
                             </div>
                         </div>
-                        <div class="col-md-3 mb-3">
+                        <div class="col-md-2 mb-3">
                             <label class="form-label">Link Active</label>
                             <div class="form-check">
                                 <input class="form-check-input" type="checkbox" formControlName="link_active"
@@ -50,7 +62,7 @@
                     </div>
                     <div class="d-flex justify-content-end gap-2">
                         <button type="button" class="btn btn-danger waves-effect"
-                            (click)="mappingForm.reset({ link_active: true, jobopening_ids: [], link_name: '' })">Cancel</button>
+                            (click)="mappingForm.reset({ link_active: true, jobopening_ids: [], link_name: '', type: '' })">Cancel</button>
                         <button type="button" class="btn btn-primary waves-effect waves-light" (click)="submitMapping()"
                             [disabled]="mappingForm.invalid || addingCollege">Submit</button>
                     </div>
@@ -73,6 +85,7 @@
                         <thead class="table-light">
                             <tr>
                                 <th class="text-left">#</th>
+                                <th class="text-center">Type</th>
                                 <th class="text-center">College Name</th>
                                 <th class="text-center">Link Name</th>
                                 <th class="text-center">Job Title</th>
@@ -84,12 +97,22 @@
                         <tbody>
                             <tr *ngFor="let mapping of paginateData; let i=index">
                                 <td class="text-left">{{ (page - 1) * pageSize + i + 1 }}</td>
+                                <td class="text-center">
+                                    <span class="badge" [ngClass]="{
+                                            'bg-primary': mapping.type === 'placement',
+                                            'bg-info': mapping.type === 'internship',
+                                            'bg-success': mapping.type === 'career'
+                                          }">
+                                        {{ mapping.type | titlecase }}
+                                    </span>
+                                </td>
                                 <td class="text-center">{{ mapping.college_name }}</td>
                                 <td class="text-center">{{ mapping.link_name }}</td>
                                 <td class="text-center">{{ mapping.jobtitle }}</td>
                                 <td class="text-center">
-                                    <a [href]="getPlacementFormLink(mapping.college_id, mapping.link_name)"
-                                        target="_blank">{{ getPlacementFormLink(mapping.college_id, mapping.link_name)
+                                    <a [href]="getPlacementFormLink(mapping.college_id, mapping.link_name, mapping.type)"
+                                        target="_blank">{{ getPlacementFormLink(mapping.college_id, mapping.link_name,
+                                        mapping.type)
                                         }}</a>
                                 </td>
                                 <td class="text-center">

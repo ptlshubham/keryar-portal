@@ -37,6 +37,7 @@ export class CollegeJobMappingComponent implements OnInit {
     ];
 
     this.mappingForm = this.fb.group({
+      type: ['', Validators.required],
       college_id: ['', Validators.required],
       jobopening_ids: [[], Validators.required],
       link_active: [true],
@@ -101,12 +102,13 @@ export class CollegeJobMappingComponent implements OnInit {
   groupMappingsByCollege(mappings: any[]): any[] {
     const grouped = new Map<string, any>();
     mappings.forEach(mapping => {
-      const key = `${mapping.college_id}|${mapping.link_name}`;
+      const key = `${mapping.college_id}|${mapping.link_name}|${mapping.type}`;
       if (!grouped.has(key)) {
         grouped.set(key, {
           college_id: mapping.college_id,
           college_name: mapping.college_name,
           link_name: mapping.link_name,
+          type: mapping.type,
           jobtitles: [mapping.jobtitle],
           link_active: mapping.link_active,
           ids: [mapping.id]
@@ -140,6 +142,7 @@ export class CollegeJobMappingComponent implements OnInit {
     }
 
     const mappingData = {
+      type: this.mappingForm.value.type,
       college_id: this.mappingForm.value.college_id,
       jobopening_ids: this.mappingForm.value.jobopening_ids,
       link_active: this.mappingForm.value.link_active,
@@ -150,7 +153,7 @@ export class CollegeJobMappingComponent implements OnInit {
       next: (res: any) => {
         if (res.success) {
           this.toastr.success('Mappings saved successfully');
-          this.mappingForm.reset({ link_active: true, jobopening_ids: [], link_name: '' });
+          this.mappingForm.reset({ link_active: true, jobopening_ids: [], link_name: '', type: '' });
           this.loadMappings();
         } else {
           this.toastr.error(res.message || 'Failed to save mappings');
@@ -225,7 +228,16 @@ export class CollegeJobMappingComponent implements OnInit {
     });
   }
 
-  getPlacementFormLink(collegeId: string, linkName: string): string {
-    return `${this.serverPath}placement/placement-form/${collegeId}/${encodeURIComponent(linkName)}`;
+  getPlacementFormLink(collegeId: string, linkName: string, type: string): string {
+    switch (type) {
+      case 'placement':
+        return `${this.serverPath}placement/placement-form/${collegeId}/${encodeURIComponent(linkName)}`;
+      case 'internship':
+        return `${this.serverPath}internship/internship-test/${collegeId}/${encodeURIComponent(linkName)}`;
+      case 'career':
+        return `${this.serverPath}career/carrer-test/${collegeId}/${encodeURIComponent(linkName)}`;
+      default:
+        return `${this.serverPath}placement/placement-form/${collegeId}/${encodeURIComponent(linkName)}`;
+    }
   }
 }
