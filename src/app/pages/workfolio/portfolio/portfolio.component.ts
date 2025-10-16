@@ -412,7 +412,7 @@ export class PortfolioComponent {
     this.selectedType = data.type;
     if (this.selectedType === 'development') {
       this.subtypes = this.developmentSubtypes;
-    } else if (this.selectedType === 'branding') {
+    } else if (this.selectedType === 'marketing') {
       this.subtypes = this.brandingSubtypes;
     }
     this.selectedSubtype = data.subtype;
