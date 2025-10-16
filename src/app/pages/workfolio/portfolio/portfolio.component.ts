@@ -27,6 +27,30 @@ export class PortfolioComponent {
   categories: any = [];
   selectedCategory: any;
 
+  // Type and Subtype dropdowns
+  types = [
+    { value: 'marketing', label: 'Marketing' },
+    { value: 'development', label: 'Development' },
+  ];
+
+  subtypes: any = [];
+  selectedType: any;
+  selectedSubtype: any;
+
+  developmentSubtypes = [
+    { value: 'website', label: 'Website' },
+    { value: 'webapplication', label: 'Web Application' },
+    { value: 'mobileapp', label: 'Mobile App' },
+    { value: 'ui/ux', label: 'UI/UX' }
+  ];
+
+  brandingSubtypes = [
+    { value: 'brand', label: 'Brand' },
+    { value: 'social media post', label: 'Social Media Post' },
+    { value: 'email marketing', label: 'Email Marketing' },
+    { value: 'product styling/photography', label: 'Product Styling/Photography' },
+  ];
+
   // Inner image
   coverImageUrl: any | null = null;
   coverUploading: boolean = false;
@@ -74,6 +98,8 @@ export class PortfolioComponent {
       title: ['', [Validators.required]],
       clientname: [null, [Validators.required]],
       category: [null, [Validators.required]],
+      type: ['', [Validators.required]],
+      subtype: ['', [Validators.required]],
       authorname: ['', [Validators.required]],
       description: ['', [Validators.required]],
       publishdate: ['', [Validators.required]],
@@ -86,6 +112,24 @@ export class PortfolioComponent {
     this.galleryUploaders.push({ images: [] });
   }
 
+  onTypeChange(event: any) {
+    this.selectedType = event.value;
+    this.selectedSubtype = null;
+    this.validationForm.patchValue({ subtype: '' });
+
+    if (this.selectedType === 'development') {
+      this.subtypes = this.developmentSubtypes;
+    } else if (this.selectedType === 'marketing') {
+      this.subtypes = this.brandingSubtypes;
+    } else {
+      this.subtypes = [];
+    }
+  }
+
+  onSubtypeChange(event: any) {
+    this.selectedSubtype = event.value;
+  }
+
   addPortfolio() {
     this.isOpen = false;
     this.validationForm.reset();
@@ -96,6 +140,9 @@ export class PortfolioComponent {
     this.submitted = false;
     this.isEditing = false;
     this.currentPortfolioId = null;
+    this.selectedType = null;
+    this.selectedSubtype = null;
+    this.subtypes = [];
     this.getClients();
   }
 
@@ -238,6 +285,8 @@ export class PortfolioComponent {
       let data = this.validationForm.value;
       data.clientname = this.selectedClientName;
       data.category = this.selectedCategory;
+      data.type = this.selectedType;
+      data.subtype = this.selectedSubtype;
       data.coverimage = this.coverImage ? this.coverImage : '';
       data.galleryMultiImage = this.galleryMultiImage ? this.galleryMultiImage : [];
 
@@ -359,10 +408,21 @@ export class PortfolioComponent {
       formattedPublishDate = moment(data.publishdate).format('YYYY-MM-DD');
     }
 
+    // Set type and populate subtypes
+    this.selectedType = data.type;
+    if (this.selectedType === 'development') {
+      this.subtypes = this.developmentSubtypes;
+    } else if (this.selectedType === 'branding') {
+      this.subtypes = this.brandingSubtypes;
+    }
+    this.selectedSubtype = data.subtype;
+
     this.validationForm.patchValue({
       title: data.title,
       clientname: data.clientname,
       category: data.category,
+      type: data.type,
+      subtype: data.subtype,
       authorname: data.authorname,
       description: data.description,
       publishdate: formattedPublishDate,

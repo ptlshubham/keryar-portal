@@ -28,7 +28,26 @@
                                     </div>
                                 </div>
                             </div>
+                            <div class="col-lg-4 mb-2">
+                                <label class="form-label">Type <span class="text-danger">*</span></label>
+                                <ng-select [items]="types" bindLabel="label" bindValue="value" formControlName="type"
+                                    placeholder="Select Type" (change)="onTypeChange($event)">
+                                </ng-select>
+                                <div class="text-danger mt-1" *ngIf="f['type'].touched && f['type'].invalid">
+                                    Type is required.
+                                </div>
+                            </div>
 
+                            <div class="col-lg-4 mb-2">
+                                <label class="form-label">Sub Type <span class="text-danger">*</span></label>
+                                <ng-select [items]="subtypes" bindLabel="label" bindValue="value"
+                                    formControlName="subtype" placeholder="Select Sub Type" [disabled]="!selectedType"
+                                    (change)="onSubtypeChange($event)">
+                                </ng-select>
+                                <div class="text-danger mt-1" *ngIf="f['subtype'].touched && f['subtype'].invalid">
+                                    Sub Type is required.
+                                </div>
+                            </div>
                             <!-- Client Name Dropdown -->
                             <div class="col-lg-4 mb-2">
                                 <div class="mb-3">
@@ -202,6 +221,9 @@
                             <tr>
                                 <th class="text-left">#</th>
                                 <th class="text-center">Portfolio Name</th>
+                                <th class="text-center">Type</th>
+                                <th class="text-center">SubType</th>
+
                                 <th class="text-center">Client Name</th>
                                 <th class="text-center">Category</th>
                                 <th class="text-center">Image</th>
@@ -214,6 +236,9 @@
                             <tr *ngFor="let c of paginateData; let i=index">
                                 <td class="text-left">{{c.index}}</td>
                                 <td class="text-center">{{c.title}}</td>
+                                <td class="text-center">{{c.type}}</td>
+                                <td class="text-center">{{c.subtype}}</td>
+
                                 <td class="text-center">{{c.clientname}}</td>
                                 <td class="text-center">{{c.category}}</td>
                                 <td class="text-center">
