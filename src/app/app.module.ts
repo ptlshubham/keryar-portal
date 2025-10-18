@@ -9,7 +9,7 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { TranslateModule, TranslateLoader } from '@ngx-translate/core';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
-import { NgbModule, NgbTooltipModule, NgbPopoverModule, NgbNavModule } from '@ng-bootstrap/ng-bootstrap';
+import { NgbModule, NgbTooltipModule, NgbPopoverModule, NgbNavModule, NgbPaginationModule } from '@ng-bootstrap/ng-bootstrap';
 
 import { PagesModule } from './pages/pages.module';
 import { LayoutsModule } from './layouts/layouts.module';
@@ -51,6 +51,7 @@ export function createTranslateLoader(http: HttpClient): any {
     NgbTooltipModule,
     NgbPopoverModule,
     NgbNavModule,
+    NgbPaginationModule,
   ToastrModule.forRoot(),
     ExtrapagesModule], providers: [
       CookieService,

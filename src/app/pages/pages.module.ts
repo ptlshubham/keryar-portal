@@ -4,7 +4,7 @@ import { RouterModule } from '@angular/router';
 
 // counter
 import { CountUpModule } from 'ngx-countup';
-import { NgbDropdownModule, NgbNavModule } from '@ng-bootstrap/ng-bootstrap';
+import { NgbDropdownModule, NgbNavModule, NgbPaginationModule } from '@ng-bootstrap/ng-bootstrap';
 import { NgApexchartsModule } from 'ng-apexcharts';
 import { SimplebarAngularModule } from 'simplebar-angular';
 import { CarouselModule } from 'ngx-owl-carousel-o';
@@ -19,10 +19,12 @@ import { WidgetModule } from '../shared/widget/widget.module';
 import { PagesRoutingModule } from './pages-routing.module';
 
 import { DashboardComponent } from './dashboard/dashboard.component';
+import { CallToActionListComponent } from './call-to-action-list/call-to-action-list.component';
 
 @NgModule({
   declarations: [
     DashboardComponent,
+    CallToActionListComponent,
   ],
   imports: [
     CommonModule,
@@ -37,6 +39,7 @@ import { DashboardComponent } from './dashboard/dashboard.component';
     RouterModule,
     NgbDropdownModule,
     NgbNavModule,
+    NgbPaginationModule,
     // LightboxModule,
     LeafletModule
   ],

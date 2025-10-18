@@ -137,4 +137,7 @@ export class ApiService {
   public static updateRemarksURL: string = ApiService.HOST_URL + '/keryar/UpdateRemarks';
   public static sendInternshipLinkURL: string = ApiService.HOST_URL + '/keryar/sendInternshipLink';
 
+  public static getAllCallToActionDataURL: string = ApiService.HOST_URL + '/keryar/GetAllCallToAction';
+  public static removeCallToActionByIdURL: string = ApiService.HOST_URL + '/keryar/RemoveCallToActionById/';
+
 }

@@ -2,6 +2,8 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 
 import { DashboardComponent } from './dashboard/dashboard.component';
+import { CallToActionListComponent } from './call-to-action-list/call-to-action-list.component';
+
 
 const routes: Routes = [
   {
@@ -22,6 +24,10 @@ const routes: Routes = [
   },
   {
     path: 'connect', loadChildren: () => import('./connect/connect.module').then(m => m.ConnectModule)
+  },
+  {
+    path: 'call-to-action',
+    component: CallToActionListComponent
   },
   // {
   //   path: 'pages', loadChildren: () => import('./extraspages/extraspages.module').then(m => m.ExtraspagesModule)

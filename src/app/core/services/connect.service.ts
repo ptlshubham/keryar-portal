@@ -27,4 +27,12 @@ export class ConnectService {
         return this.httpClient.post(ApiService.sendInternshipLinkURL, data);
     }
 
+    getAllCallToActionData(page: any = 1, limit: any = 10) {
+        return this.httpClient.get(`${ApiService.getAllCallToActionDataURL}?page=${page}&limit=${limit}`);
+    }
+
+    removeCallToActionById(id: any) {
+        return this.httpClient.get(ApiService.removeCallToActionByIdURL + id);
+    }
+
 }
