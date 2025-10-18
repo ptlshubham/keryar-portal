@@ -29,8 +29,8 @@ export class PortfolioComponent {
 
   // Type and Subtype dropdowns
   types = [
-    { value: 'marketing', label: 'Marketing' },
-    { value: 'development', label: 'Development' },
+    { value: 'Marketing', label: 'Marketing' },
+    { value: 'Development', label: 'Development' },
   ];
 
   subtypes: any = [];
@@ -38,15 +38,15 @@ export class PortfolioComponent {
   selectedSubtype: any;
 
   developmentSubtypes = [
-    { value: 'website', label: 'Website' },
-    { value: 'webapplication', label: 'Web Application' },
-    { value: 'mobileapp', label: 'Mobile App' },
-    { value: 'ui/ux', label: 'UI/UX' }
+    { value: 'Website', label: 'Website' },
+    { value: 'Web Application', label: 'Web Application' },
+    { value: 'Mobile App', label: 'Mobile App' },
+    { value: 'UI/UX', label: 'UI/UX' }
   ];
 
   brandingSubtypes = [
-    { value: 'brand', label: 'Brand' },
-    { value: 'social media post', label: 'Social Media Post' },
+    { value: 'Brand', label: 'Brand' },
+    { value: 'Social Media', label: 'Social Media' },
     { value: 'email marketing', label: 'Email Marketing' },
     { value: 'product styling/photography', label: 'Product Styling/Photography' },
   ];
@@ -101,6 +101,7 @@ export class PortfolioComponent {
       type: ['', [Validators.required]],
       subtype: ['', [Validators.required]],
       authorname: ['', [Validators.required]],
+      keywords: ['', [Validators.required]],
       description: ['', [Validators.required]],
       publishdate: ['', [Validators.required]],
     });
@@ -113,13 +114,13 @@ export class PortfolioComponent {
   }
 
   onTypeChange(event: any) {
-    this.selectedType = event.value;
+    this.selectedType = event.target ? event.target.value : event.value;
     this.selectedSubtype = null;
     this.validationForm.patchValue({ subtype: '' });
 
-    if (this.selectedType === 'development') {
+    if (this.selectedType === 'Development') {
       this.subtypes = this.developmentSubtypes;
-    } else if (this.selectedType === 'marketing') {
+    } else if (this.selectedType === 'Marketing') {
       this.subtypes = this.brandingSubtypes;
     } else {
       this.subtypes = [];
@@ -127,7 +128,7 @@ export class PortfolioComponent {
   }
 
   onSubtypeChange(event: any) {
-    this.selectedSubtype = event.value;
+    this.selectedSubtype = event.target ? event.target.value : event.value;
   }
 
   addPortfolio() {
@@ -398,6 +399,7 @@ export class PortfolioComponent {
   }
 
   editPortfolioById(data: any) {
+    debugger
     this.isOpen = false;
     this.isEditing = true;
     this.currentPortfolioId = data.id;
@@ -410,10 +412,12 @@ export class PortfolioComponent {
 
     // Set type and populate subtypes
     this.selectedType = data.type;
-    if (this.selectedType === 'development') {
+    if (this.selectedType === 'Development') {
       this.subtypes = this.developmentSubtypes;
-    } else if (this.selectedType === 'marketing') {
+    } else if (this.selectedType === 'Marketing') {
       this.subtypes = this.brandingSubtypes;
+    } else {
+      this.subtypes = [];
     }
     this.selectedSubtype = data.subtype;
 
@@ -421,12 +425,37 @@ export class PortfolioComponent {
       title: data.title,
       clientname: data.clientname,
       category: data.category,
-      type: data.type,
-      subtype: data.subtype,
       authorname: data.authorname,
+      keywords: data.keywords || '',
       description: data.description,
       publishdate: formattedPublishDate,
     });
+
+    setTimeout(() => {
+      this.validationForm.patchValue({
+        type: data.type,
+      });
+
+      this.selectedType = data.type;
+      if (this.selectedType === 'Development') {
+        this.subtypes = this.developmentSubtypes;
+      } else if (this.selectedType === 'Marketing') {
+        this.subtypes = this.brandingSubtypes;
+      } else {
+        this.subtypes = [];
+      }
+
+      // Then set the subtype after subtypes are populated
+      setTimeout(() => {
+        this.validationForm.patchValue({
+          subtype: data.subtype,
+        });
+        this.selectedSubtype = data.subtype;
+        console.log('Form values after patch:', this.validationForm.value);
+        console.log('Final subtypes array:', this.subtypes);
+        console.log('Final selected subtype:', this.selectedSubtype);
+      }, 50);
+    }, 100);
     this.coverImage = data.coverimage;
     this.coverImageUrl = this.serverPath + data.coverimage;
     this.galleryMultiImage = Array.isArray(data.galleryImages) ? data.galleryImages.map((img: any) => img.image) : [];

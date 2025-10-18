@@ -29,21 +29,24 @@
                                 </div>
                             </div>
                             <div class="col-lg-4 mb-2">
-                                <label class="form-label">Type <span class="text-danger">*</span></label>
-                                <ng-select [items]="types" bindLabel="label" bindValue="value" formControlName="type"
-                                    placeholder="Select Type" (change)="onTypeChange($event)">
-                                </ng-select>
+                                <label class="form-label">Type<span class="text-danger">*</span></label>
+                                <select class="form-select" formControlName="type" (change)="onTypeChange($event)">
+                                    <option value="" disabled selected>Select Type</option>
+                                    <option *ngFor="let type of types" [value]="type.value">{{type.label}}</option>
+                                </select>
                                 <div class="text-danger mt-1" *ngIf="f['type'].touched && f['type'].invalid">
                                     Type is required.
                                 </div>
                             </div>
 
                             <div class="col-lg-4 mb-2">
-                                <label class="form-label">Sub Type <span class="text-danger">*</span></label>
-                                <ng-select [items]="subtypes" bindLabel="label" bindValue="value"
-                                    formControlName="subtype" placeholder="Select Sub Type" [disabled]="!selectedType"
-                                    (change)="onSubtypeChange($event)">
-                                </ng-select>
+                                <label class="form-label">Sub Type<span class="text-danger">*</span></label>
+                                <select class="form-select" formControlName="subtype" (change)="onSubtypeChange($event)"
+                                    [disabled]="!selectedType">
+                                    <option value="" disabled selected>Select Sub Type</option>
+                                    <option *ngFor="let subtype of subtypes" [value]="subtype.value">{{subtype.label}}
+                                    </option>
+                                </select>
                                 <div class="text-danger mt-1" *ngIf="f['subtype'].touched && f['subtype'].invalid">
                                     Sub Type is required.
                                 </div>
@@ -61,7 +64,17 @@
                                     </ng-select>
                                 </div>
                             </div>
-
+                            <div class="col-lg-4 mb-2">
+                                <div class="mb-3">
+                                    <label class="form-label">Keywords<span class="text-danger">*</span></label>
+                                    <textarea id="basicpill-address-input1" class="form-control" rows="2"
+                                        placeholder="Seperated By Comma" formControlName="keywords"
+                                        [ngClass]="{'is-invalid': f.keywords.touched && f.keywords.errors}"></textarea>
+                                    <div *ngIf="f.keywords.touched && f.keywords.errors" class="invalid-feedback">
+                                        <span *ngIf="f.keywords.errors.required">This Field is required.</span>
+                                    </div>
+                                </div>
+                            </div>
                             <!-- Category Dropdown -->
                             <div class="col-lg-4 mb-2">
                                 <div class="mb-3">
@@ -210,7 +223,7 @@
                         <p class="card-title-desc">List of all Portfolio</p>
                     </div>
                     <button type="button" class="btn btn-primary waves-effect waves-light" (click)="addPortfolio()">
-                        <i class="fas fa-user-plus"></i> Add New Portfolio
+                        <i class="mdi mdi-image"></i> Add New Portfolio
                     </button>
                 </div>
             </div>
