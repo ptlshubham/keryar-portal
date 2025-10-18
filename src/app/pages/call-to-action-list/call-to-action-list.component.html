@@ -11,8 +11,7 @@
                         <thead class="table-light">
                             <tr>
                                 <th class="text-left">#</th>
-                                <th class="text-center">First Name</th>
-                                <th class="text-center">Last Name</th>
+                                <th class="text-center"> Name</th>
                                 <th class="text-center">Email</th>
                                 <th class="text-center">Contact</th>
                                 <th class="text-center">Page</th>
@@ -23,8 +22,7 @@
                         <tbody>
                             <tr *ngFor="let c of paginateData; let i=index">
                                 <td class="text-left">{{c.index}}</td>
-                                <td class="text-center">{{c.firstname || 'N/A'}}</td>
-                                <td class="text-center">{{c.lastname || 'N/A'}}</td>
+                                <td class="text-center">{{c.name || 'N/A'}}</td>
                                 <td class="text-center">{{c.email || 'N/A'}}</td>
                                 <td class="text-center">{{c.contactnumber || 'N/A'}}</td>
                                 <td class="text-center">{{c.pagename || 'N/A'}}</td>
