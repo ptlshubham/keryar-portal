@@ -21,6 +21,22 @@
                         <div class="row">
                             <div class="col-lg-4 mb-3">
                                 <div class="form-group mb-3">
+                                    <label>Type</label>
+                                    <select class="form-control" formControlName="type"
+                                        [ngClass]="{'is-invalid': f.type.touched && f.type.errors}">
+                                        <option [ngValue]="null" disabled>Select Type</option>
+                                        <option value="Career">Career</option>
+                                        <option value="Internship">Internship</option>
+                                        <option value="Placement">Placement</option>
+                                    </select>
+                                    <div *ngIf="f.type.touched && f.type.errors" class="invalid-feedback">
+                                        <span *ngIf="f.type.errors.required">This field is required.</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-4 mb-3">
+                                <div class="form-group mb-3">
                                     <label>Job Title</label>
                                     <input type="text" class="form-control" placeholder="Enter Job Title"
                                         formControlName="jobtitle"
@@ -234,6 +250,7 @@
         <button type="button" class="btn-close" (click)="modal.dismiss('Close click')"></button>
     </div>
     <div class="modal-body">
+        <p><strong>Type:</strong> {{ selectedJob?.type || 'N/A' }}</p>
         <h6><strong>Job Title:</strong> {{ selectedJob?.jobtitle || 'N/A' }}</h6>
         <p><strong>Department:</strong> {{ selectedJob?.department || 'N/A' }}</p>
         <p><strong>Job Type:</strong> {{ selectedJob?.jobtype || 'N/A' }}</p>
@@ -302,6 +319,7 @@
                         <thead class="table-light">
                             <tr>
                                 <th class="text-left">#</th>
+                                <th class="text-center">Type</th>
                                 <th class="text-center">Job Title</th>
                                 <th class="text-center">Department</th>
                                 <th class="text-center">Job Type</th>
@@ -317,6 +335,7 @@
                         <tbody>
                             <tr *ngFor="let c of paginateData; let i=index">
                                 <td class="text-left">{{c.index}}</td>
+                                <td class="text-center">{{c.type}}</td>
                                 <td class="text-center">{{c.jobtitle}}</td>
                                 <td class="text-center">{{c.department}}</td>
                                 <td class="text-center">{{c.jobtype}}</td>

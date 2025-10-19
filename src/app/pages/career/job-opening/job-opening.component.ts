@@ -65,6 +65,7 @@ export class JobOpeningComponent {
       { label: 'Job Openings', active: true },
     ];
     this.validationForm = this.formBuilder.group({
+      type: ['', [Validators.required]],
       jobtitle: ['', [Validators.required]],
       department: [null, [Validators.required]],
       jobtype: [null, [Validators.required]],
@@ -129,6 +130,7 @@ export class JobOpeningComponent {
   loadQuestionSets() {
     this.placementService.getAllSelfQuestionSetDetails().subscribe(
       (res: any) => {
+        console.log(res)
         this.questionSets = (res.data || res).map((set: any) => ({
           ...set,
           displayName: `${set.type} - ${set.year} - ${set.difficulty}`
@@ -183,7 +185,6 @@ export class JobOpeningComponent {
 
   getQuestionSet(id: string): any {
     const set = this.questionSets.find(set => set.id === id) || {};
-    console.log('getQuestionSet:', id, set);
     return set;
   }
 
@@ -344,6 +345,7 @@ export class JobOpeningComponent {
     this.editMode = false;
     this.currentJobId = null;
     this.validationForm.reset({
+      type: null,
       department: null,
       jobtype: null,
       experience: [],
@@ -360,7 +362,6 @@ export class JobOpeningComponent {
         jobopeningimage: job.jobopeningimage || null, // <-- ensure present
 
       }));
-      console.log('Job Opening Data:', this.jobOpeningData);
       for (let i = 0; i < this.jobOpeningData.length; i++) {
         this.jobOpeningData[i].index = i + 1;
       }

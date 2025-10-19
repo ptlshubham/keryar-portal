@@ -126,6 +126,24 @@ export const MENU: MenuItem[] = [
                 link: '/placement/questions',
                 parentId: 8
             },
+            {
+                id: 11,
+                label: 'College List',
+                link: '/placement/college',
+                parentId: 11
+            },
+            {
+                id: 10,
+                label: 'Campus Job Opening',
+                link: '/career/job-opening',
+                parentId: 10
+            },
+            {
+                id: 12,
+                label: 'Generate Test Link',
+                link: '/placement/college-mapping',
+                parentId: 12
+            },
         ]
     },
     {
@@ -139,24 +157,7 @@ export const MENU: MenuItem[] = [
             //     link: '/placement/student-list',
             //     parentId: 10
             // },
-            {
-                id: 10,
-                label: 'Campus Job Opening',
-                link: '/career/job-opening',
-                parentId: 10
-            },
-            {
-                id: 11,
-                label: 'College List',
-                link: '/placement/college',
-                parentId: 11
-            },
-            {
-                id: 11,
-                label: 'Generate Test Link',
-                link: '/placement/college-mapping',
-                parentId: 11
-            },
+
             {
                 id: 11,
                 label: 'Assessment review',
