@@ -26,6 +26,9 @@ const routes: Routes = [
     path: 'connect', loadChildren: () => import('./connect/connect.module').then(m => m.ConnectModule)
   },
   {
+    path: 'internship', loadChildren: () => import('./internship/internship.module').then(m => m.InternshipModule)
+  },
+  {
     path: 'call-to-action',
     component: CallToActionListComponent
   },

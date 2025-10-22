@@ -180,5 +180,31 @@ export const MENU: MenuItem[] = [
 
         ]
     },
+    {
+        id: 8,
+        label: 'Internship',
+        icon: 'mdi mdi-domain', // 🏫 Campus/company related
+        subItems: [
+            {
+                id: 12,
+                label: 'Internship Result',
+                link: '/internship/internship-result',
+                parentId: 12
+            },
+            {
+                id: 12,
+                label: 'Interview Round',
+                link: '/internship/interview-round',
+                parentId: 12
+            },
+            {
+                id: 12,
+                label: 'Approved Students',
+                link: '/internship/approved-students',
+                parentId: 12
+            },
+
+        ]
+    },
 ];
 

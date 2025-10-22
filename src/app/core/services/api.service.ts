@@ -137,6 +137,20 @@ export class ApiService {
   public static updateRemarksURL: string = ApiService.HOST_URL + '/keryar/UpdateRemarks';
   public static sendInternshipLinkURL: string = ApiService.HOST_URL + '/keryar/sendInternshipLink';
 
+  // internship assessment
+  public static getAllInternshipAssessmentsURL: string = ApiService.HOST_URL + '/keryar/GetAllInternshipAssessments';
+  public static getInternshipAssessmentPreviewURL: string = ApiService.HOST_URL + '/keryar/GetInternshipAssessmentPreview';
+  public static approveRejectInternshipAssessmentURL: string = ApiService.HOST_URL + '/keryar/ApproveRejectInternshipAssessment';
+  public static removeInternshipAssessmentURL: string = ApiService.HOST_URL + '/keryar/RemoveInternshipAssessment/';
+  // Add this to your ApiService class
+  public static updateInternshipAnswerCorrectnessURL: string = ApiService.HOST_URL + '/keryar/UpdateInternshipAnswerCorrectness';
+
+  // internship interview round
+  public static getApprovedInternshipStudentsURL: string = `${ApiService.HOST_URL}/keryar/GetApprovedInternshipStudents`;
+  public static updateInternshipInterviewStatusURL: string = `${ApiService.HOST_URL}/keryar/UpdateInternshipInterviewStatus`;
+  public static removeInternshipInterviewStudentURL: string = `${ApiService.HOST_URL}/keryar/RemoveInternshipInterviewStudent`;
+  public static updateInternshipRemarksURL: string = ApiService.HOST_URL + '/keryar/UpdateInternshipRemarks';
+
   public static getAllCallToActionDataURL: string = ApiService.HOST_URL + '/keryar/GetAllCallToAction';
   public static removeCallToActionByIdURL: string = ApiService.HOST_URL + '/keryar/RemoveCallToActionById/';
 
