@@ -235,7 +235,7 @@ export class CollegeJobMappingComponent implements OnInit {
       case 'internship':
         return `${this.serverPath}internship/internship-test/${collegeId}/${encodeURIComponent(linkName)}`;
       case 'career':
-        return `${this.serverPath}career/carrer-test/${collegeId}/${encodeURIComponent(linkName)}`;
+        return `${this.serverPath}career-job-openings/verify-email/${collegeId}/${encodeURIComponent(linkName)}`;
       default:
         return `${this.serverPath}placement/placement-form/${collegeId}/${encodeURIComponent(linkName)}`;
     }
