@@ -2,7 +2,7 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { CKEditorModule } from '@ckeditor/ckeditor5-angular';
-import { NgbAlertModule, NgbDropdownModule, NgbCarouselModule, NgbProgressbarModule, NgbNavModule, NgbCollapseModule, NgbAccordionModule, NgbPopoverModule, NgbTooltipModule, NgbPaginationModule, NgbToastModule, NgbTypeaheadModule } from '@ng-bootstrap/ng-bootstrap';
+import { NgbAlertModule, NgbDropdownModule, NgbCarouselModule, NgbProgressbarModule, NgbNavModule, NgbCollapseModule, NgbAccordionModule, NgbPopoverModule, NgbTooltipModule, NgbPaginationModule, NgbToastModule, NgbTypeaheadModule, NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { CountUpModule } from 'ngx-countup';
 import { DropzoneModule } from 'ngx-dropzone-wrapper';
@@ -11,11 +11,13 @@ import { CoreModule } from 'src/app/core/core.module';
 import { SharedModule } from 'src/app/shared/shared.module';
 import { CareerRoutingModule } from './career-routing.module';
 import { JobOpeningComponent } from './job-opening/job-opening.component';
+import { JobApplicationListComponent } from './job-application-list/job-application-list.component';
 
 
 @NgModule({
   declarations: [
-    JobOpeningComponent
+    JobOpeningComponent,
+    JobApplicationListComponent
   ],
   imports: [
     CommonModule,
@@ -41,6 +43,7 @@ import { JobOpeningComponent } from './job-opening/job-opening.component';
     NgbTypeaheadModule,
     CountUpModule,
     LightboxModule,
+    NgbModule
   ]
 })
 export class CareerModule { }

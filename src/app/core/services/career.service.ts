@@ -38,6 +38,10 @@ export class CareerService {
     uploadJobOpeningImg(data: any) {
         return this.httpClient.post(ApiService.uploadJobOpeningImgURL, data);
     }
-
-
+    getCareerApplications() {
+        return this.httpClient.get(ApiService.getCareerApplicationsURL);
+    }
+    getCareerApplicationsByJob(id: string): Observable<any> {
+        return this.httpClient.get(ApiService.getCareerApplicationsByJobURL + id);
+    }
 }

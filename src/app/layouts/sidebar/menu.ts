@@ -204,6 +204,23 @@ export const MENU: MenuItem[] = [
                 parentId: 12
             },
 
+
+        ]
+    },
+    {
+        id: 8,
+        label: 'Career',
+        icon: 'mdi mdi-domain', // 🏫 Campus/company related
+        subItems: [
+            {
+                id: 12,
+                label: 'Job Application List',
+                link: '/career/job-application-list',
+                parentId: 12
+            },
+
+
+
         ]
     },
 ];

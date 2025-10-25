@@ -1,0 +1,148 @@
+/* ────────────────────────────────────────────────────────────────
+   MODAL LAYOUT – LEFT: Details | RIGHT: Resume
+   ──────────────────────────────────────────────────────────────── */
+.modal-xl {
+    --bs-modal-width: 90vw;
+    max-width: 1200px;
+}
+
+.modal-body {
+    padding: 1.5rem;
+}
+
+/* ───── GRID LAYOUT ───── */
+.modal-content .row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    margin: 0;
+}
+
+.modal-content .col-md-6 {
+    flex: 1 1 45%;
+    min-width: 300px;
+}
+
+/* ───── LEFT PANEL: Applicant + Job ───── */
+.applicant-section,
+.job-section {
+    background: #f8f9fa;
+    border-radius: 12px;
+    padding: 1.25rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.applicant-section h6,
+.job-section h6 {
+    font-weight: 600;
+    color: #2c3e50;
+    margin-bottom: 1rem;
+    font-size: 1.1rem;
+    border-bottom: 2px solid #3498db;
+    padding-bottom: 0.5rem;
+    display: inline-block;
+}
+
+/* List Items */
+.list-unstyled li {
+    margin-bottom: 0.75rem;
+    font-size: 0.95rem;
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.list-unstyled strong {
+    min-width: 130px;
+    color: #2c3e50;
+    font-weight: 600;
+}
+
+.list-unstyled a {
+    color: #3498db;
+    text-decoration: none;
+}
+
+.list-unstyled a:hover {
+    text-decoration: underline;
+}
+
+/* ───── RIGHT PANEL: Resume ───── */
+.resume-section {
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 1.25rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    border: 1px solid #e9ecef;
+}
+
+.resume-section h6 {
+    font-weight: 600;
+    color: #2c3e50;
+    margin-bottom: 1rem;
+    font-size: 1.1rem;
+    border-bottom: 2px solid #e74c3c;
+    padding-bottom: 0.5rem;
+    display: inline-block;
+}
+
+.resume-iframe {
+    width: 100%;
+    height: 580px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.download-btn {
+    background: linear-gradient(135deg, #3498db, #2980b9);
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.download-btn:hover {
+    background: linear-gradient(135deg, #2980b9, #1c6ea4);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
+}
+
+.no-resume {
+    color: #95a5a6;
+    font-style: italic;
+    text-align: center;
+    padding: 2rem;
+    background: #f1f2f6;
+    border-radius: 8px;
+}
+
+/* ───── HR & FOOTER ───── */
+.modal-body hr {
+    border: 0;
+    height: 1px;
+    background: linear-gradient(to right, transparent, #ddd, transparent);
+    margin: 1.5rem 0;
+}
+
+.modal-footer {
+    border-top: 1px solid #e9ecef;
+    padding: 1rem 1.5rem;
+}
+
+/* ───── RESPONSIVE ───── */
+@media (max-width: 768px) {
+    .modal-content .row {
+        flex-direction: column;
+    }
+
+    .modal-content .col-md-6 {
+        flex: 1 1 auto;
+    }
+
+    .resume-iframe {
+        height: 400px;
+    }
+}

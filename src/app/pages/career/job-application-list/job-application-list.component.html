@@ -1,0 +1,179 @@
+<!-- src/app/job-application-list/job-application-list.component.html -->
+<div class="row">
+    <div class="col-lg-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Job Application List</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>#</th>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Contact</th>
+                                <th>Job Title</th>
+                                <th>Department</th>
+                                <th>Location</th>
+                                <th>Applied On</th>
+                                <th class="text-end">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let app of paginateData">
+                                <td>{{ app.index }}</td>
+                                <td>{{ app.firstname }} {{ app.lastname }}</td>
+                                <td>{{ app.email }}</td>
+                                <td>{{ app.contactnumber }}</td>
+                                <td>
+                                    <span class="badge bg-success">{{ app.jobtitle || '—' }}</span>
+                                </td>
+                                <td>{{ app.department || '—' }}</td>
+                                <td>{{ app.location || '—' }}</td>
+                                <td>
+                                    {{ formatDate(app.createddate) }}
+                                    <small class="text-muted">{{ formatTime(app.createddate) }}</small>
+                                </td>
+                                <td class="text-end">
+                                    <button class="btn btn-soft-info btn-sm" (click)="openPreview(app)" title="View">
+                                        <i class="bx bx-show"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="mt-4">
+                    <ngb-pagination [collectionSize]="collectionSize" [pageSize]="pageSize" [(page)]="page"
+                        (pageChange)="refreshPage()"
+                        class="d-flex justify-content-end pagination-rounded-flat pagination-success">
+                    </ngb-pagination>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Preview Modal -->
+<!-- Change ViewChild reference to template reference -->
+<div class="modal fade" id="previewModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Application & Job Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body" *ngIf="selectedApp; else noData">
+                <div class="row">
+
+                    <!-- Applicant Info -->
+                    <div class="col-md-6">
+                        <ng-container *ngTemplateOutlet="applicantInfo"></ng-container>
+                    </div>
+
+                    <!-- Job Info -->
+                    <div class="col-md-6">
+                        <ng-container *ngTemplateOutlet="jobInfo"></ng-container>
+                    </div>
+
+                </div>
+
+                <hr>
+
+                <!-- Resume -->
+                <ng-container *ngTemplateOutlet="resumeSection"></ng-container>
+            </div>
+
+            <div class="modal-footer">
+                <button class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add template reference for the modal content -->
+<ng-template #previewModalTemplate>
+    <div class="modal-header">
+        <h5 class="modal-title">Application & Job Details</h5>
+        <button type="button" class="btn-close" (click)="modalRef.dismiss()"></button>
+    </div>
+
+    <div class="modal-body" *ngIf="selectedApp; else noData">
+        <div class="row">
+            <!-- Applicant Info -->
+            <div class="col-md-6">
+                <ng-container *ngTemplateOutlet="applicantInfo"></ng-container>
+            </div>
+
+            <!-- Job Info -->
+            <div class="col-md-6">
+                <ng-container *ngTemplateOutlet="jobInfo"></ng-container>
+            </div>
+        </div>
+
+        <hr>
+
+        <!-- Resume -->
+        <ng-container *ngTemplateOutlet="resumeSection"></ng-container>
+    </div>
+
+    <div class="modal-footer">
+        <button class="btn btn-secondary" (click)="modalRef.dismiss()">Close</button>
+    </div>
+</ng-template>
+
+<!-- ================== NG-TEMPLATES ================== -->
+
+<!-- Applicant Template -->
+<ng-template #applicantInfo>
+    <h6 class="mb-3">Applicant</h6>
+    <ul class="list-unstyled">
+        <li><strong>Name:</strong> {{ selectedApp.firstname }} {{ selectedApp.lastname }}</li>
+        <li><strong>Email:</strong> <a href="mailto:{{ selectedApp.email }}">{{ selectedApp.email }}</a></li>
+        <li><strong>Contact:</strong> {{ selectedApp.contactnumber }}</li>
+        <li><strong>Experience:</strong> {{ selectedApp.experience }}</li>
+        <li><strong>Applied On:</strong> {{ formatDate(selectedApp.createddate) }} at {{
+            formatTime(selectedApp.createddate) }}</li>
+        <li><strong>Test Date:</strong> {{ formatDate(selectedApp.testdate) }}</li>
+        <li><strong>Test Time:</strong> {{ formatTime(selectedApp.testtiming) }}</li>
+    </ul>
+</ng-template>
+
+<!-- Job Info Template -->
+<ng-template #jobInfo>
+    <h6 class="mb-3">Job Opening</h6>
+    <ul class="list-unstyled">
+        <li><strong>Title:</strong> {{ selectedApp.jobtitle || '—' }}</li>
+        <li><strong>Department:</strong> {{ selectedApp.department || '—' }}</li>
+        <li><strong>Location:</strong> {{ selectedApp.location || '—' }}</li>
+        <li><strong>Type:</strong> {{ selectedApp.jobtype || '—' }}</li>
+        <li><strong>Experience:</strong> {{ selectedApp.job_experience || '—' }}</li>
+        <li><strong>Salary:</strong> {{ selectedApp.salary || '—' }}</li>
+        <li><strong>Openings:</strong> {{ selectedApp.openings || '—' }}</li>
+    </ul>
+</ng-template>
+
+<!-- Resume Template -->
+<ng-template #resumeSection>
+    <h6 class="mb-3">Resume</h6>
+    <ng-container *ngIf="resumeUrl; else noResume">
+        <iframe [src]="resumeUrl" width="100%" height="500" class="border rounded"></iframe>
+        <div class="mt-3 text-end">
+            <button class="btn btn-sm btn-outline-primary" (click)="downloadResume()">
+                <i class="bx bx-download"></i> Download PDF
+            </button>
+        </div>
+    </ng-container>
+    <ng-template #noResume>
+        <p class="text-muted fst-italic">No resume uploaded</p>
+    </ng-template>
+</ng-template>
+
+<!-- No Data Template -->
+<ng-template #noData>
+    <p class="text-center text-muted">No application selected.</p>
+</ng-template>
