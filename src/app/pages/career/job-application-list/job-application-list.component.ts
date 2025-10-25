@@ -7,7 +7,7 @@ import { ToastrService } from 'ngx-toastr';
 import { CareerService } from 'src/app/core/services/career.service';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
-
+import Swal from 'sweetalert2';
 @Component({
   selector: 'app-job-application-list',
   templateUrl: './job-application-list.component.html',
@@ -94,5 +94,40 @@ export class JobApplicationListComponent implements OnInit {
 
   formatTime(d: string | null): string {
     return d ? new Date(d).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }) : '—';
+  }
+
+  deleteJobApplication(app: any) {
+    Swal.fire({
+      title: 'Are you sure?',
+      text: `Delete application by ${app.firstname} ${app.lastname}?`,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
+      confirmButtonText: 'Yes, delete it!',
+      cancelButtonText: 'Cancel'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.careerService.deleteCareerApplication(app.id).subscribe({
+          next: (res: any) => {
+            if (res.success) {
+              Swal.fire({
+                title: 'Deleted!',
+                text: 'Application has been deleted.',
+                icon: 'success',
+                timer: 2000,
+                showConfirmButton: false
+              });
+              this.loadApplications(); // Refresh list
+            } else {
+              Swal.fire('Error!', res.message || 'Failed to delete', 'error');
+            }
+          },
+          error: () => {
+            Swal.fire('Error!', 'Network error. Please try again.', 'error');
+          }
+        });
+      }
+    });
   }
 }

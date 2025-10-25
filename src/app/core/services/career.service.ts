@@ -44,4 +44,7 @@ export class CareerService {
     getCareerApplicationsByJob(id: string): Observable<any> {
         return this.httpClient.get(ApiService.getCareerApplicationsByJobURL + id);
     }
+    deleteCareerApplication(id: string): Observable<any> {
+        return this.httpClient.get(ApiService.deleteCareerApplicationURL + id);
+    }
 }

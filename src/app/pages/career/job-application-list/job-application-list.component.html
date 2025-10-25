@@ -37,8 +37,13 @@
                                     <small class="text-muted">{{ formatTime(app.createddate) }}</small>
                                 </td>
                                 <td class="text-end">
-                                    <button class="btn btn-soft-info btn-sm" (click)="openPreview(app)" title="View">
+                                    <button class="btn btn-soft-info btn-sm me-2" (click)="openPreview(app)"
+                                        title="View">
                                         <i class="bx bx-show"></i>
+                                    </button>
+                                    <button class="btn btn-soft-danger btn-sm" (click)="deleteJobApplication(app)"
+                                        title="Delete">
+                                        <i class="bx bx-trash"></i>
                                     </button>
                                 </td>
                             </tr>

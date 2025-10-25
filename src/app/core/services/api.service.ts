@@ -155,5 +155,6 @@ export class ApiService {
   public static removeCallToActionByIdURL: string = ApiService.HOST_URL + '/keryar/RemoveCallToActionById/';
   public static getCareerApplicationsURL: string = ApiService.HOST_URL + '/keryar/GetCareerApplications';
   public static getCareerApplicationsByJobURL: string = ApiService.HOST_URL + '/keryar/GetCareerApplicationsByJob/';
+  public static deleteCareerApplicationURL: string = ApiService.HOST_URL + '/keryar/DeleteCareerApplication/';
 
 }
