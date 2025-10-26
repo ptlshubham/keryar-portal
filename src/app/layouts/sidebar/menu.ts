@@ -218,6 +218,24 @@ export const MENU: MenuItem[] = [
                 link: '/career/job-application-list',
                 parentId: 12
             },
+            {
+                id: 12,
+                label: 'Career Result',
+                link: '/career/career-result',
+                parentId: 12
+            },
+            {
+                id: 12,
+                label: 'Interview Round',
+                link: '/career/interview-round',
+                parentId: 12
+            },
+            {
+                id: 12,
+                label: 'Hired Candidates',
+                link: '/career/hired-candidates',
+                parentId: 12
+            },
 
 
 

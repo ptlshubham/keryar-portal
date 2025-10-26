@@ -1,0 +1,380 @@
+<div class="container-fluid">
+    <div class="page-title-box">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <h6 class="page-title">Career Assessments</h6>
+                <ol class="breadcrumb m-0">
+                    <li class="breadcrumb-item"><a href="javascript:void(0);">Home</a></li>
+                    <li class="breadcrumb-item active">Career Results</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title">List of All Career Assessments</h5>
+                    <p class="card-title-desc">Review career assessments, approve/reject submissions, and preview
+                        test details.</p>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3 align-items-end">
+                        <div class="col-lg-2 col-md-3 col-sm-6 mb-2">
+                            <label for="searchTerm" class="form-label">Search</label>
+                            <input id="searchTerm" type="text" class="form-control" [(ngModel)]="searchTerm"
+                                (ngModelChange)="onSearchChange()" placeholder="Search by name, email">
+                        </div>
+                        <div class="col-lg-2 col-md-3 col-sm-6 mb-2">
+                            <label for="selectedDate" class="form-label">Selected Date</label>
+                            <input id="selectedDate" type="date" class="form-control" [(ngModel)]="selectedDate"
+                                (ngModelChange)="onDateChange()" placeholder="dd/mm/yyyy">
+                        </div>
+                        <div class="col-lg-2 col-md-3 col-sm-6 mb-2">
+                            <label for="statusFilter" class="form-label">Filter by Status</label>
+                            <select id="statusFilter" class="form-select" [(ngModel)]="filterStatus"
+                                (change)="filterByStatus(filterStatus)">
+                                <option value="">All Status</option>
+                                <option [value]="assessmentStatus.Pending">Pending</option>
+                                <option [value]="assessmentStatus.Approved">Approved</option>
+                                <option [value]="assessmentStatus.Rejected">Rejected</option>
+                            </select>
+                        </div>
+                        <div class="col-lg-6 col-md-6 col-sm-12 mb-2 d-flex flex-column">
+                            <label class="form-label opacity-0">Actions</label>
+                            <div class="d-flex gap-1 justify-content-end">
+                                <button class="btn btn-primary btn-sm" (click)="loadAssessments()" title="Refresh">
+                                    <i class="mdi mdi-refresh"></i>
+                                </button>
+                                <button class="btn btn-outline-success btn-sm" (click)="downloadPdf()"
+                                    [disabled]="filteredAssessments.length === 0" title="Download PDF">
+                                    <i class="mdi mdi-file-pdf"></i>
+                                </button>
+                                <button class="btn btn-outline-primary btn-sm" (click)="downloadExcel()"
+                                    [disabled]="filteredAssessments.length === 0" title="Download Excel">
+                                    <i class="mdi mdi-file-excel"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table mb-0 table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>#</th>
+                                    <th class="sortable" [class.active]="sortColumn === 'name'" (click)="sortBy('name')"
+                                        style="cursor: pointer;">
+                                        Candidate Name
+                                        <i class="mdi ms-1" [ngClass]="getSortIcon('name')"></i>
+                                    </th>
+                                    <th class="sortable" [class.active]="sortColumn === 'email'"
+                                        (click)="sortBy('email')" style="cursor: pointer;">
+                                        Email
+                                        <i class="mdi ms-1" [ngClass]="getSortIcon('email')"></i>
+                                    </th>
+                                    <th class="sortable" [class.active]="sortColumn === 'experience'"
+                                        (click)="sortBy('experience')" style="cursor: pointer;">
+                                        Experience
+                                        <i class="mdi ms-1" [ngClass]="getSortIcon('experience')"></i>
+                                    </th>
+                                    <th class="sortable" [class.active]="sortColumn === 'subject'"
+                                        (click)="sortBy('subject')" style="cursor: pointer;">
+                                        Subject
+                                        <i class="mdi ms-1" [ngClass]="getSortIcon('subject')"></i>
+                                    </th>
+                                    <th class="sortable" [class.active]="sortColumn === 'status'"
+                                        (click)="sortBy('status')" style="cursor: pointer;">
+                                        Status
+                                        <i class="mdi ms-1" [ngClass]="getSortIcon('status')"></i>
+                                    </th>
+                                    <th class="sortable" [class.active]="sortColumn === 'marks'"
+                                        (click)="sortBy('marks')" style="cursor: pointer;">
+                                        Marks
+                                        <i class="mdi ms-1" [ngClass]="getSortIcon('marks')"></i>
+                                    </th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let assessment of paginateData; let i = index; trackBy: trackById">
+                                    <td>{{ (page - 1) * pageSize + i + 1 }}</td>
+                                    <td>{{ assessment.career.name }}</td>
+                                    <td>{{ assessment.career.email }}</td>
+                                    <td>{{ assessment.career.experience | slice:0:15 }}</td>
+                                    <td>{{ assessment.career.subject | slice:0:15 }}</td>
+                                    <td [ngClass]="{
+                                        'text-warning': assessment.status === assessmentStatus.Pending,
+                                        'text-success': assessment.status === assessmentStatus.Approved,
+                                        'text-danger': assessment.status === assessmentStatus.Rejected,
+                                        'text-secondary': assessment.status !== assessmentStatus.Pending && assessment.status !== assessmentStatus.Approved && assessment.status !== assessmentStatus.Rejected
+                                    }">
+                                        <i class="mdi me-1" [ngClass]="{
+                                               'mdi-clock-outline': assessment.status === assessmentStatus.Pending,
+                                               'mdi-check-circle': assessment.status === assessmentStatus.Approved,
+                                               'mdi-close-circle': assessment.status === assessmentStatus.Rejected
+                                           }"></i>
+                                        {{ assessment.status | titlecase }}
+                                    </td>
+                                    <td>{{ assessment.calculated_marks }} / {{ assessment.total_marks }}</td>
+                                    <td class="text-nowrap">
+                                        <button class="btn btn-primary btn-sm me-1"
+                                            (click)="openPreviewModal(previewModal, assessment)">
+                                            <i class="mdi mdi-eye"></i>
+                                        </button>
+                                        <button class="btn btn-success btn-sm me-1"
+                                            *ngIf="assessment.status === assessmentStatus.Pending"
+                                            (click)="approveAssessment(assessment.assessment_id)"
+                                            [disabled]="isApproving">
+                                            <i class="mdi mdi-check"></i>
+                                        </button>
+                                        <button class="btn btn-danger btn-sm me-1"
+                                            *ngIf="assessment.status === assessmentStatus.Pending"
+                                            (click)="rejectAssessment(assessment.assessment_id)"
+                                            [disabled]="isRejecting">
+                                            <i class="mdi mdi-close"></i>
+                                        </button>
+                                        <button class="btn btn-outline-danger btn-sm"
+                                            (click)="removeAssessment(assessment.assessment_id)"
+                                            [disabled]="isRemoving">
+                                            <i class="mdi mdi-delete"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr *ngIf="!paginateData?.length">
+                                    <td colspan="8" class="text-center">No career assessments found</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <ngb-pagination [collectionSize]="collectionSize" [pageSize]="pageSize" [(page)]="page"
+                    (pageChange)="getPagination()" class="d-flex justify-content-end"></ngb-pagination>
+            </div>
+        </div>
+    </div>
+
+    <ng-template #previewModal let-modal>
+        <div class="modal-header">
+            <h5 class="modal-title">Career Assessment Details: {{ selectedAssessment?.career?.name ||
+                'Loading...' }}</h5>
+            <button type="button" class="btn-close" (click)="closeModal()"></button>
+        </div>
+        <div class="modal-body">
+            <div *ngIf="isLoadingPreview" class="text-center">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+            </div>
+            <div *ngIf="selectedAssessment" class="row g-4">
+                <!-- Candidate Details -->
+                <div class="col-12 col-xl-5">
+                    <h6 class="mb-3">Career Details</h6>
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <p><strong>Name:</strong> {{ selectedAssessment.career.name || 'N/A' }}</p>
+                            <p><strong>Email:</strong> {{ selectedAssessment.career.email || 'N/A' }}</p>
+                            <p><strong>Contact:</strong> {{ selectedAssessment.career.contactnumber || 'N/A' }}</p>
+                            <p><strong>Experience:</strong> {{ selectedAssessment.career.experience || 'N/A' }}</p>
+                            <p><strong>Subject:</strong> {{ selectedAssessment.career.subject || 'N/A' }}</p>
+                            <p><strong>Question Set:</strong> {{ selectedAssessment.questionset.type }} - {{
+                                selectedAssessment.questionset.category || 'N/A' }}</p>
+                            <p><strong>Difficulty:</strong> {{ selectedAssessment.questionset.difficulty || 'N/A' }}</p>
+                            <p><strong>Year:</strong> {{ selectedAssessment.questionset.year || 'N/A' }}</p>
+                            <p><strong>Status:</strong>
+                                <span [ngClass]="{
+                                    'text-warning': selectedAssessment.status === assessmentStatus.Pending,
+                                    'text-success': selectedAssessment.status === assessmentStatus.Approved,
+                                    'text-danger': selectedAssessment.status === assessmentStatus.Rejected
+                                }">
+                                    {{ selectedAssessment.status | titlecase }}
+                                </span>
+                            </p>
+                            <p><strong>Total Time:</strong> {{ selectedAssessment.questionset.totaltime ?
+                                (selectedAssessment.questionset.totaltime | number:'1.0-0') + ' min' : 'N/A' }}</p>
+                            <p><strong>Remaining Time:</strong> {{ selectedAssessment.remaining_time ?
+                                (selectedAssessment.remaining_time / 60 | number:'1.0-0') + ' min' : 'N/A' }}</p>
+                            <p><strong>Marks:</strong> {{ selectedAssessment.calculated_marks }} / {{
+                                selectedAssessment.total_marks }}</p>
+                        </div>
+                    </div>
+
+                    <div class="d-flex gap-2 mt-3" *ngIf="selectedAssessment.career.resume">
+                        <a class="btn btn-primary btn-sm" [href]="selectedAssessment.career.resume" target="_blank"
+                            rel="noopener">
+                            Open Resume in New Tab
+                        </a>
+                        <a class="btn btn-outline-primary btn-sm" [href]="selectedAssessment.career.resume" download>
+                            Download Resume
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Resume Preview -->
+                <div class="col-12 col-xl-7">
+                    <h6 class="mb-3">Resume Preview</h6>
+                    <div class="border rounded" style="height:70vh; overflow:hidden;">
+                        <ng-container *ngIf="safeResumeUrl; else noResume">
+                            <object [data]="safeResumeUrl" type="application/pdf" width="100%" height="100%">
+                                <iframe [src]="safeResumeUrl" width="100%" height="100%" style="border:0;"></iframe>
+                            </object>
+                        </ng-container>
+                        <ng-template #noResume>
+                            <div class="h-100 d-flex align-items-center justify-content-center text-muted">
+                                No resume available to preview.
+                            </div>
+                        </ng-template>
+                    </div>
+                    <div class="small text-muted mt-2">
+                        If the preview doesn't load, click "Open Resume in New Tab."
+                    </div>
+                </div>
+
+                <!-- Question Set Preview -->
+                <div class="col-12">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="modal-title mt-0">Form Type: {{ selectedAssessment.questionset.type || 'N/A' }}</h5>
+                        <h5 class="modal-title mt-0">Year: {{ selectedAssessment.questionset.year || 'N/A' }}</h5>
+                        <h5 class="modal-title mt-0">Difficulty: {{ selectedAssessment.questionset.difficulty || 'N/A'
+                            }}</h5>
+                    </div>
+                    <h5 class="title text-center mb-3">Question List</h5>
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="card" *ngFor="let data of selectedAssessment.answers; let i = index">
+                                <div class="card-body overflow-hidden position-relative">
+                                    <div class="faq-count">
+                                        <div class="d-flex justify-content-between align-items-center gap-2">
+                                            <h5>{{ i + 1 }}. {{ data.question_text }}</h5>
+                                            <div>
+                                                <h5 class="badge bg-primary" style="font-size:medium;">Weight: {{
+                                                    data.weight }}</h5>
+                                                <h5 class="badge bg-secondary" style="font-size:medium;">Time: {{
+                                                    data.time }} min</h5>
+                                                <h5 class="badge" [ngClass]="{
+                                                      'bg-success': data.is_correct === 1,
+                                                      'bg-danger': data.is_correct === 0,
+                                                      'bg-secondary': data.is_correct === null
+                                                    }" style="font-size:medium;">
+                                                    {{ data.is_correct === 1 ? '+' + data.weight : '0' }}
+                                                </h5>
+                                            </div>
+                                        </div>
+
+                                        <!-- Multiple Choice Questions (Checkbox/Radio) -->
+                                        <div *ngIf="data.option_type === 'Checkbox' || data.option_type === 'Radio'">
+                                            <div class="options-table mt-3">
+                                                <table class="table table-bordered mb-0" style="background: #f9f9f9;">
+                                                    <thead class="table-light">
+                                                        <tr>
+                                                            <th style="width: 50%">Option</th>
+                                                            <th style="width: 20%">Select</th>
+                                                            <th style="width: 20%">Value</th>
+                                                            <th style="width: 10%">Correct</th>
+                                                            <th style="width: 10%">Candidate's Answer</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <ng-container *ngIf="data.option_type === 'Checkbox'">
+                                                            <tr *ngFor="let opt of data.optionsArr; let optInd = index">
+                                                                <td class="fw-bold" style="font-size: 1rem;">{{
+                                                                    opt.options }}</td>
+                                                                <td>
+                                                                    <input class="form-check-input" type="checkbox"
+                                                                        disabled
+                                                                        [checked]="isOptionSelected(data.answer, optInd, opt.value)" />
+                                                                </td>
+                                                                <td class="fw-bold" style="font-size: 1rem;">{{
+                                                                    opt.value }}</td>
+                                                                <td>
+                                                                    <i class="bx bx-check text-success font-size-18"
+                                                                        *ngIf="opt.isCorrect"></i>
+                                                                </td>
+                                                                <td>
+                                                                    <i class="bx bx-check text-primary font-size-18"
+                                                                        *ngIf="isOptionSelected(data.answer, optInd, opt.value)"></i>
+                                                                </td>
+                                                            </tr>
+                                                        </ng-container>
+                                                        <ng-container *ngIf="data.option_type === 'Radio'">
+                                                            <tr *ngFor="let opt of data.optionsArr; let optInd = index">
+                                                                <td class="fw-bold" style="font-size: 1rem;">{{
+                                                                    opt.options }}</td>
+                                                                <td>
+                                                                    <input class="form-check-input" type="radio"
+                                                                        [name]="'radio'+i" disabled
+                                                                        [checked]="isRadioSelected(data.answer, optInd, opt.value)" />
+                                                                </td>
+                                                                <td class="fw-bold" style="font-size: 1rem;">{{
+                                                                    opt.value }}</td>
+                                                                <td>
+                                                                    <i class="bx bx-check text-success font-size-18"
+                                                                        *ngIf="opt.isCorrect"></i>
+                                                                </td>
+                                                                <td>
+                                                                    <i class="bx bx-check text-primary font-size-18"
+                                                                        *ngIf="isRadioSelected(data.answer, optInd, opt.value)"></i>
+                                                                </td>
+                                                            </tr>
+                                                        </ng-container>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+
+                                        <!-- Text Input Questions -->
+                                        <div *ngIf="data.option_type === 'Input' || data.option_type === 'Textarea'">
+                                            <div class="form-group mt-3">
+                                                <label>Correct Answer</label>
+                                                <input *ngIf="data.option_type === 'Input'" type="text"
+                                                    class="form-control" [value]="data.correctAnswer || ''" readonly>
+                                                <textarea *ngIf="data.option_type === 'Textarea'" class="form-control"
+                                                    rows="4" [value]="data.correctAnswer || ''" readonly></textarea>
+                                            </div>
+                                            <div class="form-group mt-3">
+                                                <label>Candidate's Answer</label>
+                                                <input *ngIf="data.option_type === 'Input'" type="text"
+                                                    class="form-control" [value]="data.answer || 'No answer provided'"
+                                                    readonly>
+                                                <textarea *ngIf="data.option_type === 'Textarea'" class="form-control"
+                                                    rows="4" [value]="data.answer || 'No answer provided'"
+                                                    readonly></textarea>
+                                            </div>
+                                            <div class="form-group mt-3" *ngIf="data.answer">
+                                                <label>Correctness</label>
+                                                <div>
+                                                    <button class="btn btn-success btn-sm me-2"
+                                                        (click)="setCorrect(data.question_id, 1)"
+                                                        [disabled]="data.is_correct === 1 || isLoadingPreview">
+                                                        Mark Correct
+                                                    </button>
+                                                    <button class="btn btn-danger btn-sm me-2"
+                                                        (click)="setCorrect(data.question_id, 0)"
+                                                        [disabled]="data.is_correct === 0 || isLoadingPreview">
+                                                        Mark Incorrect
+                                                    </button>
+                                                    <span *ngIf="data.is_correct !== null">
+                                                        {{ data.is_correct === 1 ? 'Correct' : 'Incorrect' }}
+                                                    </span>
+                                                    <span *ngIf="data.is_correct === null">Not evaluated</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div *ngIf="!selectedAssessment.answers?.length" class="alert alert-info">
+                                No answers submitted for this assessment.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" (click)="closeModal()">Close</button>
+        </div>
+    </ng-template>
+</div>

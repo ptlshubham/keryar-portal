@@ -12,12 +12,18 @@ import { SharedModule } from 'src/app/shared/shared.module';
 import { CareerRoutingModule } from './career-routing.module';
 import { JobOpeningComponent } from './job-opening/job-opening.component';
 import { JobApplicationListComponent } from './job-application-list/job-application-list.component';
+import { CareerResultComponent } from './career-result/career-result.component';
+import { ApprovedCareerPersonComponent } from './approved-career-person/approved-career-person.component';
+import { CareerInterviewRoundComponent } from './career-interview-round/career-interview-round.component';
 
 
 @NgModule({
   declarations: [
     JobOpeningComponent,
-    JobApplicationListComponent
+    JobApplicationListComponent,
+    CareerResultComponent,
+    ApprovedCareerPersonComponent,
+    CareerInterviewRoundComponent
   ],
   imports: [
     CommonModule,

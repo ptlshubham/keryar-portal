@@ -47,4 +47,64 @@ export class CareerService {
     deleteCareerApplication(id: string): Observable<any> {
         return this.httpClient.get(ApiService.deleteCareerApplicationURL + id);
     }
+
+
+    getAllCareerAssessments(status?: string): Observable<any> {
+        let url = `${ApiService.HOST_URL}/keryar/GetAllCareerAssessments`;
+        if (status) {
+            url += `?status=${status}`;
+        }
+        return this.httpClient.get(url);
+    }
+
+    // Get career assessment preview
+    getCareerAssessmentPreview(assessmentId: string): Observable<any> {
+        return this.httpClient.get(`${ApiService.HOST_URL}/keryar/GetCareerAssessmentPreview/${assessmentId}`);
+    }
+
+    // Approve/Reject career assessment
+    approveRejectCareerAssessment(assessmentId: string, status: string): Observable<any> {
+        return this.httpClient.post(`${ApiService.HOST_URL}/keryar/ApproveRejectCareerAssessment`, {
+            assessmentId,
+            status
+        });
+    }
+
+    // Update career answer correctness
+    updateCareerAnswerCorrectness(careerFormId: string, questionSetId: string, questionId: string, isCorrect: number): Observable<any> {
+        return this.httpClient.post(`${ApiService.HOST_URL}/keryar/UpdateCareerAnswerCorrectness`, {
+            careerFormId,
+            questionSetId,
+            questionId,
+            isCorrect
+        });
+    }
+
+    // Get approved career students
+    getApprovedCareerStudents(): Observable<any> {
+        return this.httpClient.get(`${ApiService.HOST_URL}/keryar/GetApprovedCareerStudents`);
+    }
+
+    // Update career interview status
+    updateCareerInterviewStatus(data: { id: string, interviewround: string }): Observable<any> {
+        return this.httpClient.post(`${ApiService.HOST_URL}/keryar/UpdateCareerInterviewStatus`, data);
+    }
+
+    // Remove career interview student
+    removeCareerInterviewStudent(id: string): Observable<any> {
+        return this.httpClient.post(`${ApiService.HOST_URL}/keryar/RemoveCareerInterviewStudent`, { id });
+    }
+
+    // Update career remarks
+    updateCareerRemarks(assessmentId: string, remarks: string): Observable<any> {
+        return this.httpClient.post(`${ApiService.HOST_URL}/keryar/UpdateCareerRemarks`, {
+            assessmentId,
+            remarks
+        });
+    }
+
+    // Remove career assessment
+    removeCareerAssessment(assessmentId: string): Observable<any> {
+        return this.httpClient.delete(`${ApiService.HOST_URL}/keryar/RemoveCareerAssessment/${assessmentId}`);
+    }
 }
