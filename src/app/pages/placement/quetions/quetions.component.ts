@@ -75,7 +75,8 @@ export class QuetionsComponent implements OnInit {
     return enteredQuestions.every(q => {
       // Basic validation for weight and time - allow 0 for weight
       const hasValidWeight = q.weight !== null && q.weight !== undefined && q.weight !== '' && Number(q.weight) >= 0;
-      const hasValidTime = q.time !== null && q.time !== undefined && q.time !== '' && Number(q.time) > 0;
+      // Allow time to be 0 minutes as valid
+      const hasValidTime = q.time !== null && q.time !== undefined && q.time !== '' && Number(q.time) >= 0;
 
       if (!hasValidWeight || !hasValidTime) return false;
 
@@ -347,8 +348,9 @@ export class QuetionsComponent implements OnInit {
         if (q.weight === null || q.weight === undefined || q.weight === '' || Number(q.weight) < 0) {
           errors.push(`Question ${index + 1}: Weight must be 0 or greater`);
         }
-        if (!q.time || Number(q.time) <= 0) {
-          errors.push(`Question ${index + 1}: Time must be greater than 0`);
+        // Allow time to be 0 or greater
+        if (q.time === null || q.time === undefined || q.time === '' || Number(q.time) < 0) {
+          errors.push(`Question ${index + 1}: Time must be 0 or greater`);
         }
         if (!q.option_type) {
           errors.push(`Question ${index + 1}: Option type is required`);
