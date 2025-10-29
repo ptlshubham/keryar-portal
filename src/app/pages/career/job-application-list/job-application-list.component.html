@@ -16,7 +16,6 @@
                                 <th>Contact</th>
                                 <th>Job Title</th>
                                 <th>Department</th>
-                                <th>Location</th>
                                 <th>Applied On</th>
                                 <th class="text-end">Action</th>
                             </tr>
@@ -31,7 +30,6 @@
                                     <span class="badge bg-success">{{ app.jobtitle || '—' }}</span>
                                 </td>
                                 <td>{{ app.department || '—' }}</td>
-                                <td>{{ app.location || '—' }}</td>
                                 <td>
                                     {{ formatDate(app.createddate) }}
                                     <small class="text-muted">{{ formatTime(app.createddate) }}</small>
@@ -154,7 +152,6 @@
     <ul class="list-unstyled">
         <li><strong>Title:</strong> {{ selectedApp.jobtitle || '—' }}</li>
         <li><strong>Department:</strong> {{ selectedApp.department || '—' }}</li>
-        <li><strong>Location:</strong> {{ selectedApp.location || '—' }}</li>
         <li><strong>Type:</strong> {{ selectedApp.jobtype || '—' }}</li>
         <li><strong>Experience:</strong> {{ selectedApp.job_experience || '—' }}</li>
         <li><strong>Salary:</strong> {{ selectedApp.salary || '—' }}</li>

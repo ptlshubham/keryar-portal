@@ -107,6 +107,12 @@ export const MENU: MenuItem[] = [
                 link: '/connect/contact-us',
                 parentId: 12
             },
+            {
+                id: 12,
+                label: 'Inquiry Form List',
+                link: '/call-to-action',
+                parentId: 12
+            },
         ]
     },
     {
