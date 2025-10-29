@@ -3,6 +3,8 @@ import { RouterModule, Routes } from '@angular/router';
 
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { CallToActionListComponent } from './call-to-action-list/call-to-action-list.component';
+import { StudentListComponent } from './placement/student-list/student-list.component';
+import { StudentformListComponent } from './studentform-list/studentform-list.component';
 
 
 const routes: Routes = [
@@ -31,6 +33,10 @@ const routes: Routes = [
   {
     path: 'call-to-action',
     component: CallToActionListComponent
+  },
+  {
+    path: 'student-form-list',
+    component: StudentformListComponent
   },
   // {
   //   path: 'pages', loadChildren: () => import('./extraspages/extraspages.module').then(m => m.ExtraspagesModule)

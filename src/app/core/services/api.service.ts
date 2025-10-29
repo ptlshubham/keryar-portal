@@ -157,4 +157,8 @@ export class ApiService {
   public static getCareerApplicationsByJobURL: string = ApiService.HOST_URL + '/keryar/GetCareerApplicationsByJob/';
   public static deleteCareerApplicationURL: string = ApiService.HOST_URL + '/keryar/DeleteCareerApplication/';
 
+  public static getStudentFormDetailsURL: string = ApiService.HOST_URL + '/keryar/GetAllStudentFormDetails';
+  public static removeStudentFormDetailsByIdURL: string = ApiService.HOST_URL + '/keryar/RemoveStudentFormById/';
+
+
 }

@@ -241,5 +241,18 @@ export const MENU: MenuItem[] = [
 
         ]
     },
+    {
+        id: 8,
+        label: 'Student Form',
+        icon: 'mdi mdi-domain', // 🏫 Campus/company related
+        subItems: [
+            {
+                id: 12,
+                label: ' Student Form List',
+                link: '/student-form-list',
+                parentId: 12
+            },
+        ]
+    },
 ];
 

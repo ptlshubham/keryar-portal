@@ -20,11 +20,13 @@ import { PagesRoutingModule } from './pages-routing.module';
 
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { CallToActionListComponent } from './call-to-action-list/call-to-action-list.component';
+import { StudentformListComponent } from './studentform-list/studentform-list.component';
 
 @NgModule({
   declarations: [
     DashboardComponent,
     CallToActionListComponent,
+    StudentformListComponent,
   ],
   imports: [
     CommonModule,
