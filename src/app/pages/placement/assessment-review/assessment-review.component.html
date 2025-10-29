@@ -302,7 +302,10 @@
                                 <div class="card-body overflow-hidden position-relative">
                                     <div class="faq-count">
                                         <div class="d-flex justify-content-between align-items-center gap-2">
-                                            <h5>{{ i + 1 }}. {{ data.question_text }}</h5>
+                                            <h5>
+                                                <span [textContent]="i + 1 + '. ' + (data.question_text || '')"
+                                                    style="white-space:pre-wrap; display:block;"></span>
+                                            </h5>
                                             <div>
                                                 <h5 class="badge bg-primary" style="font-size:medium;">Weight: {{
                                                     data.weight }}</h5>
@@ -374,19 +377,26 @@
                                         <div *ngIf="data.option_type === 'Input' || data.option_type === 'Textarea'">
                                             <div class="form-group mt-3">
                                                 <label>Correct Answer</label>
-                                                <input *ngIf="data.option_type === 'Input'" type="text"
-                                                    class="form-control" [value]="data.correctAnswer || ''" readonly>
-                                                <textarea *ngIf="data.option_type === 'Textarea'" class="form-control"
-                                                    rows="4" [value]="data.correctAnswer || ''" readonly></textarea>
+                                                <ng-container *ngIf="data.correctAnswer; else noCorrect">
+                                                    <div class="border rounded p-2 bg-light"
+                                                        style="white-space:pre-wrap;">
+                                                        <span [textContent]="data.correctAnswer"></span>
+                                                    </div>
+                                                </ng-container>
+                                                <ng-template #noCorrect>
+                                                    <div class="text-muted">N/A</div>
+                                                </ng-template>
                                             </div>
                                             <div class="form-group mt-3">
                                                 <label>Student's Answer</label>
-                                                <input *ngIf="data.option_type === 'Input'" type="text"
-                                                    class="form-control" [value]="data.answer || 'No answer provided'"
-                                                    readonly>
-                                                <textarea *ngIf="data.option_type === 'Textarea'" class="form-control"
-                                                    rows="4" [value]="data.answer || 'No answer provided'"
-                                                    readonly></textarea>
+                                                <ng-container *ngIf="data.answer; else noAnswer">
+                                                    <div class="border rounded p-2" style="white-space:pre-wrap;">
+                                                        <span [textContent]="data.answer"></span>
+                                                    </div>
+                                                </ng-container>
+                                                <ng-template #noAnswer>
+                                                    <div class="text-muted">No answer provided</div>
+                                                </ng-template>
                                             </div>
                                             <div class="form-group mt-3" *ngIf="data.answer">
                                                 <label>Correctness</label>

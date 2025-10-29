@@ -3,7 +3,7 @@ import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { ToastrService } from 'ngx-toastr';
 import { PlacementService } from 'src/app/core/services/placement.service';
 import Swal from 'sweetalert2';
-import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import { DomSanitizer, SafeResourceUrl, SafeHtml } from '@angular/platform-browser';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import * as XLSX from 'xlsx';
@@ -137,9 +137,12 @@ export class AssessmentReviewComponent implements OnInit {
 
       if (answer.option_type === 'Checkbox') {
         if (Array.isArray(answer.answer)) {
-          questionMarks = answer.optionsArr
+          const optionSum = answer.optionsArr
             .filter((opt: any, index: number) => this.isOptionSelected(answer.answer, index, opt.value))
             .reduce((sum: number, opt: any) => sum + Number(opt.value || 0), 0);
+          const weight = Number(answer.weight || 0);
+          // Cap the checkbox score to the question weight if weight is provided
+          questionMarks = weight > 0 ? Math.min(optionSum, weight) : optionSum;
         }
       } else if (answer.option_type === 'Radio') {
         const selectedOption = answer.optionsArr.find((opt: any, index: number) =>
@@ -671,9 +674,12 @@ export class AssessmentReviewComponent implements OnInit {
 
       if (answer.option_type === 'Checkbox') {
         if (Array.isArray(answer.answer)) {
-          questionMarks = answer.optionsArr
+          const optionSum = answer.optionsArr
             .filter((opt: any, index: number) => this.isOptionSelected(answer.answer, index, opt.value))
             .reduce((sum: number, opt: any) => sum + Number(opt.value || 0), 0);
+          const weight = Number(answer.weight || 0);
+          // Cap the checkbox score to the question weight if weight is provided
+          questionMarks = weight > 0 ? Math.min(optionSum, weight) : optionSum;
         }
       } else if (answer.option_type === 'Radio') {
         const selectedOption = answer.optionsArr.find((opt: any, index: number) =>
@@ -721,6 +727,10 @@ export class AssessmentReviewComponent implements OnInit {
         this.toastr.error('Error updating correctness: ' + (err.error?.message || err.message));
       }
     });
+  }
+
+  sanitizeHtml(html: string): SafeHtml {
+    return this.sanitizer.bypassSecurityTrustHtml(html || '');
   }
 
   trackById(_: number, item: any) {
