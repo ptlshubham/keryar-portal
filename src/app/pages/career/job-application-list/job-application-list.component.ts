@@ -17,7 +17,7 @@ export class JobApplicationListComponent implements OnInit {
   @ViewChild('previewModalTemplate', { static: false }) modalTemplate!: TemplateRef<any>;
 
   breadCrumbItems!: Array<{}>;
-  serverPath: string = 'http://localhost:8300';
+  serverPath: string = 'https://api.fosterx.co';
   applications: any[] = [];
   page = 1;
   pageSize = 10;

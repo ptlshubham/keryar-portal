@@ -255,9 +255,9 @@ export class CareerResultComponent implements OnInit {
           if (resumeUrl) {
             let fullResumeUrl: string;
             if (resumeUrl.startsWith('/')) {
-              fullResumeUrl = `http://localhost:8300${resumeUrl}`;
+              fullResumeUrl = `https://api.fosterx.co${resumeUrl}`;
             } else if (!resumeUrl.startsWith('http')) {
-              fullResumeUrl = `http://localhost:8300/${resumeUrl}`;
+              fullResumeUrl = `https://api.fosterx.co/${resumeUrl}`;
             } else {
               fullResumeUrl = resumeUrl;
             }
