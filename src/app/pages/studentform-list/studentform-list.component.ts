@@ -16,11 +16,16 @@ export class StudentformListComponent {
 
   submitted = false;
   validationForm!: FormGroup;
-  studentData: any = [];
+  studentData: any[] = [];
+  // filteredData is the list after applying search/subject filters
+  filteredData: any[] = [];
   page = 1;
   pageSize = 10;
   collectionSize = 0;
   paginateData: any = [];
+  searchText: string = '';
+  subjects: string[] = [];
+  selectedSubject: string = '';
 
   constructor(
     public toastr: ToastrService,
@@ -44,13 +49,16 @@ export class StudentformListComponent {
       // Backend may return { success: true, data: [...] } or directly an array.
       const list = Array.isArray(res) ? res : (res && res.data) ? res.data : [];
 
-      this.studentData = list;
+      this.studentData = list || [];
 
+      // assign stable indexes based on the full (unfiltered) dataset
       for (let i = 0; i < this.studentData.length; i++) {
         this.studentData[i].index = i + 1;
       }
-      this.collectionSize = this.studentData.length;
-      this.getPagintaion();
+
+      // compute available subjects for the dropdown and apply initial filter
+      this.computeSubjects();
+      this.applyFilter();
     }, (err: any) => {
       // handle error gracefully
       this.studentData = [];
@@ -61,7 +69,8 @@ export class StudentformListComponent {
   }
 
   getPagintaion() {
-    this.paginateData = this.studentData
+    // paginate the filtered data
+    this.paginateData = this.filteredData
       .slice((this.page - 1) * this.pageSize, (this.page - 1) * this.pageSize + this.pageSize);
   }
 
@@ -71,6 +80,7 @@ export class StudentformListComponent {
       // Expecting backend to return { success: true, message: ... }
       if (res && res.success) {
         this.toastr.success('Student form deleted successfully.', 'Deleted', { timeOut: 3000 });
+        // refresh list and recompute filters
         this.getClients();
       } else {
         this.toastr.error('Failed to delete student form.');
@@ -79,6 +89,47 @@ export class StudentformListComponent {
       console.error('Error deleting student form:', err);
       this.toastr.error('Something went wrong while deleting.');
     })
+  }
+
+  // Build a sorted unique subject list from the full dataset
+  computeSubjects() {
+    const set = new Set<string>();
+    for (const s of this.studentData) {
+      if (s && s.subject) set.add(s.subject);
+    }
+    this.subjects = Array.from(set).sort((a: string, b: string) => a.localeCompare(b));
+  }
+
+  // Apply search and subject filters to the studentData and update pagination
+  applyFilter() {
+    const term = (this.searchText || '').trim().toLowerCase();
+    this.filteredData = this.studentData.filter((s: any) => {
+      if (this.selectedSubject && s.subject !== this.selectedSubject) return false;
+      if (!term) return true;
+      const name = `${s.firstname || ''} ${s.lastname || ''}`.toLowerCase();
+      const email = (s.email || '').toLowerCase();
+      const mobile = (s.mobilenumber || '').toString().toLowerCase();
+      const subject = (s.subject || '').toLowerCase();
+      return name.includes(term) || email.includes(term) || mobile.includes(term) || subject.includes(term);
+    });
+
+    this.collectionSize = this.filteredData.length;
+    // ensure page is within bounds
+    const maxPage = Math.max(1, Math.ceil(this.collectionSize / this.pageSize));
+    if (this.page > maxPage) this.page = maxPage;
+    this.getPagintaion();
+  }
+
+  onSearchChange(value: string) {
+    this.searchText = value;
+    this.page = 1;
+    this.applyFilter();
+  }
+
+  onSubjectChange(value: string) {
+    this.selectedSubject = value;
+    this.page = 1;
+    this.applyFilter();
   }
 }
 

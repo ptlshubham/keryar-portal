@@ -189,7 +189,7 @@ export const MENU: MenuItem[] = [
     {
         id: 8,
         label: 'Internship',
-        icon: 'mdi mdi-domain', // 🏫 Campus/company related
+        icon: 'mdi mdi-briefcase-account-outline', // 🎓 Internship / Work experience
         subItems: [
             {
                 id: 12,
@@ -216,7 +216,7 @@ export const MENU: MenuItem[] = [
     {
         id: 8,
         label: 'Career',
-        icon: 'mdi mdi-domain', // 🏫 Campus/company related
+        icon: 'mdi mdi-rocket-launch-outline', // 🚀 Career growth / Job opportunities
         subItems: [
             {
                 id: 12,
@@ -250,7 +250,7 @@ export const MENU: MenuItem[] = [
     {
         id: 8,
         label: 'Student Form',
-        icon: 'mdi mdi-domain', // 🏫 Campus/company related
+        icon: 'mdi mdi-school-outline', // 🎒 Student / Education related
         subItems: [
             {
                 id: 12,
