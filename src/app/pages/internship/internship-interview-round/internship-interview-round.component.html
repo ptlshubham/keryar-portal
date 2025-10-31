@@ -76,7 +76,6 @@
                                     <th>College</th>
                                     <th>Department</th>
                                     <th>Subject</th>
-                                    <th>Duration</th>
                                     <th>Question Set</th>
                                     <th>Interview Status</th>
                                     <th>Marks</th>
@@ -92,7 +91,6 @@
                                     <td>{{ student.internship.collagename }}</td>
                                     <td>{{ student.internship.department }}</td>
                                     <td>{{ student.internship.subject | slice:0:15 }}</td>
-                                    <td>{{ student.internship.duration }}</td>
                                     <td>{{ student.questionset.type }}</td>
                                     <td [ngClass]="{
                                         'text-warning': student.interviewround === interviewStatus.Pending,
@@ -169,7 +167,14 @@
                             <p><strong>City:</strong> {{ selectedStudent.internship.city || 'N/A' }}</p>
                             <p><strong>College:</strong> {{ selectedStudent.internship.collagename || 'N/A' }}</p>
                             <p><strong>Department:</strong> {{ selectedStudent.internship.department || 'N/A' }}</p>
-                            <p><strong>Duration:</strong> {{ selectedStudent.internship.duration || 'N/A' }}</p>
+                            <p><strong>Start Date:</strong>
+                                {{ selectedStudent.internship.startdate ? (selectedStudent.internship.startdate |
+                                date:'mediumDate') : 'N/A' }}
+                            </p>
+                            <p><strong>End Date:</strong>
+                                {{ selectedStudent.internship.enddate ? (selectedStudent.internship.enddate |
+                                date:'mediumDate') : 'N/A' }}
+                            </p>
                             <p><strong>Subject:</strong> {{ selectedStudent.internship.subject || 'N/A' }}</p>
                             <p><strong>Question Set:</strong> {{ selectedStudent.questionset.type || 'N/A' }}</p>
                             <p><strong>Difficulty:</strong> {{ selectedStudent.questionset.difficulty || 'N/A' }}</p>

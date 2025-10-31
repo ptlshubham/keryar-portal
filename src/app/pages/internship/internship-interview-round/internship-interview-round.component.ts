@@ -22,7 +22,6 @@ interface WorksheetRow {
   'Mobile Number': string;
   'College Name': string;
   'Department': string;
-  'Duration': string;
   'Subject': string;
   'Interview Status': string;
   'Total Marks': number;
@@ -460,7 +459,6 @@ export class InternshipInterviewRoundComponent implements OnInit {
       'Mobile Number': student.internship.mobilenumber || 'N/A',
       'College Name': student.internship.collagename || 'N/A',
       'Department': student.internship.department || 'N/A',
-      'Duration': student.internship.duration || 'N/A',
       'Subject': student.internship.subject || 'N/A',
       'Interview Status': student.interviewround ? student.interviewround.charAt(0).toUpperCase() + student.interviewround.slice(1) : 'Pending',
       'Total Marks': student.total_marks || 0,

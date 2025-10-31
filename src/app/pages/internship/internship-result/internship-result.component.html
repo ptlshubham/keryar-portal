@@ -194,7 +194,14 @@
                             <p><strong>City:</strong> {{ selectedAssessment.internship.city || 'N/A' }}</p>
                             <p><strong>College:</strong> {{ selectedAssessment.internship.collagename || 'N/A' }}</p>
                             <p><strong>Department:</strong> {{ selectedAssessment.internship.department || 'N/A' }}</p>
-                            <p><strong>Duration:</strong> {{ selectedAssessment.internship.duration || 'N/A' }}</p>
+                            <p><strong>Start Date:</strong>
+                                {{ selectedAssessment.internship.startdate ? (selectedAssessment.internship.startdate |
+                                date:'mediumDate') : 'N/A' }}
+                            </p>
+                            <p><strong>End Date:</strong>
+                                {{ selectedAssessment.internship.enddate ? (selectedAssessment.internship.enddate |
+                                date:'mediumDate') : 'N/A' }}
+                            </p>
                             <p><strong>Subject:</strong> {{ selectedAssessment.internship.subject || 'N/A' }}</p>
                             <p><strong>Question Set:</strong> {{ selectedAssessment.questionset.type }} - {{
                                 selectedAssessment.questionset.category || 'N/A' }}</p>

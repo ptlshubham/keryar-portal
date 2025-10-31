@@ -21,7 +21,6 @@ interface WorksheetRow {
   'Mobile Number': string;
   'College Name': string;
   'Department': string;
-  'Duration': string;
   'Subject': string;
   'Status': string;
   'Total Marks': number;
@@ -482,7 +481,6 @@ export class InternshipResultComponent implements OnInit {
       'Mobile Number': assessment.internship.mobilenumber || 'N/A',
       'College Name': assessment.internship.collagename || 'N/A',
       'Department': assessment.internship.department || 'N/A',
-      'Duration': assessment.internship.duration || 'N/A',
       'Subject': assessment.internship.subject || 'N/A',
       'Status': assessment.status ? assessment.status.charAt(0).toUpperCase() + assessment.status.slice(1) : 'N/A',
       'Total Marks': assessment.total_marks || 0,
