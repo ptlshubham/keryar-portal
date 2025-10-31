@@ -233,8 +233,7 @@ export class InterviewRoundComponent implements OnInit {
       'Applied Role',
       'Total Marks',
       'Obtained Marks',
-      'Interview Status',
-      'Remarks'
+      'Interview Status'
     ];
 
     const body = this.filteredStudents.map((student, index) => [
@@ -245,8 +244,7 @@ export class InterviewRoundComponent implements OnInit {
       student.appliedrole || 'N/A',
       student.total_marks || 0,
       student.calculated_marks || 0,
-      student.interviewround ? student.interviewround.charAt(0).toUpperCase() + student.interviewround.slice(1) : 'Pending',
-      student.remarks || 'N/A'
+      student.interviewround ? student.interviewround.charAt(0).toUpperCase() + student.interviewround.slice(1) : 'Pending'
     ]);
 
     autoTable(doc, {
@@ -277,8 +275,7 @@ export class InterviewRoundComponent implements OnInit {
         4: { cellWidth: 40 },
         5: { cellWidth: 30 },
         6: { cellWidth: 30 },
-        7: { cellWidth: 30 },
-        8: { cellWidth: 40 }
+        7: { cellWidth: 40 }
       },
       didDrawPage: () => {
         addHeader();
