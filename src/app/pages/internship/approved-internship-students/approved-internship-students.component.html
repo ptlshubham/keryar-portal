@@ -191,7 +191,11 @@
                                 <div class="card-body overflow-hidden position-relative">
                                     <div class="faq-count">
                                         <div class="d-flex justify-content-between align-items-center gap-2">
-                                            <h5>{{ i + 1 }}. {{ data.question_text }}</h5>
+                                            <h5>
+                                                <span
+                                                    [textContent]="i + 1 + '. ' + (data.question_text || data.question || '')"
+                                                    style="white-space:pre-wrap; display:block;"></span>
+                                            </h5>
                                             <div>
                                                 <h5 class="badge bg-primary" style="font-size:medium;">Weight: {{
                                                     data.weight }}</h5>

@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { SafeHtml } from '@angular/platform-browser';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { ToastrService } from 'ngx-toastr';
 import { InternshipService } from 'src/app/core/services/internship.service';
@@ -63,6 +64,10 @@ export class InternshipInterviewRoundComponent implements OnInit {
     private internshipService: InternshipService,
     private sanitizer: DomSanitizer
   ) { }
+
+  sanitizeHtml(html: string): SafeHtml {
+    return this.sanitizer.bypassSecurityTrustHtml(html || '');
+  }
 
   ngOnInit() {
     this.breadCrumbItems = [
