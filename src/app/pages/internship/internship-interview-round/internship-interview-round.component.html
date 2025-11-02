@@ -33,13 +33,13 @@
                                 (ngModelChange)="onDateChange()" placeholder="dd/mm/yyyy">
                         </div>
                         <div class="col-md-2">
-                            <label for="statusFilter" class="form-label">Filter by Interview Status</label>
+                            <label for="statusFilter" class="form-label">Filter by Status</label>
                             <select id="statusFilter" class="form-select" [(ngModel)]="filterStatus"
                                 (change)="filterByStatus(filterStatus)">
                                 <option value="">All Status</option>
-                                <option [value]="interviewStatus.Pending">Pending</option>
-                                <option [value]="interviewStatus.Approved">Approved</option>
-                                <option [value]="interviewStatus.Rejected">Rejected</option>
+                                <option [value]="assessmentStatus.Pending">Pending</option>
+                                <option [value]="assessmentStatus.Passed">Passed</option>
+                                <option [value]="assessmentStatus.Failed">Failed</option>
                             </select>
                         </div>
                         <div class="col-md-2">
@@ -63,6 +63,12 @@
                                 [disabled]="filteredStudents.length === 0" aria-label="Download Excel">
                                 <i class="mdi mdi-file-excel"></i>
                             </button>
+                            <!-- New button for changing status of selected students -->
+                            <button class="btn btn-success btn-sm ms-1"
+                                (click)="openChangeStatusModal(changeStatusModal)" [disabled]="!hasSelection()"
+                                title="Change Status for Selected">
+                                <i class="mdi mdi-check-bold"></i> Change Status
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -71,6 +77,11 @@
                         <table class="table mb-0 table-hover">
                             <thead class="table-light">
                                 <tr>
+                                    <!-- New checkbox column header -->
+                                    <th style="width:32px">
+                                        <input type="checkbox" [checked]="isAllSelected()"
+                                            (change)="toggleSelectAll($event)" />
+                                    </th>
                                     <th>#</th>
                                     <th>Student Name</th>
                                     <th>Email</th>
@@ -78,14 +89,22 @@
                                     <th>Department</th>
                                     <th>Subject</th>
                                     <th>Question Set</th>
-                                    <th>Interview Status</th>
                                     <th>Marks</th>
+                                    <!-- Add Status column -->
+                                    <th>Status</th>
+                                    <!-- Add Student Status column -->
+                                    <th>Student Status</th>
                                     <th>Remarks</th>
                                     <th>Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr *ngFor="let student of paginateData; let i = index; trackBy: trackById">
+                                    <!-- New checkbox cell -->
+                                    <td>
+                                        <input type="checkbox" [checked]="isSelected(student.assessment_id)"
+                                            (change)="toggleSelection($event, student.assessment_id)" />
+                                    </td>
                                     <td>{{ (page - 1) * pageSize + i + 1 }}</td>
                                     <td>{{ student.internship.name }}</td>
                                     <td>{{ student.internship.email }}</td>
@@ -93,19 +112,24 @@
                                     <td>{{ student.internship.department }}</td>
                                     <td>{{ student.internship.subject | slice:0:15 }}</td>
                                     <td>{{ student.questionset.type }}</td>
+                                    <td>{{ student.calculated_marks }} / {{ student.total_marks }}</td>
+                                    <!-- Add Status cell -->
                                     <td [ngClass]="{
-                                        'text-warning': student.interviewround === interviewStatus.Pending,
-                                        'text-success': student.interviewround === interviewStatus.Approved,
-                                        'text-danger': student.interviewround === interviewStatus.Rejected
+                                        'text-success': student.status === 'passed',
+                                        'text-danger': student.status === 'failed',
+                                        'text-warning': student.status === 'pending'
                                     }">
                                         <i class="mdi me-1" [ngClass]="{
-                                            'mdi-clock-outline': student.interviewround === interviewStatus.Pending,
-                                            'mdi-check-circle': student.interviewround === interviewStatus.Approved,
-                                            'mdi-close-circle': student.interviewround === interviewStatus.Rejected
+                                            'mdi-check-circle': student.status === 'passed',
+                                            'mdi-close-circle': student.status === 'failed',
+                                            'mdi-clock-outline': student.status === 'pending'
                                         }"></i>
-                                        {{ student.interviewround | titlecase }}
+                                        {{ student.status | titlecase }}
                                     </td>
-                                    <td>{{ student.calculated_marks }} / {{ student.total_marks }}</td>
+                                    <!-- Add Student Status cell -->
+                                    <td>{{ ((student.studentstatus || student.internship?.studentstatus) ?
+                                        (student.studentstatus || student.internship?.studentstatus) : 'N/A') |
+                                        titlecase }}</td>
                                     <td>{{ (student.remarks || 'N/A') | slice:0:20 }}...</td>
                                     <td class="text-nowrap">
                                         <button class="btn btn-primary btn-sm me-1"
@@ -113,17 +137,11 @@
                                             aria-label="Preview student">
                                             <i class="mdi mdi-eye"></i>
                                         </button>
-                                        <button class="btn btn-success btn-sm me-1"
-                                            *ngIf="student.interviewround === interviewStatus.Pending"
-                                            (click)="hireStudent(student.assessment_id)" [disabled]="isHiring"
-                                            aria-label="Hire student">
-                                            <i class="mdi mdi-check"></i>
-                                        </button>
-                                        <button class="btn btn-danger btn-sm me-1"
-                                            *ngIf="student.interviewround === interviewStatus.Pending"
-                                            (click)="rejectStudent(student.assessment_id)" [disabled]="isRejecting"
-                                            aria-label="Reject student">
-                                            <i class="mdi mdi-close"></i>
+                                        <!-- Single Status button like in result component -->
+                                        <button class="btn btn-warning btn-sm me-1"
+                                            (click)="openChangeStatusModal(changeStatusModal, student)"
+                                            [disabled]="isChangingStatus">
+                                            <i class="mdi mdi-pencil"></i> Status
                                         </button>
                                         <button class="btn btn-outline-danger btn-sm"
                                             (click)="removeStudent(student.assessment_id)" [disabled]="isRemoving"
@@ -133,7 +151,8 @@
                                     </td>
                                 </tr>
                                 <tr *ngIf="!paginateData?.length">
-                                    <td colspan="12" class="text-center">No approved students found</td>
+                                    <!-- Update colspan to account for new columns -->
+                                    <td colspan="14" class="text-center">No approved students found</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -182,18 +201,14 @@
                             <p><strong>Assessment Status:</strong>
                                 <span class="badge bg-success">{{ selectedStudent.status | titlecase }}</span>
                             </p>
-                            <p><strong>Interview Status:</strong>
-                                <span class="badge" [ngClass]="{
-                                    'bg-warning': selectedStudent.interviewround === interviewStatus.Pending,
-                                    'bg-success': selectedStudent.interviewround === interviewStatus.Approved,
-                                    'bg-danger': selectedStudent.interviewround === interviewStatus.Rejected
-                                }">{{ selectedStudent.interviewround | titlecase }}</span>
-                            </p>
                             <p><strong>Marks:</strong> {{ selectedStudent.calculated_marks }} / {{
                                 selectedStudent.total_marks }}</p>
                             <p><strong>Remarks:</strong> {{ selectedStudent.remarks || 'N/A' }}</p>
                             <p><strong>Created Date:</strong> {{ selectedStudent.createddate | date:'medium' || 'N/A' }}
                             </p>
+                            <p><strong>Student Status:</strong> {{ ((selectedStudent.studentstatus ||
+                                selectedStudent.internship?.studentstatus) ? (selectedStudent.studentstatus ||
+                                selectedStudent.internship?.studentstatus) : 'N/A') | titlecase }}</p>
                         </div>
                     </div>
                     <div class="d-flex gap-2 mt-3" *ngIf="selectedStudent.internship.resume">
@@ -364,6 +379,50 @@
         </div>
         <div class="modal-footer">
             <button type="button" class="btn btn-secondary" (click)="closeModal()">Close</button>
+        </div>
+    </ng-template>
+
+    <!-- Updated modal for changing status of selected students -->
+    <ng-template #changeStatusModal let-modal>
+        <div class="modal-header">
+            <h5 class="modal-title">Change Status & Student Status</h5>
+            <button type="button" class="btn-close" (click)="modal.close()"></button>
+        </div>
+        <div class="modal-body">
+            <p>Choose status and student status for the selected student(s). Confirming will update the status
+                for the selected assessments.</p>
+            <!-- Status Dropdown -->
+            <div class="mb-3">
+                <label for="statusSelect" class="form-label">Status</label>
+                <select id="statusSelect" class="form-select" [(ngModel)]="selectedStatus">
+                    <option [ngValue]="assessmentStatus.Pending">Pending</option>
+                    <option [ngValue]="assessmentStatus.Passed">Passed</option>
+                    <option [ngValue]="assessmentStatus.Failed">Failed</option>
+                </select>
+            </div>
+            <!-- Student Status Dropdown -->
+            <div class="mb-3">
+                <label for="studentStatusSelect" class="form-label">Student Status</label>
+                <select id="studentStatusSelect" class="form-select" [(ngModel)]="selectedStudentStatus">
+                    <option value="free">Free</option>
+                    <option value="paid">Paid</option>
+                    <option value="hold">Hold</option>
+                </select>
+            </div>
+            <div *ngIf="selectionArray().length">
+                <p><strong>Will change for:</strong></p>
+                <ul class="small">
+                    <li *ngFor="let id of selectionArray()">{{ getStudentNameById(id) || id }}</li>
+                </ul>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" (click)="modal.close()">Cancel</button>
+            <button type="button" class="btn btn-success" (click)="changeSelectedStatus(modal)"
+                [disabled]="isChangingStatus">
+                <span *ngIf="!isChangingStatus">Confirm</span>
+                <span *ngIf="isChangingStatus">Processing...</span>
+            </button>
         </div>
     </ng-template>
 </div>

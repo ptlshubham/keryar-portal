@@ -2,10 +2,10 @@
     <div class="page-title-box">
         <div class="row align-items-center">
             <div class="col-md-8">
-                <h6 class="page-title">Approved Internship Students</h6>
+                <h6 class="page-title">Paid Internship Students</h6> <!-- Updated title -->
                 <ol class="breadcrumb m-0">
                     <li class="breadcrumb-item"><a href="javascript:void(0);">Home</a></li>
-                    <li class="breadcrumb-item active">Approved Internship Students</li>
+                    <li class="breadcrumb-item active">Paid Internship Students</li> <!-- Updated breadcrumb -->
                 </ol>
             </div>
         </div>
@@ -15,8 +15,9 @@
         <div class="col-12">
             <div class="card">
                 <div class="card-header">
-                    <h5 class="card-title">Approved Internship Students</h5>
-                    <p class="card-title-desc">Review approved internship students and preview assessment details.</p>
+                    <h5 class="card-title">Paid Internship Students</h5> <!-- Updated card title -->
+                    <p class="card-title-desc">Review paid internship students and preview assessment details.</p>
+                    <!-- Updated description -->
                 </div>
                 <div class="card-body">
                     <div class="row mb-3 align-items-end">
@@ -51,6 +52,11 @@
                                 [disabled]="filteredStudents.length === 0" aria-label="Download Excel">
                                 <i class="mdi mdi-file-excel"></i>
                             </button>
+                            <!-- Add Status Selected button -->
+                            <button class="btn btn-success btn-sm ms-1" (click)="openApproveModal(approveModal)"
+                                [disabled]="!hasSelection()" title="Change Status for Selected">
+                                <i class="mdi mdi-check-bold"></i> Status Selected
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -59,6 +65,11 @@
                         <table class="table mb-0 table-hover">
                             <thead class="table-light">
                                 <tr>
+                                    <!-- Add checkbox column -->
+                                    <th style="width:32px">
+                                        <input type="checkbox" [checked]="isAllSelected()"
+                                            (change)="toggleSelectAll($event)" />
+                                    </th>
                                     <th>#</th>
                                     <th>Student Name</th>
                                     <th>Email</th>
@@ -67,12 +78,20 @@
                                     <th>Subject</th>
                                     <th>Question Set</th>
                                     <th>Marks</th>
+                                    <!-- Add Status column -->
+                                    <th>Status</th>
+                                    <th>Student Status</th>
                                     <th>Remarks</th>
                                     <th>Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr *ngFor="let student of paginateData; let i = index; trackBy: trackById">
+                                    <!-- Add checkbox cell -->
+                                    <td>
+                                        <input type="checkbox" [checked]="isSelected(student.assessment_id)"
+                                            (change)="toggleSelection($event, student.assessment_id)" />
+                                    </td>
                                     <td>{{ (page - 1) * pageSize + i + 1 }}</td>
                                     <td>{{ student.internship.name }}</td>
                                     <td>{{ student.internship.email }}</td>
@@ -81,6 +100,23 @@
                                     <td>{{ student.internship.subject | slice:0:15 }}</td>
                                     <td>{{ student.questionset.type }}</td>
                                     <td>{{ student.calculated_marks }} / {{ student.total_marks }}</td>
+                                    <!-- Add Status cell -->
+                                    <td [ngClass]="{
+                                        'text-success': student.status === 'passed',
+                                        'text-danger': student.status === 'failed',
+                                        'text-warning': student.status === 'pending'
+                                    }">
+                                        <i class="mdi me-1" [ngClass]="{
+                                            'mdi-check-circle': student.status === 'passed',
+                                            'mdi-close-circle': student.status === 'failed',
+                                            'mdi-clock-outline': student.status === 'pending'
+                                        }"></i>
+                                        {{ student.status | titlecase }}
+                                    </td>
+                                    <!-- Add Student Status cell -->
+                                    <td>{{ ((student.studentstatus || student.internship?.studentstatus) ?
+                                        (student.studentstatus || student.internship?.studentstatus) : 'N/A') |
+                                        titlecase }}</td>
                                     <td>{{ (student.remarks || 'N/A') | slice:0:20 }}...</td>
                                     <td class="text-nowrap">
                                         <button class="btn btn-primary btn-sm me-1"
@@ -88,10 +124,21 @@
                                             aria-label="Preview student">
                                             <i class="mdi mdi-eye"></i>
                                         </button>
+                                        <!-- Add Status button -->
+                                        <button class="btn btn-warning btn-sm me-1"
+                                            (click)="openApproveModal(approveModal, student)" [disabled]="isApproving">
+                                            <i class="mdi mdi-pencil"></i> Status
+                                        </button>
+                                        <!-- Add Remove button -->
+                                        <button class="btn btn-outline-danger btn-sm"
+                                            (click)="removeAssessment(student.assessment_id)" [disabled]="isRemoving">
+                                            <i class="mdi mdi-delete"></i>
+                                        </button>
                                     </td>
                                 </tr>
                                 <tr *ngIf="!paginateData?.length">
-                                    <td colspan="11" class="text-center">No approved internship students found</td>
+                                    <!-- Update colspan to account for new columns -->
+                                    <td colspan="14" class="text-center">No paid internship students found</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -132,14 +179,14 @@
                             <p><strong>Assessment Status:</strong>
                                 <span class="badge bg-success">{{ selectedStudent.status | titlecase }}</span>
                             </p>
-                            <p><strong>Interview Status:</strong>
-                                <span class="badge bg-success">{{ selectedStudent.interviewround | titlecase }}</span>
-                            </p>
                             <p><strong>Marks:</strong> {{ selectedStudent.calculated_marks }} / {{
                                 selectedStudent.total_marks }}</p>
                             <p><strong>Remarks:</strong> {{ selectedStudent.remarks || 'N/A' }}</p>
                             <p><strong>Created Date:</strong> {{ selectedStudent.createddate | date:'medium' || 'N/A' }}
                             </p>
+                            <p><strong>Student Status:</strong> {{ ((selectedStudent.studentstatus ||
+                                selectedStudent.internship?.studentstatus) ? (selectedStudent.studentstatus ||
+                                selectedStudent.internship?.studentstatus) : 'N/A') | titlecase }}</p>
                         </div>
                     </div>
                     <div class="d-flex gap-2 mt-3" *ngIf="selectedStudent.internship.resume">
@@ -312,6 +359,51 @@
         </div>
         <div class="modal-footer">
             <button type="button" class="btn btn-secondary" (click)="closeModal()">Close</button>
+        </div>
+    </ng-template>
+
+    <!-- Add Approve / Change Modal -->
+    <ng-template #approveModal let-modal>
+        <div class="modal-header">
+            <h5 class="modal-title">Change Status & Student Status</h5>
+            <button type="button" class="btn-close" (click)="modal.close()"></button>
+        </div>
+        <div class="modal-body">
+            <p>Choose student status and the new approval status for the selected student(s). Confirming will update the
+                status for the selected assessments.</p>
+
+            <!-- Status Dropdown -->
+            <div class="mb-3">
+                <label for="statusSelect" class="form-label">Status</label>
+                <select id="statusSelect" class="form-select" [(ngModel)]="selectedStatus">
+                    <option [ngValue]="assessmentStatus.Pending">Pending</option>
+                    <option [ngValue]="assessmentStatus.Passed">Passed</option>
+                    <option [ngValue]="assessmentStatus.Failed">Failed</option>
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label for="studentStatus" class="form-label">Student Status</label>
+                <select id="studentStatus" class="form-select" [(ngModel)]="selectedStudentStatus">
+                    <option value="free">Free</option>
+                    <option value="paid">Paid</option>
+                    <option value="hold">Hold</option>
+                </select>
+            </div>
+
+            <div *ngIf="selectionArray().length">
+                <p><strong>Will change for:</strong></p>
+                <ul class="small">
+                    <li *ngFor="let id of selectionArray()">{{ getAssessmentNameById(id) || id }}</li>
+                </ul>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" (click)="modal.close()">Cancel</button>
+            <button type="button" class="btn btn-success" (click)="approveSelected(modal)" [disabled]="isApproving">
+                <span *ngIf="!isApproving">Confirm</span>
+                <span *ngIf="isApproving">Processing...</span>
+            </button>
         </div>
     </ng-template>
 </div>

@@ -8,11 +8,12 @@ import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import * as XLSX from 'xlsx';
+import { forkJoin } from 'rxjs'; // Add this import for handling multiple updates
 
-enum InterviewStatus {
+enum AssessmentStatus {
   Pending = 'pending',
-  Approved = 'Passed',
-  Rejected = 'Failed'
+  Passed = 'passed',  // Changed to match result component's 'passed'
+  Failed = 'failed'   // Changed to match result component's 'failed'
 }
 
 interface WorksheetRow {
@@ -23,7 +24,7 @@ interface WorksheetRow {
   'College Name': string;
   'Department': string;
   'Subject': string;
-  'Interview Status': string;
+  'Status': string;
   'Total Marks': number;
   'Obtained Marks': number;
   'Remarks': string;
@@ -54,8 +55,14 @@ export class InternshipInterviewRoundComponent implements OnInit {
   isRemoving = false;
   isSavingRemarks = false;
   private modalRef?: NgbModalRef;
-  interviewStatus = InterviewStatus;
+  assessmentStatus = AssessmentStatus;
   safeResumeUrl?: SafeResourceUrl;
+
+  // New properties for multi-selection and status change
+  selectedIds: Set<string> = new Set<string>();
+  selectedStatus: AssessmentStatus = AssessmentStatus.Pending;
+  selectedStudentStatus: 'free' | 'paid' | 'hold' = 'free';
+  isChangingStatus = false;
 
   constructor(
     private modalService: NgbModal,
@@ -178,7 +185,7 @@ export class InternshipInterviewRoundComponent implements OnInit {
 
     if (this.filterStatus) {
       filteredStudents = filteredStudents.filter(student =>
-        student.interviewround === this.filterStatus
+        student.status === this.filterStatus
       );
     }
 
@@ -315,7 +322,7 @@ export class InternshipInterviewRoundComponent implements OnInit {
     }).then((result) => {
       if (result.isConfirmed) {
         this.isHiring = true;
-        this.internshipService.updateInternshipInterviewStatus({ id: studentId, interviewround: InterviewStatus.Approved }).subscribe({
+        this.internshipService.updateInternshipInterviewStatus({ id: studentId, interviewround: AssessmentStatus.Passed }).subscribe({
           next: (response) => {
             if (response.success) {
               this.toastr.success(response.message || 'Student marked as Approved');
@@ -348,7 +355,7 @@ export class InternshipInterviewRoundComponent implements OnInit {
     }).then((result) => {
       if (result.isConfirmed) {
         this.isRejecting = true;
-        this.internshipService.updateInternshipInterviewStatus({ id: studentId, interviewround: InterviewStatus.Rejected }).subscribe({
+        this.internshipService.updateInternshipInterviewStatus({ id: studentId, interviewround: AssessmentStatus.Failed }).subscribe({
           next: (response) => {
             if (response.success) {
               this.toastr.success(response.message || 'Student marked as rejected');
@@ -422,7 +429,7 @@ export class InternshipInterviewRoundComponent implements OnInit {
 
     doc.addPage();
 
-    const headers = ['#', 'Student Name', 'Email', 'College', 'Department', 'Subject', 'Total Marks', 'Obtained Marks', 'Interview Status', 'Remarks'];
+    const headers = ['#', 'Student Name', 'Email', 'College', 'Department', 'Subject', 'Total Marks', 'Obtained Marks', 'Status', 'Remarks'];
     const body = this.filteredStudents.map((student, index) => [
       index + 1,
       student.internship.name || 'N/A',
@@ -432,7 +439,7 @@ export class InternshipInterviewRoundComponent implements OnInit {
       student.internship.subject || 'N/A',
       student.total_marks || 0,
       student.calculated_marks || 0,
-      student.interviewround ? student.interviewround.charAt(0).toUpperCase() + student.interviewround.slice(1) : 'Pending',
+      student.status ? student.status.charAt(0).toUpperCase() + student.status.slice(1) : 'Pending',
       student.remarks || 'N/A'
     ]);
 
@@ -460,7 +467,7 @@ export class InternshipInterviewRoundComponent implements OnInit {
       'College Name': student.internship.collagename || 'N/A',
       'Department': student.internship.department || 'N/A',
       'Subject': student.internship.subject || 'N/A',
-      'Interview Status': student.interviewround ? student.interviewround.charAt(0).toUpperCase() + student.interviewround.slice(1) : 'Pending',
+      'Status': student.status ? student.status.charAt(0).toUpperCase() + student.status.slice(1) : 'Pending',
       'Total Marks': student.total_marks || 0,
       'Obtained Marks': student.calculated_marks || 0,
       'Remarks': student.remarks || 'N/A'
@@ -492,5 +499,97 @@ export class InternshipInterviewRoundComponent implements OnInit {
   isRadioSelected(answer: any, optionIndex: number, optionValue: any): boolean {
     if (answer === null || answer === undefined) return false;
     return answer === optionIndex || answer === optionValue || answer === optionIndex.toString();
+  }
+
+  // New methods for multi-selection
+  selectionArray(): string[] {
+    return Array.from(this.selectedIds);
+  }
+
+  isSelected(id: string): boolean {
+    return this.selectedIds.has(id);
+  }
+
+  toggleSelection(event: any, id: string) {
+    if (event.target.checked) {
+      this.selectedIds.add(id);
+    } else {
+      this.selectedIds.delete(id);
+    }
+  }
+
+  isAllSelected(): boolean {
+    const visibleIds = this.paginateData.map(i => i.assessment_id);
+    return visibleIds.length > 0 && visibleIds.every(id => this.selectedIds.has(id));
+  }
+
+  toggleSelectAll(event: any) {
+    const checked = event.target.checked;
+    const visibleIds = this.paginateData.map(i => i.assessment_id);
+    if (checked) {
+      visibleIds.forEach(id => this.selectedIds.add(id));
+    } else {
+      visibleIds.forEach(id => this.selectedIds.delete(id));
+    }
+  }
+
+  hasSelection(): boolean {
+    return this.selectedIds.size > 0;
+  }
+
+  // Updated method to handle single or multi-selection like in result component
+  openChangeStatusModal(modal: any, student?: any) {
+    if (student) {
+      // Single student selection
+      this.selectedIds = new Set<string>([student.assessment_id]);
+      this.selectedStatus = student.status ? student.status as AssessmentStatus : AssessmentStatus.Pending;
+      this.selectedStudentStatus = student.studentstatus || 'free'; // Assuming studentstatus exists
+    } else {
+      // Multi-selection or default
+      this.selectedStatus = AssessmentStatus.Pending;
+      this.selectedStudentStatus = 'free';
+    }
+    this.modalRef = this.modalService.open(modal, {
+      size: 'md',
+      centered: true,
+      backdrop: 'static'
+    });
+  }
+
+  // New method to change status for selected students
+  changeSelectedStatus(modalRef?: NgbModalRef) {
+    if (!this.hasSelection()) {
+      this.toastr.error('No students selected');
+      return;
+    }
+    const ids = this.selectionArray();
+    this.isChangingStatus = true;
+
+    // Use the same API as in the result component
+    const observables = ids.map(id =>
+      this.internshipService.updateInternshipAssessmentStatus(id, this.selectedStatus, this.selectedStudentStatus)
+    );
+
+    forkJoin(observables).subscribe({
+      next: (results: any[]) => {
+        this.toastr.success('Selected student(s) status updated');
+        this.selectedIds.clear();
+        this.loadApprovedStudents();
+        if (modalRef) {
+          modalRef.close();
+        }
+      },
+      error: (err) => {
+        this.toastr.error('Error updating selected students: ' + (err.error?.message || err.message));
+      }
+    }).add(() => {
+      this.isChangingStatus = false;
+    });
+  }
+
+  // New helper to get student name by ID
+  getStudentNameById(id: string): string | null {
+    const found = this.students.find(s => s.assessment_id === id) || this.paginateData.find(s => s.assessment_id === id);
+    return found ? (found.internship?.name || null) : null;
   }
 }

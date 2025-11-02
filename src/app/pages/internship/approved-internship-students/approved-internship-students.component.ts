@@ -6,6 +6,13 @@ import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import * as XLSX from 'xlsx';
+import { forkJoin } from 'rxjs';
+
+enum AssessmentStatus {
+  Pending = 'pending',
+  Passed = 'passed',
+  Failed = 'failed'
+}
 
 interface WorksheetRow {
   '#': number;
@@ -44,6 +51,14 @@ export class ApprovedInternshipStudentsComponent implements OnInit {
   private modalRef?: NgbModalRef;
   safeResumeUrl?: SafeResourceUrl;
 
+  // Add selection state for multi-approve
+  selectedIds: Set<string> = new Set<string>();
+  selectedStudentStatus: 'free' | 'paid' | 'hold' = 'free';
+  selectedStatus: AssessmentStatus = AssessmentStatus.Passed;
+  isApproving = false;
+  isRemoving = false;
+  assessmentStatus = AssessmentStatus;
+
   constructor(
     private modalService: NgbModal,
     private toastr: ToastrService,
@@ -54,17 +69,17 @@ export class ApprovedInternshipStudentsComponent implements OnInit {
   ngOnInit() {
     this.breadCrumbItems = [
       { label: 'Home' },
-      { label: 'Approved Internship Students', active: true }
+      { label: 'Paid Internship Students', active: true }
     ];
     this.loadApprovedStudents();
   }
 
   loadApprovedStudents() {
-    this.internshipService.getApprovedInternshipStudents().subscribe({
+    this.internshipService.getAllInternshipAssessments('').subscribe({  // Use same API as result component
       next: (response) => {
         if (response.success) {
           this.students = response.data
-            .filter((item: any) => item.interviewround === 'Approved')
+            .filter((item: any) => item.studentstatus === 'paid')  // Filter by studentstatus
             .map((item: any, index: number) => ({
               ...item,
               index: index + 1,
@@ -89,7 +104,7 @@ export class ApprovedInternshipStudentsComponent implements OnInit {
           });
           this.applyFilters();
         } else {
-          this.toastr.error(response.message || 'Failed to fetch approved students');
+          this.toastr.error(response.message || 'Failed to fetch paid students');
         }
       },
       error: (err) => {
@@ -168,7 +183,7 @@ export class ApprovedInternshipStudentsComponent implements OnInit {
     // Cover Page
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(24);
-    doc.text('Approved Internship Students Report', pageWidth / 2, 50, { align: 'center' });
+    doc.text('Paid Internship Students Report', pageWidth / 2, 50, { align: 'center' });  // Updated title
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(14);
     doc.text(`Prepared for: ${instituteName}`, pageWidth / 2, 70, { align: 'center' });
@@ -180,7 +195,7 @@ export class ApprovedInternshipStudentsComponent implements OnInit {
     const addHeader = () => {
       doc.setFont('helvetica', 'bold');
       doc.setFontSize(14);
-      doc.text('Approved Internship Students Report', 14, 20);
+      doc.text('Paid Internship Students Report', 14, 20);
       doc.setFont('helvetica', 'normal');
       doc.setFontSize(10);
       doc.text(`Institute: ${instituteName}`, 14, 28);
@@ -223,7 +238,7 @@ export class ApprovedInternshipStudentsComponent implements OnInit {
     });
 
     addFooter();
-    doc.save(`approved-internship-students-${this.getCurrentDateString()}.pdf`);
+    doc.save(`paid-internship-students-${this.getCurrentDateString()}.pdf`);  // Updated filename
   }
 
   downloadExcel() {
@@ -248,8 +263,8 @@ export class ApprovedInternshipStudentsComponent implements OnInit {
 
     const worksheet = XLSX.utils.json_to_sheet(worksheetData);
     const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, 'ApprovedInternshipStudents');
-    XLSX.writeFile(workbook, `approved-internship-students-${this.getCurrentDateString()}.xlsx`);
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'PaidInternshipStudents');  // Updated sheet name
+    XLSX.writeFile(workbook, `paid-internship-students-${this.getCurrentDateString()}.xlsx`);  // Updated filename
   }
 
   private getCurrentDateString(): string {
@@ -397,4 +412,117 @@ export class ApprovedInternshipStudentsComponent implements OnInit {
     if (answer === null || answer === undefined) return false;
     return answer === optionIndex || answer === optionValue || answer === optionIndex.toString();
   }
+
+  // Add selection methods
+  selectionArray(): string[] {
+    return Array.from(this.selectedIds);
+  }
+
+  isSelected(id: string): boolean {
+    return this.selectedIds.has(id);
+  }
+
+  toggleSelection(event: any, id: string) {
+    if (event.target.checked) {
+      this.selectedIds.add(id);
+    } else {
+      this.selectedIds.delete(id);
+    }
+  }
+
+  isAllSelected(): boolean {
+    const visibleIds = this.paginateData.map(i => i.assessment_id);
+    return visibleIds.length > 0 && visibleIds.every(id => this.selectedIds.has(id));
+  }
+
+  toggleSelectAll(event: any) {
+    const checked = event.target.checked;
+    const visibleIds = this.paginateData.map(i => i.assessment_id);
+    if (checked) {
+      visibleIds.forEach(id => this.selectedIds.add(id));
+    } else {
+      visibleIds.forEach(id => this.selectedIds.delete(id));
+    }
+  }
+
+  hasSelection(): boolean {
+    return this.selectedIds.size > 0;
+  }
+
+  // Add openApproveModal method
+  openApproveModal(modal: any, student?: any) {
+    if (student) {
+      this.selectedIds = new Set<string>([student.assessment_id]);
+      this.selectedStatus = student.status ? student.status as AssessmentStatus : AssessmentStatus.Passed;
+      this.selectedStudentStatus = student.studentstatus || student.internship?.studentstatus || 'free';
+    } else {
+      this.selectedStatus = AssessmentStatus.Passed;
+      this.selectedStudentStatus = 'free';
+    }
+    this.modalRef = this.modalService.open(modal, {
+      size: 'md',
+      centered: true,
+      backdrop: 'static'
+    });
+  }
+
+  // Add approveSelected method
+  approveSelected(modalRef?: NgbModalRef) {
+    if (!this.hasSelection()) {
+      this.toastr.error('No students selected');
+      return;
+    }
+    const ids = this.selectionArray();
+    this.isApproving = true;
+
+    const observables = ids.map(id =>
+      this.internshipService.updateInternshipAssessmentStatus(id, this.selectedStatus, this.selectedStudentStatus)
+    );
+
+    forkJoin(observables).subscribe({
+      next: (results: any[]) => {
+        this.toastr.success('Selected student(s) updated');
+        this.selectedIds.clear();
+        this.loadApprovedStudents();
+        if (modalRef) {
+          modalRef.close();
+        }
+      },
+      error: (err) => {
+        this.toastr.error('Error updating selected students: ' + (err.error?.message || err.message));
+      }
+    }).add(() => {
+      this.isApproving = false;
+    });
+  }
+
+  // Add removeAssessment method
+  removeAssessment(assessmentId: string) {
+    // Similar to result component
+    // Assuming removeInternshipAssessment exists
+    this.internshipService.removeInternshipAssessment(assessmentId).subscribe({
+      next: (response) => {
+        if (response.success) {
+          this.toastr.success(response.message || 'Assessment removed successfully');
+          this.loadApprovedStudents();
+          this.closeModal();
+        } else {
+          this.toastr.error(response.message || 'Failed to remove assessment');
+        }
+      },
+      error: (err) => {
+        this.toastr.error('Error removing assessment: ' + (err.error?.message || err.message));
+      },
+      complete: () => {
+        this.isRemoving = false;
+      }
+    });
+  }
+
+  // Add getAssessmentNameById method
+  getAssessmentNameById(id: string): string | null {
+    const found = this.students.find(a => a.assessment_id === id) || this.paginateData.find(a => a.assessment_id === id);
+    return found ? (found.internship?.name || found.internship?.firstname || null) : null;
+  }
+
 }
