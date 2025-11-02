@@ -70,7 +70,7 @@ export class InternshipService {
         return this.httpClient.post(ApiService.updateInternshipInterviewStatusURL, data);
     }
 
-    removeInternshipInterviewStudent(id: string): Observable<any> {
+    removeInternshipInterviewStudent(id: any): Observable<any> {
         return this.httpClient.post(ApiService.removeInternshipInterviewStudentURL, { id });
     }
 

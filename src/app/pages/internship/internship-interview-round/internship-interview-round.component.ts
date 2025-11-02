@@ -376,7 +376,7 @@ export class InternshipInterviewRoundComponent implements OnInit {
     });
   }
 
-  removeStudent(studentId: string) {
+  removeStudent(studentId: any) {
     Swal.fire({
       title: 'Are you sure?',
       text: 'Do you want to remove this student? This action cannot be undone.',
