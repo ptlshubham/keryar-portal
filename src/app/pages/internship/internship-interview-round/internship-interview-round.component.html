@@ -16,7 +16,8 @@
             <div class="card">
                 <div class="card-header">
                     <h5 class="card-title">Approved Students for Internship Interview</h5>
-                    <p class="card-title-desc">Review approved students, mark as Hired/Rejected, and preview assessment
+                    <p class="card-title-desc">Review approved students, mark as Approved/Rejected, and preview
+                        assessment
                         details.</p>
                 </div>
                 <div class="card-body">
@@ -37,7 +38,7 @@
                                 (change)="filterByStatus(filterStatus)">
                                 <option value="">All Status</option>
                                 <option [value]="interviewStatus.Pending">Pending</option>
-                                <option [value]="interviewStatus.Hired">Hired</option>
+                                <option [value]="interviewStatus.Approved">Approved</option>
                                 <option [value]="interviewStatus.Rejected">Rejected</option>
                             </select>
                         </div>
@@ -94,12 +95,12 @@
                                     <td>{{ student.questionset.type }}</td>
                                     <td [ngClass]="{
                                         'text-warning': student.interviewround === interviewStatus.Pending,
-                                        'text-success': student.interviewround === interviewStatus.Hired,
+                                        'text-success': student.interviewround === interviewStatus.Approved,
                                         'text-danger': student.interviewround === interviewStatus.Rejected
                                     }">
                                         <i class="mdi me-1" [ngClass]="{
                                             'mdi-clock-outline': student.interviewround === interviewStatus.Pending,
-                                            'mdi-check-circle': student.interviewround === interviewStatus.Hired,
+                                            'mdi-check-circle': student.interviewround === interviewStatus.Approved,
                                             'mdi-close-circle': student.interviewround === interviewStatus.Rejected
                                         }"></i>
                                         {{ student.interviewround | titlecase }}
@@ -184,7 +185,7 @@
                             <p><strong>Interview Status:</strong>
                                 <span class="badge" [ngClass]="{
                                     'bg-warning': selectedStudent.interviewround === interviewStatus.Pending,
-                                    'bg-success': selectedStudent.interviewround === interviewStatus.Hired,
+                                    'bg-success': selectedStudent.interviewround === interviewStatus.Approved,
                                     'bg-danger': selectedStudent.interviewround === interviewStatus.Rejected
                                 }">{{ selectedStudent.interviewround | titlecase }}</span>
                             </p>

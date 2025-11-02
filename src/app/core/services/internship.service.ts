@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { ApiService } from './api.service';
-import { forkJoin, Observable } from 'rxjs';
+import { Observable } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
 
@@ -32,8 +32,12 @@ export class InternshipService {
         return this.httpClient.get(`${ApiService.getInternshipAssessmentPreviewURL}/${assessmentId}`);
     }
 
-    approveRejectInternshipAssessment(assessmentId: string, status: 'approved' | 'rejected'): Observable<any> {
-        return this.httpClient.post(ApiService.approveRejectInternshipAssessmentURL, { assessmentId, status });
+    updateInternshipAssessmentStatus(assessmentId: string, status?: 'pending' | 'passed' | 'failed', studentStatus?: string): Observable<any> {
+        const payload: any = { assessmentId };
+        if (status !== undefined && status !== null) payload.status = status;
+        // NOTE: backend expects `studentStatus` (camelCase) for updating internship type/student status
+        if (studentStatus !== undefined && studentStatus !== null) payload.studentStatus = studentStatus;
+        return this.httpClient.post(ApiService.updateInternshipAssessmentStatusURL, payload);
     }
 
     removeInternshipAssessment(id: string): Observable<any> {
@@ -50,8 +54,9 @@ export class InternshipService {
     }
 
     // Internship Interview Round APIs
-    getApprovedInternshipStudents(): Observable<any> {
-        return this.httpClient.get(ApiService.getApprovedInternshipStudentsURL);
+    getApprovedInternshipStudents(status?: string): Observable<any> {
+        const params = status ? `?status=${status}` : '';
+        return this.httpClient.get(`${ApiService.getApprovedInternshipStudentsURL}${params}`);
     }
 
     updateInternshipInterviewStatus(data: { id: string; interviewround: string }): Observable<any> {

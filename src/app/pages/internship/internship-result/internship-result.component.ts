@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild, TemplateRef } from '@angular/core';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { ToastrService } from 'ngx-toastr';
 import { InternshipService } from 'src/app/core/services/internship.service';
@@ -7,11 +7,12 @@ import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import * as XLSX from 'xlsx';
+import { forkJoin } from 'rxjs';
 
 enum AssessmentStatus {
   Pending = 'pending',
-  Approved = 'approved',
-  Rejected = 'rejected'
+  Passed = 'passed',
+  Failed = 'failed'
 }
 
 interface WorksheetRow {
@@ -23,6 +24,7 @@ interface WorksheetRow {
   'Department': string;
   'Subject': string;
   'Status': string;
+  'Student Status': string; // added student status column
   'Total Marks': number;
   'Obtained Marks': number;
 }
@@ -55,6 +57,16 @@ export class InternshipResultComponent implements OnInit {
   private modalRef?: NgbModalRef;
   assessmentStatus = AssessmentStatus;
   safeResumeUrl?: SafeResourceUrl;
+
+  // selection state for multi-approve
+  selectedIds: Set<string> = new Set<string>();
+  selectedStudentStatus: 'free' | 'paid' | 'hold' = 'free';
+
+  // NEW: selected status to apply (Pending/Passed/Failed)
+  selectedStatus: AssessmentStatus = AssessmentStatus.Passed;
+
+  // expose template ref for approve modal
+  @ViewChild('approveModal') approveModalTemplateRef?: TemplateRef<any>;
 
   constructor(
     private modalService: NgbModal,
@@ -303,72 +315,64 @@ export class InternshipResultComponent implements OnInit {
     this.safeResumeUrl = undefined;
   }
 
-  approveAssessment(assessmentId: string) {
-    Swal.fire({
-      title: 'Are you sure?',
-      text: 'Do you want to approve this internship assessment?',
-      icon: 'question',
-      showCancelButton: true,
-      confirmButtonColor: '#3085d6',
-      cancelButtonColor: '#d33',
-      confirmButtonText: 'Yes, approve it!'
-    }).then((result) => {
-      if (result.isConfirmed) {
-        this.isApproving = true;
-        this.internshipService.approveRejectInternshipAssessment(assessmentId, AssessmentStatus.Approved).subscribe({
-          next: (response) => {
-            if (response.success) {
-              this.toastr.success(response.message || 'Assessment approved');
-              this.loadAssessments();
-              this.closeModal();
-            } else {
-              this.toastr.error(response.message || 'Failed to approve assessment');
-            }
-          },
-          error: (err) => {
-            this.toastr.error('Error approving assessment: ' + (err.error?.message || err.message));
-          },
-          complete: () => {
-            this.isApproving = false;
-          }
-        });
-      }
-    });
+  // helper to get array of selected IDs
+  selectionArray(): string[] {
+    return Array.from(this.selectedIds);
   }
 
-  rejectAssessment(assessmentId: string) {
-    Swal.fire({
-      title: 'Are you sure?',
-      text: 'Do you want to reject this internship assessment?',
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#3085d6',
-      cancelButtonColor: '#d33',
-      confirmButtonText: 'Yes, reject it!'
-    }).then((result) => {
-      if (result.isConfirmed) {
-        this.isRejecting = true;
-        this.internshipService.approveRejectInternshipAssessment(assessmentId, AssessmentStatus.Rejected).subscribe({
-          next: (response) => {
-            if (response.success) {
-              this.toastr.success(response.message || 'Assessment rejected');
-              this.loadAssessments();
-              this.closeModal();
-            } else {
-              this.toastr.error(response.message || 'Failed to reject assessment');
-            }
-          },
-          error: (err) => {
-            this.toastr.error('Error rejecting assessment: ' + (err.error?.message || err.message));
-          },
-          complete: () => {
-            this.isRejecting = false;
-          }
-        });
-      }
-    });
+  isSelected(id: string): boolean {
+    return this.selectedIds.has(id);
   }
 
+  toggleSelection(event: any, id: string) {
+    if (event.target.checked) {
+      this.selectedIds.add(id);
+    } else {
+      this.selectedIds.delete(id);
+    }
+  }
+
+  isAllSelected(): boolean {
+    // only consider visible page items for select-all
+    const visibleIds = this.paginateData.map(i => i.assessment_id);
+    return visibleIds.length > 0 && visibleIds.every(id => this.selectedIds.has(id));
+  }
+
+  toggleSelectAll(event: any) {
+    const checked = event.target.checked;
+    const visibleIds = this.paginateData.map(i => i.assessment_id);
+    if (checked) {
+      visibleIds.forEach(id => this.selectedIds.add(id));
+    } else {
+      visibleIds.forEach(id => this.selectedIds.delete(id));
+    }
+  }
+
+  hasSelection(): boolean {
+    return this.selectedIds.size > 0;
+  }
+
+  // when approving single item or multiple items — open modal
+  openApproveModal(modal: any, assessment?: any) {
+    // if single assessment passed, set selection to that single item
+    if (assessment) {
+      this.selectedIds = new Set<string>([assessment.assessment_id]);
+      // set default selectedStatus to current assessment status if available
+      this.selectedStatus = assessment.status ? assessment.status as AssessmentStatus : AssessmentStatus.Passed;
+      // PREFILL student status if available on the assessment (top-level or nested)
+      this.selectedStudentStatus = assessment.studentstatus || assessment.internship?.studentstatus || 'free';
+    } else {
+      // keep existing selection (for multi-select) and default status
+      this.selectedStatus = AssessmentStatus.Passed;
+      this.selectedStudentStatus = 'free';
+    }
+    // default internship type fallback already set above
+    this.modalRef = this.modalService.open(modal, {
+      size: 'md',
+      centered: true,
+      backdrop: 'static'
+    });
+  }
   removeAssessment(assessmentId: string) {
     Swal.fire({
       title: 'Are you sure?',
@@ -401,7 +405,44 @@ export class InternshipResultComponent implements OnInit {
       }
     });
   }
+  // helper to show name in modal list
+  getAssessmentNameById(id: string): string | null {
+    const found = this.assessments.find(a => a.assessment_id === id) || this.paginateData.find(a => a.assessment_id === id);
+    return found ? (found.internship?.name || found.internship?.firstname || null) : null;
+  }
 
+  // Approve / Change all selected IDs (now uses selectedStatus)
+  approveSelected(modalRef?: NgbModalRef) {
+    if (!this.hasSelection()) {
+      this.toastr.error('No students selected');
+      return;
+    }
+    const ids = this.selectionArray();
+    this.isApproving = true;
+
+    // build observables array calling new UpdateInternshipAssessmentStatus endpoint for each id
+    // include selectedStudentStatus as `studentStatus`
+    const observables = ids.map(id =>
+      this.internshipService.updateInternshipAssessmentStatus(id, this.selectedStatus, this.selectedStudentStatus)
+    );
+
+    forkJoin(observables).subscribe({
+      next: (results: any[]) => {
+        this.toastr.success('Selected student(s) updated');
+        // clear selection and refresh
+        this.selectedIds.clear();
+        this.loadAssessments();
+        if (modalRef) {
+          modalRef.close();
+        }
+      },
+      error: (err) => {
+        this.toastr.error('Error updating selected students: ' + (err.error?.message || err.message));
+      }
+    }).add(() => {
+      this.isApproving = false;
+    });
+  }
   setCorrect(questionId: string, isCorrect: number) {
     if (!this.selectedAssessment) return;
     const internshipFormId = this.selectedAssessment.internship.id;
@@ -445,7 +486,8 @@ export class InternshipResultComponent implements OnInit {
 
     doc.addPage();
 
-    const headers = ['#', 'Student Name', 'Email', 'College', 'Department', 'Subject', 'Total Marks', 'Obtained Marks', 'Status'];
+    // include Student Status
+    const headers = ['#', 'Student Name', 'Email', 'College', 'Department', 'Subject', 'Status', 'Student Status', 'Total Marks', 'Obtained Marks'];
     const body = this.filteredAssessments.map((assessment, index) => [
       index + 1,
       assessment.internship.name || 'N/A',
@@ -453,9 +495,10 @@ export class InternshipResultComponent implements OnInit {
       assessment.internship.collagename || 'N/A',
       assessment.internship.department || 'N/A',
       assessment.internship.subject || 'N/A',
+      assessment.status ? assessment.status.charAt(0).toUpperCase() + assessment.status.slice(1) : 'N/A',
+      (assessment.studentstatus || assessment.internship?.studentstatus) ? String(assessment.studentstatus || assessment.internship?.studentstatus).charAt(0).toUpperCase() + String(assessment.studentstatus || assessment.internship?.studentstatus).slice(1) : 'N/A',
       assessment.total_marks || 'N/A',
-      assessment.calculated_marks || '0',
-      assessment.status ? assessment.status.charAt(0).toUpperCase() + assessment.status.slice(1) : 'N/A'
+      assessment.calculated_marks || '0'
     ]);
 
     autoTable(doc, {
@@ -483,6 +526,7 @@ export class InternshipResultComponent implements OnInit {
       'Department': assessment.internship.department || 'N/A',
       'Subject': assessment.internship.subject || 'N/A',
       'Status': assessment.status ? assessment.status.charAt(0).toUpperCase() + assessment.status.slice(1) : 'N/A',
+      'Student Status': (assessment.studentstatus || assessment.internship?.studentstatus) ? String(assessment.studentstatus || assessment.internship?.studentstatus).charAt(0).toUpperCase() + String(assessment.studentstatus || assessment.internship?.studentstatus).slice(1) : 'N/A',
       'Total Marks': assessment.total_marks || 0,
       'Obtained Marks': assessment.calculated_marks || 0
     }));

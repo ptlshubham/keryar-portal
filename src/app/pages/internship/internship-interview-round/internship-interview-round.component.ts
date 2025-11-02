@@ -11,8 +11,8 @@ import * as XLSX from 'xlsx';
 
 enum InterviewStatus {
   Pending = 'pending',
-  Hired = 'hired',
-  Rejected = 'rejected'
+  Approved = 'Passed',
+  Rejected = 'Failed'
 }
 
 interface WorksheetRow {
@@ -306,7 +306,7 @@ export class InternshipInterviewRoundComponent implements OnInit {
   hireStudent(studentId: string) {
     Swal.fire({
       title: 'Are you sure?',
-      text: 'Do you want to mark this student as hired for internship?',
+      text: 'Do you want to mark this student as Approved for internship?',
       icon: 'question',
       showCancelButton: true,
       confirmButtonColor: '#3085d6',
@@ -315,18 +315,18 @@ export class InternshipInterviewRoundComponent implements OnInit {
     }).then((result) => {
       if (result.isConfirmed) {
         this.isHiring = true;
-        this.internshipService.updateInternshipInterviewStatus({ id: studentId, interviewround: InterviewStatus.Hired }).subscribe({
+        this.internshipService.updateInternshipInterviewStatus({ id: studentId, interviewround: InterviewStatus.Approved }).subscribe({
           next: (response) => {
             if (response.success) {
-              this.toastr.success(response.message || 'Student marked as hired');
+              this.toastr.success(response.message || 'Student marked as Approved');
               this.loadApprovedStudents();
               this.closeModal();
             } else {
-              this.toastr.error(response.message || 'Failed to mark as hired');
+              this.toastr.error(response.message || 'Failed to mark as Approved');
             }
           },
           error: (err) => {
-            this.toastr.error('Error marking as hired: ' + (err.error?.message || err.message));
+            this.toastr.error('Error marking as Approved: ' + (err.error?.message || err.message));
           },
           complete: () => {
             this.isHiring = false;

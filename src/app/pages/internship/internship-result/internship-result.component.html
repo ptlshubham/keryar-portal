@@ -37,8 +37,8 @@
                                 (change)="filterByStatus(filterStatus)">
                                 <option value="">All Status</option>
                                 <option [value]="assessmentStatus.Pending">Pending</option>
-                                <option [value]="assessmentStatus.Approved">Approved</option>
-                                <option [value]="assessmentStatus.Rejected">Rejected</option>
+                                <option [value]="assessmentStatus.Passed">Passed</option>
+                                <option [value]="assessmentStatus.Failed">Failed</option>
                             </select>
                         </div>
                         <div class="col-lg-2 col-md-3 col-sm-6 mb-2">
@@ -63,6 +63,11 @@
                                     [disabled]="filteredAssessments.length === 0" title="Download Excel">
                                     <i class="mdi mdi-file-excel"></i>
                                 </button>
+                                <!-- Approve/Status selected button (renamed) -->
+                                <button class="btn btn-success btn-sm ms-1" (click)="openApproveModal(approveModal)"
+                                    [disabled]="!hasSelection()" title="Change Status for Selected">
+                                    <i class="mdi mdi-check-bold"></i> Status Selected
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -72,6 +77,10 @@
                         <table class="table mb-0 table-hover">
                             <thead class="table-light">
                                 <tr>
+                                    <th style="width:32px">
+                                        <input type="checkbox" [checked]="isAllSelected()"
+                                            (change)="toggleSelectAll($event)" />
+                                    </th>
                                     <th>#</th>
                                     <th class="sortable" [class.active]="sortColumn === 'name'" (click)="sortBy('name')"
                                         style="cursor: pointer;">
@@ -103,6 +112,10 @@
                                         Status
                                         <i class="mdi ms-1" [ngClass]="getSortIcon('status')"></i>
                                     </th>
+
+                                    <!-- NEW: Student Status column -->
+                                    <th>Student Status</th>
+
                                     <th class="sortable" [class.active]="sortColumn === 'marks'"
                                         (click)="sortBy('marks')" style="cursor: pointer;">
                                         Marks
@@ -113,6 +126,10 @@
                             </thead>
                             <tbody>
                                 <tr *ngFor="let assessment of paginateData; let i = index; trackBy: trackById">
+                                    <td>
+                                        <input type="checkbox" [checked]="isSelected(assessment.assessment_id)"
+                                            (change)="toggleSelection($event, assessment.assessment_id)" />
+                                    </td>
                                     <td>{{ (page - 1) * pageSize + i + 1 }}</td>
                                     <td>{{ assessment.internship.name }}</td>
                                     <td>{{ assessment.internship.email }}</td>
@@ -121,35 +138,35 @@
                                     <td>{{ assessment.internship.subject | slice:0:15 }}</td>
                                     <td [ngClass]="{
                                         'text-warning': assessment.status === assessmentStatus.Pending,
-                                        'text-success': assessment.status === assessmentStatus.Approved,
-                                        'text-danger': assessment.status === assessmentStatus.Rejected,
-                                        'text-secondary': assessment.status !== assessmentStatus.Pending && assessment.status !== assessmentStatus.Approved && assessment.status !== assessmentStatus.Rejected
+                                        'text-success': assessment.status === assessmentStatus.Passed,
+                                        'text-danger': assessment.status === assessmentStatus.Failed,
+                                        'text-secondary': assessment.status !== assessmentStatus.Pending && assessment.status !== assessmentStatus.Passed && assessment.status !== assessmentStatus.Failed
                                     }">
                                         <i class="mdi me-1" [ngClass]="{
                                                'mdi-clock-outline': assessment.status === assessmentStatus.Pending,
-                                               'mdi-check-circle': assessment.status === assessmentStatus.Approved,
-                                               'mdi-close-circle': assessment.status === assessmentStatus.Rejected
+                                               'mdi-check-circle': assessment.status === assessmentStatus.Passed,
+                                               'mdi-close-circle': assessment.status === assessmentStatus.Failed
                                            }"></i>
                                         {{ assessment.status | titlecase }}
                                     </td>
+                                    <!-- NEW: Student Status cell -->
+                                    <td>{{ ((assessment.studentstatus || assessment.internship?.studentstatus) ?
+                                        (assessment.studentstatus || assessment.internship?.studentstatus) : 'N/A') |
+                                        titlecase }}</td>
                                     <td>{{ assessment.calculated_marks }} / {{ assessment.total_marks }}</td>
                                     <td class="text-nowrap">
                                         <button class="btn btn-primary btn-sm me-1"
                                             (click)="openPreviewModal(previewModal, assessment)">
                                             <i class="mdi mdi-eye"></i>
                                         </button>
-                                        <button class="btn btn-success btn-sm me-1"
-                                            *ngIf="assessment.status === assessmentStatus.Pending"
-                                            (click)="approveAssessment(assessment.assessment_id)"
+
+                                        <!-- single "Status" button replaces separate approve/reject buttons -->
+                                        <button class="btn btn-warning btn-sm me-1"
+                                            (click)="openApproveModal(approveModal, assessment)"
                                             [disabled]="isApproving">
-                                            <i class="mdi mdi-check"></i>
+                                            <i class="mdi mdi-pencil"></i> Status
                                         </button>
-                                        <button class="btn btn-danger btn-sm me-1"
-                                            *ngIf="assessment.status === assessmentStatus.Pending"
-                                            (click)="rejectAssessment(assessment.assessment_id)"
-                                            [disabled]="isRejecting">
-                                            <i class="mdi mdi-close"></i>
-                                        </button>
+
                                         <button class="btn btn-outline-danger btn-sm"
                                             (click)="removeAssessment(assessment.assessment_id)"
                                             [disabled]="isRemoving">
@@ -158,7 +175,7 @@
                                     </td>
                                 </tr>
                                 <tr *ngIf="!paginateData?.length">
-                                    <td colspan="9" class="text-center">No internship assessments found</td>
+                                    <td colspan="11" class="text-center">No internship assessments found</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -194,6 +211,11 @@
                             <p><strong>City:</strong> {{ selectedAssessment.internship.city || 'N/A' }}</p>
                             <p><strong>College:</strong> {{ selectedAssessment.internship.collagename || 'N/A' }}</p>
                             <p><strong>Department:</strong> {{ selectedAssessment.internship.department || 'N/A' }}</p>
+
+                            <p><strong>Student Status:</strong> {{ ((selectedAssessment.studentstatus ||
+                                selectedAssessment.internship?.studentstatus) ? (selectedAssessment.studentstatus ||
+                                selectedAssessment.internship?.studentstatus) : 'N/A') | titlecase }}</p>
+
                             <p><strong>Start Date:</strong>
                                 {{ selectedAssessment.internship.startdate ? (selectedAssessment.internship.startdate |
                                 date:'mediumDate') : 'N/A' }}
@@ -210,8 +232,8 @@
                             <p><strong>Status:</strong>
                                 <span [ngClass]="{
                                     'text-warning': selectedAssessment.status === assessmentStatus.Pending,
-                                    'text-success': selectedAssessment.status === assessmentStatus.Approved,
-                                    'text-danger': selectedAssessment.status === assessmentStatus.Rejected
+                                    'text-success': selectedAssessment.status === assessmentStatus.Passed,
+                                    'text-danger': selectedAssessment.status === assessmentStatus.Failed
                                 }">
                                     {{ selectedAssessment.status | titlecase }}
                                 </span>
@@ -398,6 +420,53 @@
         </div>
         <div class="modal-footer">
             <button type="button" class="btn btn-secondary" (click)="closeModal()">Close</button>
+        </div>
+    </ng-template>
+
+    <!-- Approve / Change Modal -->
+    <ng-template #approveModal let-modal>
+        <div class="modal-header">
+            <h5 class="modal-title">Change Status & Student Status</h5>
+            <button type="button" class="btn-close" (click)="modal.close()"></button>
+        </div>
+        <div class="modal-body">
+            <p>Choose student status and the new approval status for the selected student(s). Confirming will update the
+                status
+                for the selected assessments.</p>
+
+            <!-- New Status Dropdown -->
+            <div class="mb-3">
+                <label for="statusSelect" class="form-label">Status</label>
+                <select id="statusSelect" class="form-select" [(ngModel)]="selectedStatus">
+                    <option [ngValue]="assessmentStatus.Pending">Pending</option>
+                    <option [ngValue]="assessmentStatus.Passed">Passed</option>
+                    <option [ngValue]="assessmentStatus.Failed">Failed</option>
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label for="studentStatus" class="form-label">Student Status</label>
+                <select id="studentStatus" class="form-select" [(ngModel)]="selectedStudentStatus">
+                    <!-- keep the existing option values but the label is Student Status -->
+                    <option value="free">Free</option>
+                    <option value="paid">Paid</option>
+                    <option value="hold">Hold</option>
+                </select>
+            </div>
+
+            <div *ngIf="selectionArray().length">
+                <p><strong>Will change for:</strong></p>
+                <ul class="small">
+                    <li *ngFor="let id of selectionArray()">{{ getAssessmentNameById(id) || id }}</li>
+                </ul>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" (click)="modal.close()">Cancel</button>
+            <button type="button" class="btn btn-success" (click)="approveSelected(modal)" [disabled]="isApproving">
+                <span *ngIf="!isApproving">Confirm</span>
+                <span *ngIf="isApproving">Processing...</span>
+            </button>
         </div>
     </ng-template>
 </div>

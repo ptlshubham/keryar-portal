@@ -64,7 +64,7 @@ export class ApprovedInternshipStudentsComponent implements OnInit {
       next: (response) => {
         if (response.success) {
           this.students = response.data
-            .filter((item: any) => item.interviewround === 'hired')
+            .filter((item: any) => item.interviewround === 'Approved')
             .map((item: any, index: number) => ({
               ...item,
               index: index + 1,

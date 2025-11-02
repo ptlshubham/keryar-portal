@@ -147,6 +147,9 @@ export class ApiService {
   // Add this to your ApiService class
   public static updateInternshipAnswerCorrectnessURL: string = ApiService.HOST_URL + '/keryar/UpdateInternshipAnswerCorrectness';
 
+  // NEW: endpoint to update internship assessment status (replace path if your backend uses a different route)
+  public static updateInternshipAssessmentStatusURL: string = ApiService.HOST_URL + '/keryar/UpdateInternshipAssessmentStatus';
+
   // internship interview round
   public static getApprovedInternshipStudentsURL: string = `${ApiService.HOST_URL}/keryar/GetApprovedInternshipStudents`;
   public static updateInternshipInterviewStatusURL: string = `${ApiService.HOST_URL}/keryar/UpdateInternshipInterviewStatus`;
