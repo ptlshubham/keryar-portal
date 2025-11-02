@@ -184,6 +184,7 @@ export const MENU: MenuItem[] = [
             },
 
 
+
         ]
     },
     {
@@ -207,6 +208,12 @@ export const MENU: MenuItem[] = [
                 id: 12,
                 label: 'Approved Students',
                 link: '/internship/approved-students',
+                parentId: 12
+            },
+            {
+                id: 12,
+                label: 'Hold Students',
+                link: '/internship/hold-students',
                 parentId: 12
             },
 

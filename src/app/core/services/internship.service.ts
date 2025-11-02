@@ -62,6 +62,10 @@ export class InternshipService {
         const params = status ? `?status=${status}` : '';
         return this.httpClient.get(`${ApiService.getRejectedInternshipStudentsURL}${params}`);
     }
+    getHoldInternshipStudents(status?: string): Observable<any> {
+        const params = status ? `?status=${status}` : '';
+        return this.httpClient.get(`${ApiService.getHoldInternshipStudentsURL}${params}`);
+    }
     updateInternshipInterviewStatus(data: { id: string; interviewround: string }): Observable<any> {
         return this.httpClient.post(ApiService.updateInternshipInterviewStatusURL, data);
     }

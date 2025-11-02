@@ -153,6 +153,8 @@ export class ApiService {
   // internship interview round
   public static getApprovedInternshipStudentsURL: string = `${ApiService.HOST_URL}/keryar/GetApprovedInternshipStudents`;
   public static getRejectedInternshipStudentsURL: string = `${ApiService.HOST_URL}/keryar/GetRejectedInternshipStudents`;
+  public static getHoldInternshipStudentsURL: string = `${ApiService.HOST_URL}/keryar/GetHoldInternshipStudents`;
+
   public static updateInternshipInterviewStatusURL: string = `${ApiService.HOST_URL}/keryar/UpdateInternshipInterviewStatus`;
   public static removeInternshipInterviewStudentURL: string = `${ApiService.HOST_URL}/keryar/RemoveInternshipInterviewStudent`;
   public static updateInternshipRemarksURL: string = ApiService.HOST_URL + '/keryar/UpdateInternshipRemarks';

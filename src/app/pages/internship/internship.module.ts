@@ -13,13 +13,15 @@ import { LightboxModule } from 'ngx-lightbox';
 import { SharedModule } from 'src/app/shared/shared.module';
 import { InternshipInterviewRoundComponent } from './internship-interview-round/internship-interview-round.component';
 import { ApprovedInternshipStudentsComponent } from './approved-internship-students/approved-internship-students.component';
+import { HoldStudentListComponent } from './hold-student-list/hold-student-list.component';
 
 
 @NgModule({
   declarations: [
     InternshipResultComponent,
     InternshipInterviewRoundComponent,
-    ApprovedInternshipStudentsComponent
+    ApprovedInternshipStudentsComponent,
+    HoldStudentListComponent
   ],
   imports: [
     CommonModule,
