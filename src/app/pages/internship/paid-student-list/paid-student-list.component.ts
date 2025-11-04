@@ -75,7 +75,7 @@ export class PaidStudentListComponent {
   }
 
   loadApprovedStudents() {
-    this.internshipService.getAllInternshipAssessments('').subscribe({  // Use same API as result component
+    this.internshipService.getRejectedInternshipStudents().subscribe({  // Use same API as result component
       next: (response) => {
         if (response.success) {
           this.students = response.data

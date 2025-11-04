@@ -89,10 +89,12 @@ export class InternshipResultComponent implements OnInit {
         if (response.success) {
           this.assessments = response.data.map((item: any, index: number) => ({
             ...item,
+            // Map 'student' property to 'internship' for consistency with template
+            internship: item.student || item.internship || {},
             index: index + 1,
             calculated_marks: item.obtained_marks || 0
           }));
-          this.colleges = [...new Set(this.assessments.map(assessment => assessment.internship.collagename).filter(college => college))].sort();
+          this.colleges = [...new Set(this.assessments.map(assessment => assessment.internship?.collagename).filter(college => college))].sort();
           this.applyFilters();
         } else {
           this.toastr.error(response.message || 'Failed to fetch assessments');
@@ -110,15 +112,15 @@ export class InternshipResultComponent implements OnInit {
     if (this.searchTerm) {
       const searchLower = this.searchTerm.toLowerCase();
       filteredAssessments = filteredAssessments.filter(assessment =>
-        assessment.internship.name.toLowerCase().includes(searchLower) ||
-        assessment.internship.email.toLowerCase().includes(searchLower) ||
-        assessment.internship.collagename.toLowerCase().includes(searchLower)
+        assessment.internship?.name?.toLowerCase().includes(searchLower) ||
+        assessment.internship?.email?.toLowerCase().includes(searchLower) ||
+        assessment.internship?.collagename?.toLowerCase().includes(searchLower)
       );
     }
 
     if (this.filterCollege) {
       filteredAssessments = filteredAssessments.filter(assessment =>
-        assessment.internship.collagename.toLowerCase() === this.filterCollege.toLowerCase()
+        assessment.internship?.collagename?.toLowerCase() === this.filterCollege.toLowerCase()
       );
     }
 
@@ -145,24 +147,24 @@ export class InternshipResultComponent implements OnInit {
 
         switch (this.sortColumn) {
           case 'name':
-            aValue = a.internship.name?.toLowerCase() || '';
-            bValue = b.internship.name?.toLowerCase() || '';
+            aValue = a.internship?.name?.toLowerCase() || '';
+            bValue = b.internship?.name?.toLowerCase() || '';
             break;
           case 'email':
-            aValue = a.internship.email?.toLowerCase() || '';
-            bValue = b.internship.email?.toLowerCase() || '';
+            aValue = a.internship?.email?.toLowerCase() || '';
+            bValue = b.internship?.email?.toLowerCase() || '';
             break;
           case 'college':
-            aValue = a.internship.collagename?.toLowerCase() || '';
-            bValue = b.internship.collagename?.toLowerCase() || '';
+            aValue = a.internship?.collagename?.toLowerCase() || '';
+            bValue = b.internship?.collagename?.toLowerCase() || '';
             break;
           case 'department':
-            aValue = a.internship.department?.toLowerCase() || '';
-            bValue = b.internship.department?.toLowerCase() || '';
+            aValue = a.internship?.department?.toLowerCase() || '';
+            bValue = b.internship?.department?.toLowerCase() || '';
             break;
           case 'subject':
-            aValue = a.internship.subject?.toLowerCase() || '';
-            bValue = b.internship.subject?.toLowerCase() || '';
+            aValue = a.internship?.subject?.toLowerCase() || '';
+            bValue = b.internship?.subject?.toLowerCase() || '';
             break;
           case 'status':
             aValue = a.status?.toLowerCase() || '';
@@ -490,11 +492,11 @@ export class InternshipResultComponent implements OnInit {
     const headers = ['#', 'Student Name', 'Email', 'College', 'Department', 'Subject', 'Status', 'Student Status', 'Total Marks', 'Obtained Marks'];
     const body = this.filteredAssessments.map((assessment, index) => [
       index + 1,
-      assessment.internship.name || 'N/A',
-      assessment.internship.email || 'N/A',
-      assessment.internship.collagename || 'N/A',
-      assessment.internship.department || 'N/A',
-      assessment.internship.subject || 'N/A',
+      assessment.internship?.name || 'N/A',
+      assessment.internship?.email || 'N/A',
+      assessment.internship?.collagename || 'N/A',
+      assessment.internship?.department || 'N/A',
+      assessment.internship?.subject || 'N/A',
       assessment.status ? assessment.status.charAt(0).toUpperCase() + assessment.status.slice(1) : 'N/A',
       (assessment.studentstatus || assessment.internship?.studentstatus) ? String(assessment.studentstatus || assessment.internship?.studentstatus).charAt(0).toUpperCase() + String(assessment.studentstatus || assessment.internship?.studentstatus).slice(1) : 'N/A',
       assessment.total_marks || 'N/A',
@@ -519,12 +521,12 @@ export class InternshipResultComponent implements OnInit {
 
     const worksheetData: WorksheetRow[] = this.filteredAssessments.map((assessment, index) => ({
       '#': index + 1,
-      'Student Name': assessment.internship.name || 'N/A',
-      'Email': assessment.internship.email || 'N/A',
-      'Mobile Number': assessment.internship.mobilenumber || 'N/A',
-      'College Name': assessment.internship.collagename || 'N/A',
-      'Department': assessment.internship.department || 'N/A',
-      'Subject': assessment.internship.subject || 'N/A',
+      'Student Name': assessment.internship?.name || 'N/A',
+      'Email': assessment.internship?.email || 'N/A',
+      'Mobile Number': assessment.internship?.mobilenumber || 'N/A',
+      'College Name': assessment.internship?.collagename || 'N/A',
+      'Department': assessment.internship?.department || 'N/A',
+      'Subject': assessment.internship?.subject || 'N/A',
       'Status': assessment.status ? assessment.status.charAt(0).toUpperCase() + assessment.status.slice(1) : 'N/A',
       'Student Status': (assessment.studentstatus || assessment.internship?.studentstatus) ? String(assessment.studentstatus || assessment.internship?.studentstatus).charAt(0).toUpperCase() + String(assessment.studentstatus || assessment.internship?.studentstatus).slice(1) : 'N/A',
       'Total Marks': assessment.total_marks || 0,
