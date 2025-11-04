@@ -200,14 +200,14 @@ export const MENU: MenuItem[] = [
             },
             {
                 id: 12,
-                label: 'Free Stuenbt Internship',
-                link: '/internship/interview-round',
+                label: 'Free student Internship',
+                link: '/internship/free-student-internship',
                 parentId: 12
             },
             {
                 id: 12,
                 label: 'Paid Student Internship',
-                link: '/internship/approved-students',
+                link: '/internship/paid-student-internship',
                 parentId: 12
             },
             {

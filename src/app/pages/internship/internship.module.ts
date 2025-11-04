@@ -14,6 +14,8 @@ import { SharedModule } from 'src/app/shared/shared.module';
 import { InternshipInterviewRoundComponent } from './internship-interview-round/internship-interview-round.component';
 import { ApprovedInternshipStudentsComponent } from './approved-internship-students/approved-internship-students.component';
 import { HoldStudentListComponent } from './hold-student-list/hold-student-list.component';
+import { FreeStudentListComponent } from './free-student-list/free-student-list.component';
+import { PaidStudentListComponent } from './paid-student-list/paid-student-list.component';
 
 
 @NgModule({
@@ -21,7 +23,9 @@ import { HoldStudentListComponent } from './hold-student-list/hold-student-list.
     InternshipResultComponent,
     InternshipInterviewRoundComponent,
     ApprovedInternshipStudentsComponent,
-    HoldStudentListComponent
+    HoldStudentListComponent,
+    FreeStudentListComponent,
+    PaidStudentListComponent
   ],
   imports: [
     CommonModule,

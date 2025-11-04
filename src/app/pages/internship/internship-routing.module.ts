@@ -4,6 +4,8 @@ import { InternshipResultComponent } from './internship-result/internship-result
 import { InternshipInterviewRoundComponent } from './internship-interview-round/internship-interview-round.component';
 import { ApprovedInternshipStudentsComponent } from './approved-internship-students/approved-internship-students.component';
 import { HoldStudentListComponent } from './hold-student-list/hold-student-list.component';
+import { FreeStudentListComponent } from './free-student-list/free-student-list.component';
+import { PaidStudentListComponent } from './paid-student-list/paid-student-list.component';
 
 const routes: Routes = [
   {
@@ -11,12 +13,12 @@ const routes: Routes = [
     component: InternshipResultComponent
   },
   {
-    path: 'interview-round',
-    component: InternshipInterviewRoundComponent
+    path: 'free-student-internship',
+    component: FreeStudentListComponent
   },
   {
-    path: 'approved-students',
-    component: ApprovedInternshipStudentsComponent
+    path: 'paid-student-internship',
+    component: PaidStudentListComponent
   },
   {
     path: 'hold-students',
