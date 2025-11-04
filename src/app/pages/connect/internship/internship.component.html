@@ -2,18 +2,48 @@
     <div class="col-12">
         <div class="card">
             <div class="card-header">
-                <h5 class="card-title">Internship Forms & Test Links</h5>
-                <p class="card-title-desc mb-0">Switch between Internship Forms and Test Link data</p>
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h5 class="card-title mb-1">Internship Forms & Test Links</h5>
+                        <p class="card-title-desc mb-0">Switch between Internship Forms and Test Link data</p>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <button type="button" class="btn btn-success" (click)="downloadExcel()">
+                            <i class="bx bxs-file-export me-1"></i>Download Excel
+                        </button>
+                        <button type="button" class="btn btn-danger" (click)="downloadPDF()">
+                            <i class="bx bxs-file-pdf me-1"></i>Download PDF
+                        </button>
+                    </div>
+                </div>
             </div>
             <div class="card-body">
                 <!-- Simple tabs (use activeTab to switch) -->
                 <div class="d-flex mb-3">
                     <button type="button" class="me-2 btn btn-lg"
                         [ngClass]="{'btn-primary': activeTab===1, 'btn-outline-primary': activeTab!==1}"
-                        (click)="activeTab = 1" (click)="getInternshipDetails()">Internship Forms</button>
+                        (click)="activeTab = 1; getInternshipDetails()">Internship Forms</button>
                     <button type="button" (click)="loadTestLinkDetails()" class="btn btn-lg"
                         [ngClass]="{'btn-primary': activeTab===2, 'btn-outline-primary': activeTab!==2}"
                         (click)="activeTab = 2">Test Links</button>
+                </div>
+
+                <!-- Search Filter -->
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <div class="input-group">
+                            <input type="text" class="form-control"
+                                placeholder="Search by name, email, college, department..." [(ngModel)]="searchText"
+                                (ngModelChange)="applySearch()">
+                            <button class="btn btn-outline-secondary" type="button" (click)="clearSearch()"
+                                *ngIf="searchText">
+                                <i class="bx bx-x"></i>
+                            </button>
+                            <button class="btn btn-primary" type="button">
+                                <i class="bx bx-search"></i>
+                            </button>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Tab content -->
@@ -79,7 +109,7 @@
                 </div>
 
                 <div *ngIf="activeTab === 2">
-                    <div *ngIf="testLinkDetails && testLinkDetails.length; else noTestLinks">
+                    <div *ngIf="filteredTestLinkData && filteredTestLinkData.length; else noTestLinks">
                         <div class="table-responsive">
                             <table class="table mb-0">
                                 <thead class="table-light">
@@ -97,7 +127,7 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr *ngFor="let t of testLinkDetails; let i = index">
+                                    <tr *ngFor="let t of filteredTestLinkData; let i = index">
                                         <td class="text-left">{{ t.index || (i + 1) }}</td>
                                         <td class="text-center">{{ t.firstname || t.first_name || t.link_owner || '-' }}
                                         </td>

@@ -7,6 +7,9 @@ import Swal from 'sweetalert2';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { PlacementService } from 'src/app/core/services/placement.service';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import * as XLSX from 'xlsx';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 
 @Component({
   selector: 'app-internship',
@@ -29,6 +32,9 @@ export class InternshipComponent implements OnInit {
   testLinkDetails: any[] = [];
   activeTab = 1;
   sendLinkModalRef: NgbModalRef | null = null; // Reference for the send link modal
+  searchText: string = '';
+  filteredInternshipData: any[] = [];
+  filteredTestLinkData: any[] = [];
 
   constructor(
     public connectService: ConnectService,
@@ -65,6 +71,8 @@ export class InternshipComponent implements OnInit {
           // fallback: try to convert to array
           this.testLinkDetails = Array.isArray(res) ? res : [res];
         }
+        this.filteredTestLinkData = [...this.testLinkDetails];
+        this.applySearch();
       },
       error: (err) => {
         console.error('Error fetching test link details:', err);
@@ -73,8 +81,71 @@ export class InternshipComponent implements OnInit {
     });
   }
 
+  applySearch() {
+    const search = this.searchText.toLowerCase().trim();
+
+    if (this.activeTab === 1) {
+      if (!search) {
+        this.filteredInternshipData = [...this.internshipFormDetails];
+      } else {
+        this.filteredInternshipData = this.internshipFormDetails.filter((item: any) => {
+          return (
+            (item.firstname && item.firstname.toLowerCase().includes(search)) ||
+            (item.lastname && item.lastname.toLowerCase().includes(search)) ||
+            (item.email && item.email.toLowerCase().includes(search)) ||
+            (item.mobilenumber && item.mobilenumber.toString().includes(search)) ||
+            (item.internshiptype && item.internshiptype.toLowerCase().includes(search)) ||
+            (item.subject && item.subject.toLowerCase().includes(search)) ||
+            (item.collagename && item.collagename.toLowerCase().includes(search)) ||
+            (item.college_name && item.college_name.toLowerCase().includes(search)) ||
+            (item.institute && item.institute.toLowerCase().includes(search)) ||
+            (item.department && item.department.toLowerCase().includes(search)) ||
+            (item.dept && item.dept.toLowerCase().includes(search))
+          );
+        });
+      }
+      this.collectionSize = this.filteredInternshipData.length;
+      this.page = 1; // Reset to first page
+      this.getPagintaion();
+    } else if (this.activeTab === 2) {
+      if (!search) {
+        this.filteredTestLinkData = [...this.testLinkDetails];
+      } else {
+        this.filteredTestLinkData = this.testLinkDetails.filter((item: any) => {
+          return (
+            (item.firstname && item.firstname.toLowerCase().includes(search)) ||
+            (item.first_name && item.first_name.toLowerCase().includes(search)) ||
+            (item.link_owner && item.link_owner.toLowerCase().includes(search)) ||
+            (item.lastname && item.lastname.toLowerCase().includes(search)) ||
+            (item.last_name && item.last_name.toLowerCase().includes(search)) ||
+            (item.email && item.email.toLowerCase().includes(search)) ||
+            (item.contact_email && item.contact_email.toLowerCase().includes(search)) ||
+            (item.mobilenumber && item.mobilenumber.toString().includes(search)) ||
+            (item.phone && item.phone.toString().includes(search)) ||
+            (item.contact_number && item.contact_number.toString().includes(search)) ||
+            (item.internshiptype && item.internshiptype.toLowerCase().includes(search)) ||
+            (item.type && item.type.toLowerCase().includes(search)) ||
+            (item.subject && item.subject.toLowerCase().includes(search)) ||
+            (item.link_name && item.link_name.toLowerCase().includes(search)) ||
+            (item.collagename && item.collagename.toLowerCase().includes(search)) ||
+            (item.college_name && item.college_name.toLowerCase().includes(search)) ||
+            (item.college && item.college.toLowerCase().includes(search)) ||
+            (item.department && item.department.toLowerCase().includes(search)) ||
+            (item.dept && item.dept.toLowerCase().includes(search))
+          );
+        });
+      }
+    }
+  }
+
+  clearSearch() {
+    this.searchText = '';
+    this.applySearch();
+  }
+
   getPagintaion() {
-    this.paginateData = this.internshipFormDetails
+    const dataSource = this.activeTab === 1 ? this.filteredInternshipData : this.internshipFormDetails;
+    this.paginateData = dataSource
       .slice((this.page - 1) * this.pageSize, (this.page - 1) * this.pageSize + this.pageSize);
   }
 
@@ -258,8 +329,9 @@ export class InternshipComponent implements OnInit {
         }
       }
 
-      this.collectionSize = this.internshipFormDetails.length;
-      this.getPagintaion();
+      this.filteredInternshipData = [...this.internshipFormDetails];
+      this.collectionSize = this.filteredInternshipData.length;
+      this.applySearch();
     });
   }
 
@@ -351,5 +423,81 @@ export class InternshipComponent implements OnInit {
     } else {
       this.toastr.error('Resume not available for download.', 'Error', { timeOut: 3000 });
     }
+  }
+
+  downloadExcel() {
+    const dataToExport = this.activeTab === 1 ? this.filteredInternshipData : this.filteredTestLinkData;
+
+    if (!dataToExport || dataToExport.length === 0) {
+      this.toastr.warning('No data available to download.', 'Warning', { timeOut: 3000 });
+      return;
+    }
+
+    const exportData = dataToExport.map((item: any, index: any) => ({
+      '#': index + 1,
+      'First Name': item.firstname || item.first_name || item.link_owner || '-',
+      'Last Name': item.lastname || item.last_name || '-',
+      'Internship Type': item.internshiptype || item.type || '-',
+      'Email': item.email || item.contact_email || '-',
+      'Mobile Number': item.mobilenumber || item.phone || item.contact_number || '-',
+      'Subject': item.subject || item.link_name || '-',
+      'College': item.collagename || item.college_name || item.college || item.institute || '-',
+      'Department': item.department || item.dept || '-',
+      'Start Date': item.startdate || '-',
+      'End Date': item.enddate || '-',
+      'Semester': item.semester || '-',
+      'Status': item.status || '-'
+    }));
+
+    const worksheet = XLSX.utils.json_to_sheet(exportData);
+    const workbook = XLSX.utils.book_new();
+    const sheetName = this.activeTab === 1 ? 'Internship Forms' : 'Test Links';
+    XLSX.utils.book_append_sheet(workbook, worksheet, sheetName);
+
+    const fileName = `${sheetName.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.xlsx`;
+    XLSX.writeFile(workbook, fileName);
+
+    this.toastr.success('Excel file downloaded successfully!', 'Success', { timeOut: 3000 });
+  }
+
+  downloadPDF() {
+    const dataToExport = this.activeTab === 1 ? this.filteredInternshipData : this.filteredTestLinkData;
+
+    if (!dataToExport || dataToExport.length === 0) {
+      this.toastr.warning('No data available to download.', 'Warning', { timeOut: 3000 });
+      return;
+    }
+
+    const doc = new jsPDF('l', 'mm', 'a4');
+    const title = this.activeTab === 1 ? 'Internship Forms Data' : 'Test Links Data';
+
+    doc.setFontSize(16);
+    doc.text(title, 14, 15);
+
+    const tableData = dataToExport.map((item: any, index: any) => [
+      index + 1,
+      item.firstname || item.first_name || item.link_owner || '-',
+      item.lastname || item.last_name || '-',
+      item.internshiptype || item.type || '-',
+      item.email || item.contact_email || '-',
+      item.mobilenumber || item.phone || item.contact_number || '-',
+      item.subject || item.link_name || '-',
+      item.collagename || item.college_name || item.college || item.institute || '-',
+      item.department || item.dept || '-'
+    ]);
+
+    autoTable(doc, {
+      head: [['#', 'First Name', 'Last Name', 'Type', 'Email', 'Mobile', 'Subject', 'College', 'Department']],
+      body: tableData,
+      startY: 25,
+      theme: 'grid',
+      styles: { fontSize: 8, cellPadding: 2 },
+      headStyles: { fillColor: [66, 139, 202], textColor: 255 }
+    });
+
+    const fileName = `${title.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.pdf`;
+    doc.save(fileName);
+
+    this.toastr.success('PDF file downloaded successfully!', 'Success', { timeOut: 3000 });
   }
 }
