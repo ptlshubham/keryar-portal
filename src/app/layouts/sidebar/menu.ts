@@ -95,12 +95,7 @@ export const MENU: MenuItem[] = [
         label: 'Connect',
         icon: 'mdi mdi-account-multiple-outline', // 🤝 Networking / Contact section
         subItems: [
-            {
-                id: 11,
-                label: 'Internship Form List',
-                link: '/connect/internship',
-                parentId: 11
-            },
+
             {
                 id: 12,
                 label: 'Contact us',
@@ -192,6 +187,12 @@ export const MENU: MenuItem[] = [
         label: 'Internship',
         icon: 'mdi mdi-briefcase-account-outline', // 🎓 Internship / Work experience
         subItems: [
+            {
+                id: 11,
+                label: 'Internship Form List',
+                link: '/connect/internship',
+                parentId: 11
+            },
             {
                 id: 12,
                 label: 'Internship Result',
