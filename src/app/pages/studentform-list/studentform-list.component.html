@@ -15,6 +15,15 @@
                         <option value="">All Subjects</option>
                         <option *ngFor="let s of subjects" [value]="s">{{ s }}</option>
                     </select>
+                    <button class="btn btn-outline-warning btn-sm" title="Remove Duplicates" (click)="removeDuplicates()">
+                        <i class="mdi mdi-content-duplicate"></i>
+                    </button>
+                    <button class="btn btn-outline-primary btn-sm" title="Download Excel" (click)="exportToExcel()">
+                        <i class="mdi mdi-file-excel"></i>
+                    </button>
+                    <button class="btn btn-outline-danger btn-sm" title="Download PDF" (click)="exportToPDF()">
+                        <i class="mdi mdi-file-pdf"></i>
+                    </button>
                 </div>
             </div>
             <div class="card-body">
