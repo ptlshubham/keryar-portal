@@ -1,159 +1,264 @@
 <!-- start page title -->
-<app-pagetitle title="Dashboard" [breadcrumbItems]="breadCrumbItems"></app-pagetitle>
+<app-pagetitle title="Dashboard" [breadcrumbItems]="breadCrumbItems"></app-pagetitle>  
 <!-- end page title -->
 
+<!-- KPIs -->
+<!-- website kpi -->
+<!-- <h3>Website</h3> -->
 <div class="row">
     <div class="col-xl-3 col-md-6">
+    <a [routerLink]="['/workfolio/clients']">
         <!-- card -->
         <div class="card card-h-100">
             <!-- card body -->
             <div class="card-body">
                 <div class="row align-items-center">
                     <div class="col-6">
-                        <span class="text-muted mb-3 lh-1 d-block text-truncate">My Wallet</span>
+                        <span class="text-muted mb-3 lh-1 d-block text-truncate">Total Client<br>&nbsp; </span>
                         <h4 class="mb-3">
-                            $<span [countUp]="865.2" [options]="option" class="counter-value"></span>K
+                            <span [countUp]="clientsCount" class="counter-value"></span>
                         </h4>
                     </div>
-
-                    <div class="col-6">
-                        <apx-chart class="apex-charts" dir="ltr" [series]="walletlineChart.series" [chart]="walletlineChart.chart" [colors]="walletlineChart.colors" [stroke]="walletlineChart.stroke" [tooltip]="walletlineChart.tooltip">
-                        </apx-chart>
+                    <div class="col-6 text-center">
+                        <i class="mdi mdi-account-group" style="font-size: 40px;"></i> 
                     </div>
+
                 </div>
-                <div class="text-nowrap">
-                    <span class="badge bg-success-subtle text-success">+$20.9k</span>
-                    <span class="ms-1 text-muted font-size-13">Since last week</span>
+                <div class="text-nowrap mt-2">
+                  <span class="view-details text-primary fw-medium link-primary link-offset-2 link-underline link-underline-opacity-0 link-underline-opacity-75-hover">
+                    View Details <i class="mdi mdi-arrow-right" style="font-size: 18px;"></i>
+                  </span>
                 </div>
             </div><!-- end card body -->
         </div><!-- end card -->
+        </a>
     </div><!-- end col -->
 
     <div class="col-xl-3 col-md-6">
+    <a [routerLink]="['/workfolio/portfolio']">
         <!-- card -->
         <div class="card card-h-100">
             <!-- card body -->
             <div class="card-body">
                 <div class="row align-items-center">
                     <div class="col-6">
-                        <span class="text-muted mb-3 lh-1 d-block text-truncate">Number of Trades</span>
+                        <span class="text-muted mb-3 lh-1 d-block text-truncate">Total Portfolio<br>&nbsp;</span>
                         <h4 class="mb-3">
-                            <span [countUp]="6258" class="counter-value"></span>
+                            <span [countUp]="portfolioCount" class="counter-value"></span>
                         </h4>
                     </div>
-                    <div class="col-6">
-                        <apx-chart class="apex-charts" dir="ltr" [series]="tradeslineChart.series" [chart]="tradeslineChart.chart" [colors]="tradeslineChart.colors" [stroke]="tradeslineChart.stroke" [tooltip]="tradeslineChart.tooltip">
-                        </apx-chart>
+                    <div class="col-6 text-center">
+                        <i class="mdi mdi-briefcase-outline" style="font-size: 40px;"></i> 
                     </div>
                 </div>
-                <div class="text-nowrap">
-                    <span class="badge bg-danger-subtle text-danger">-29 Trades</span>
-                    <span class="ms-1 text-muted font-size-13">Since last week</span>
+                <div class="text-nowrap mt-2">
+                  <span class="view-details text-primary fw-medium link-primary link-offset-2 link-underline link-underline-opacity-0 link-underline-opacity-75-hover">
+                    View Details <i class="mdi mdi-arrow-right" style="font-size: 18px;"></i>
+                  </span>
                 </div>
             </div><!-- end card body -->
         </div><!-- end card -->
+        </a>
     </div><!-- end col-->
 
     <div class="col-xl-3 col-md-6">
+    <a [routerLink]="['/student-form-list']">
         <!-- card -->
         <div class="card card-h-100">
             <!-- card body -->
             <div class="card-body">
                 <div class="row align-items-center">
                     <div class="col-6">
-                        <span class="text-muted mb-3 lh-1 d-block text-truncate">Invested Amount</span>
+                        <span class="text-muted mb-3 lh-1 d-block text-truncate">Total Student<br> Form</span>
                         <h4 class="mb-3">
-                            $<span [countUp]="4.32" [options]="option" class="counter-value"></span>M
+                            <span [countUp]="studentFormCount" class="counter-value"></span>
                         </h4>
                     </div>
-                    <div class="col-6">
-                        <apx-chart class="apex-charts" dir="ltr" [series]="investedlineChart.series" [chart]="investedlineChart.chart" [colors]="investedlineChart.colors" [stroke]="investedlineChart.stroke" [tooltip]="investedlineChart.tooltip">
-                        </apx-chart>
+                    <div class="col-6 text-center">
+                        <i class="mdi mdi-school-outline" style="font-size: 40px;"></i> 
                     </div>
                 </div>
-                <div class="text-nowrap">
-                    <span class="badge bg-success-subtle text-success">+ $2.8k</span>
-                    <span class="ms-1 text-muted font-size-13">Since last week</span>
+                <div class="text-nowrap mt-2">
+                  <span class="view-details text-primary fw-medium link-primary link-offset-2 link-underline link-underline-opacity-0 link-underline-opacity-75-hover">
+                    View Details <i class="mdi mdi-arrow-right" style="font-size: 18px;"></i>
+                  </span>
                 </div>
             </div><!-- end card body -->
         </div><!-- end card -->
+        </a>
     </div><!-- end col -->
     <div class="col-xl-3 col-md-6">
+    <a [routerLink]="['/connect/internship']">
         <!-- card -->
         <div class="card card-h-100">
             <!-- card body -->
             <div class="card-body">
                 <div class="row align-items-center">
                     <div class="col-6">
-                        <span class="text-muted mb-3 lh-1 d-block text-truncate">Profit Ration</span>
+                        <span class="text-muted mb-3 lh-1 d-block text-truncate">Total Intership<br> Form</span>
                         <h4 class="mb-3">
-                            <span [countUp]="12.37" [options]="option" class="counter-value"></span>%
+                            <span [countUp]="intershipFormCount" class="counter-value"></span>
                         </h4>
                     </div>
-                    <div class="col-6">
-                        <apx-chart class="apex-charts" dir="ltr" [series]="profitlineChart.series" [chart]="profitlineChart.chart" [colors]="profitlineChart.colors" [stroke]="profitlineChart.stroke" [tooltip]="profitlineChart.tooltip">
-                        </apx-chart>
+                    <div class="col-6 text-center">
+                        <i class="mdi mdi-account-tie-outline" style="font-size: 40px;"></i> 
                     </div>
                 </div>
-                <div class="text-nowrap">
-                    <span class="badge bg-success-subtle text-success">+2.95%</span>
-                    <span class="ms-1 text-muted font-size-13">Since last week</span>
+                <div class="text-nowrap mt-2">
+                  <span class="view-details text-primary fw-medium link-primary link-offset-2 link-underline-opacity-75-hover">
+                    View Details <i class="mdi mdi-arrow-right" style="font-size: 18px;"></i>
+                  </span>
                 </div>
             </div><!-- end card body -->
         </div><!-- end card -->
+        </a>
     </div><!-- end col -->
+    
+    <div class="col-xl-3 col-md-6">
+    <a [routerLink]="['/workfolio/casestudy']">
+        <!-- card -->
+        <div class="card card-h-100">
+            <!-- card body -->
+            <div class="card-body">
+                <div class="row align-items-center">
+                    <div class="col-6">
+                        <span class="text-muted mb-3 lh-1 d-block text-truncate">Case Study<br>&nbsp; </span>
+                        <h4 class="mb-3">
+                            <span [countUp]="caseStudyCount" class="counter-value"></span>
+                        </h4>
+                    </div>
+                    <div class="col-6 text-center">
+                        <i class="mdi mdi-file-chart-outline" style="font-size: 40px;"></i>
+                    </div>
+
+                </div>
+                <div class="text-nowrap mt-2">
+                  <span class="view-details text-primary fw-medium link-primary link-offset-2 link-underline link-underline-opacity-0 link-underline-opacity-75-hover">
+                    View Details <i class="mdi mdi-arrow-right" style="font-size: 18px;"></i>
+                  </span>
+                </div>
+            </div><!-- end card body -->
+        </div><!-- end card -->
+        </a>
+    </div><!-- end col -->
+
+    
+    <div class="col-xl-3 col-md-6">
+    <a [routerLink]="['/blog/add-blog']">
+        <!-- card -->
+        <div class="card card-h-100">
+            <!-- card body -->
+            <div class="card-body">
+                <div class="row align-items-center">
+                    <div class="col-6">
+                        <span class="text-muted mb-3 lh-1 d-block text-truncate">Blogs<br>&nbsp; </span>
+                        <h4 class="mb-3">
+                            <span [countUp]="blogCount" class="counter-value"></span>
+                        </h4>
+                    </div>
+                    <div class="col-6 text-center">
+                        <i class="mdi mdi mdi-post-outline" style="font-size: 40px;"></i> 
+                    </div>
+
+                </div>
+                <div class="text-nowrap mt-2">
+                  <span class="view-details text-primary fw-medium link-primary link-offset-2 link-underline link-underline-opacity-0 link-underline-opacity-75-hover">
+                    View Details <i class="mdi mdi-arrow-right" style="font-size: 18px;"></i>
+                  </span>
+                </div>
+            </div><!-- end card body -->
+        </div><!-- end card -->
+        </a>
+    </div><!-- end col -->
+
+    
+    <div class="col-xl-3 col-md-6">
+    <a [routerLink]="['/placement/hired-students']">
+        <!-- card -->
+        <div class="card card-h-100">
+            <!-- card body -->
+            <div class="card-body">
+                <div class="row align-items-center">
+                    <div class="col-6">
+                        <span class="text-muted mb-3 lh-1 d-block text-truncate">Placement hired<br>&nbsp; </span>
+                        <h4 class="mb-3">
+                            <span [countUp]="hiredStudentsCount" class="counter-value"></span>
+                        </h4>
+                    </div>
+                    <div class="col-6 text-center">
+                        <i class="mdi mdi-account-multiple-check" style="font-size: 40px;"></i> 
+                    </div>
+
+                </div>
+                <div class="text-nowrap mt-2">
+                  <span class="view-details text-primary fw-medium link-primary link-offset-2 link-underline link-underline-opacity-0 link-underline-opacity-75-hover">
+                    View Details <i class="mdi mdi-arrow-right" style="font-size: 18px;"></i>
+                  </span>
+                </div>
+            </div><!-- end card body -->
+        </div><!-- end card -->
+        </a>
+    </div><!-- end col -->
+
+    
+    <div class="col-xl-3 col-md-6">
+    <a [routerLink]="['/career/hired-candidates']">
+        <!-- card -->
+        <div class="card card-h-100">
+            <!-- card body -->
+            <div class="card-body">
+                <div class="row align-items-center">
+                    <div class="col-6">
+                        <span class="text-muted mb-3 lh-1 d-block text-truncate">Hired Candidate<br>&nbsp; </span>
+                        <h4 class="mb-3">
+                            <span [countUp]="hiredCandidateCount" class="counter-value"></span>
+                        </h4>
+                    </div>
+                    <div class="col-6 text-center">
+                        <i class="mdi mdi-account-check" style="font-size: 40px;"></i> 
+                    </div>
+
+                </div>
+                <div class="text-nowrap mt-2">
+                  <span class="view-details text-primary fw-medium link-primary link-offset-2 link-underline link-underline-opacity-0 link-underline-opacity-75-hover">
+                    View Details <i class="mdi mdi-arrow-right" style="font-size: 18px;"></i>
+                  </span>
+                </div>
+            </div><!-- end card body -->
+        </div><!-- end card -->
+        </a>
+    </div><!-- end col -->
+
 </div><!-- end row-->
 
-<div class="row">
+<div class="row justify-content-center">
     <div class="col-xl-5">
         <!-- card -->
         <div class="card card-h-100">
             <!-- card body -->
             <div class="card-body">
                 <div class="d-flex flex-wrap align-items-center mb-4">
-                    <h5 class="card-title me-2">Wallet Balance</h5>
-                    <div class="ms-auto">
-                        <div>
-                            <button type="button" class="btn btn-soft-secondary btn-sm">
-                                ALL
-                            </button>
-                            <button type="button" class="btn btn-soft-primary btn-sm ms-1">
-                                1M
-                            </button>
-                            <button type="button" class="btn btn-soft-secondary btn-sm ms-1">
-                                6M
-                            </button>
-                            <button type="button" class="btn btn-soft-secondary btn-sm ms-1">
-                                1Y
-                            </button>
-                        </div>
-                    </div>
+                    <h5 class="card-title me-2">Portfolio Overview</h5>
                 </div>
 
                 <div class="row align-items-center">
                     <div class="col-sm">
-                        <apx-chart dir="ltr" class="apex-charts" [series]="walletOverview.series" [chart]="walletOverview.chart" [legend]="walletOverview.legend" [colors]="walletOverview.colors" [labels]="walletOverview.labels" [stroke]="walletOverview.stroke" [plotOptions]="walletOverview.plotOptions">
+                        <apx-chart dir="ltr" class="apex-charts" [series]="portfolioOverview.series" [chart]="portfolioOverview.chart" [legend]="portfolioOverview.legend" [colors]="portfolioOverview.colors" [labels]="portfolioOverview.labels" [stroke]="portfolioOverview.stroke" [plotOptions]="portfolioOverview.plotOptions">
                         </apx-chart>
                     </div>
                     <div class="col-sm align-self-center">
                         <div class="mt-4 mt-sm-0">
-                            <div>
-                                <p class="mb-2"><i class="mdi mdi-circle align-middle font-size-10 me-2 text-success"></i> Bitcoin
-                                </p>
-                                <h6>0.4412 BTC = <span class="text-muted font-size-14 fw-normal">$ 4025.32</span></h6>
-                            </div>
-
-                            <div class="mt-4 pt-2">
-                                <p class="mb-2"><i class="mdi mdi-circle align-middle font-size-10 me-2 text-primary"></i> Ethereum
-                                </p>
-                                <h6>4.5701 ETH = <span class="text-muted font-size-14 fw-normal">$ 1123.64</span></h6>
-                            </div>
-
-                            <div class="mt-4 pt-2">
-                                <p class="mb-2"><i class="mdi mdi-circle align-middle font-size-10 me-2 text-info"></i>
-                                    Litecoin</p>
-                                <h6>35.3811 LTC = <span class="text-muted font-size-14 fw-normal">$ 2263.09</span></h6>
-                            </div>
+                          <div *ngFor="let label of portfolioOverview.labels; let i = index" class="mt-4 pb-2">
+                            <p class="mb-2">
+                              <i class="mdi mdi-circle align-middle font-size-10 me-2"
+                                 [ngStyle]="{'color': portfolioOverview.colors[i]}"></i>
+                              {{ label }}
+                            </p>
+                            <h6>
+                              {{ portfolioOverview.series[i] }}
+                              <span class="text-muted font-size-14 fw-normal"> ({{ label }})</span>
+                            </h6>
+                          </div>
                         </div>
                     </div>
                 </div>
@@ -162,615 +267,41 @@
         <!-- end card -->
     </div>
     <!-- end col -->
-    <div class="col-xl-7">
-        <div class="row">
-            <div class="col-xl-8">
-                <!-- card -->
-                <div class="card card-h-100">
-                    <!-- card body -->
-                    <div class="card-body">
-                        <div class="d-flex flex-wrap align-items-center mb-4">
-                            <h5 class="card-title me-2">Invested Overview</h5>
-                            <div class="ms-auto">
-                                <select class="form-select form-select-sm">
-                                    <option value="MAY" selected="">May</option>
-                                    <option value="AP">April</option>
-                                    <option value="MA">March</option>
-                                    <option value="FE">February</option>
-                                    <option value="JA">January</option>
-                                    <option value="DE">December</option>
-                                </select>
-                            </div>
-                        </div>
 
-                        <div class="row align-items-center">
-                            <div class="col-sm">
-                                <apx-chart dir="ltr" class="apex-charts" [series]="investedOverview.series" [chart]="investedOverview.chart" [legend]="investedOverview.legend" [colors]="investedOverview.colors" [labels]="investedOverview.labels" [stroke]="investedOverview.stroke" [plotOptions]="investedOverview.plotOptions" [fill]="investedOverview.fill">
-                                </apx-chart>
-                            </div>
-                            <div class="col-sm align-self-center">
-                                <div class="mt-4 mt-sm-0">
-                                    <p class="mb-1">Invested Amount</p>
-                                    <h4>$ 6134.39</h4>
-
-                                    <p class="text-muted mb-4"> + 0.0012.23 ( 0.2 % ) <i class="mdi mdi-arrow-up ms-1 text-success"></i></p>
-
-                                    <div class="row g-0">
-                                        <div class="col-6">
-                                            <div>
-                                                <p class="mb-2 text-muted text-uppercase font-size-11">Income</p>
-                                                <h5 class="fw-medium">$ 2632.46</h5>
-                                            </div>
-                                        </div>
-                                        <div class="col-6">
-                                            <div>
-                                                <p class="mb-2 text-muted text-uppercase font-size-11">Expenses</p>
-                                                <h5 class="fw-medium">-$ 924.38</h5>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div class="mt-2">
-                                        <a href="javascript:void(0);" class="btn btn-primary btn-sm">View more <i class="mdi mdi-arrow-right ms-1"></i></a>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <!-- end col -->
-
-            <div class="col-xl-4">
-                <!-- card -->
-                <div class="card bg-primary text-white shadow-primary card-h-100">
-                    <!-- card body -->
-                    <div class="card-body p-0">
-                        <div id="carouselExampleCaptions" class="carousel slide text-center widget-carousel" data-bs-ride="carousel">
-                            <div class="carousel-inner">
-                                <!-- Carousel with caption -->
-                                <owl-carousel-o [options]="timelineCarousel" class="events navs-carousel">
-                                    @for (slide of News; track $index) {
-                                    <ng-template carouselSlide>
-                                        <div class="item event-list">
-                                            <div class="text-center p-4">
-                                                <i class="mdi {{slide.avatar_icon}} widget-box-1-icon"></i>
-                                                <div class="avatar-md m-auto">
-                                                    <span class="avatar-title rounded-circle bg-light-subtle text-white font-size-24">
-                                                        <i class="{{slide.icon}}"></i>
-                                                    </span>
-                                                </div>
-                                                <h4 class="mt-3 lh-base fw-normal text-white"><b>{{slide.title}}</b>
-                                                    News</h4>
-                                                <p class="text-white-50 font-size-13">{{slide.content}}</p>
-                                                <button type="button" class="btn btn-light btn-sm">View details <i class="mdi mdi-arrow-right ms-1"></i></button>
-                                            </div>
-                                        </div>
-                                    </ng-template>}
-                                </owl-carousel-o>
-                                <!-- End carousel -->
-                            </div>
-                            <!-- end carousel-inner -->
-                        </div>
-                        <!-- end carousel -->
-                    </div>
-                    <!-- end card body -->
-                </div>
-                <!-- end card -->
-            </div>
-            <!-- end col -->
-        </div>
-        <!-- end row -->
-    </div>
-    <!-- end col -->
-</div> <!-- end row-->
-
-<div class="row">
-    <div class="col-xl-8">
+    
+    <div class="col-xl-5">
         <!-- card -->
-        <div class="card">
+        <div class="card card-h-100">
             <!-- card body -->
             <div class="card-body">
                 <div class="d-flex flex-wrap align-items-center mb-4">
-                    <h5 class="card-title me-2">Market Overview</h5>
-                    <div class="ms-auto">
-                        <div>
-                            <button type="button" class="btn btn-soft-primary btn-sm">
-                                ALL
-                            </button>
-                            <button type="button" class="btn btn-soft-secondary btn-sm ms-1">
-                                1M
-                            </button>
-                            <button type="button" class="btn btn-soft-secondary btn-sm ms-1">
-                                6M
-                            </button>
-                            <button type="button" class="btn btn-soft-secondary btn-sm active ms-1">
-                                1Y
-                            </button>
-                        </div>
-                    </div>
+                    <h5 class="card-title me-2">Devlopment Project Overview</h5>
                 </div>
 
                 <div class="row align-items-center">
-                    <div class="col-xl-8">
-                        <div>
-                            <apx-chart dir="ltr" class="apex-charts" [chart]="marketOverview.chart" [series]="marketOverview.series" [legend]="marketOverview.legend" [stroke]="marketOverview.stroke" [colors]="marketOverview.colors" [fill]="marketOverview.fill" [dataLabels]="marketOverview.dataLabels" [xaxis]="marketOverview.xaxis" [markers]="marketOverview.markers" [plotOptions]="marketOverview.plotOptions" [yaxis]="marketOverview.yaxis" [tooltip]="marketOverview.tooltip" [grid]="marketOverview.grid" [labels]="marketOverview.labels">
-                            </apx-chart>
-                        </div>
+                    <div class="col-sm">
+                        <apx-chart dir="ltr" class="apex-charts" [series]="devlopmentOverview.series" [chart]="devlopmentOverview.chart" [legend]="devlopmentOverview.legend" [colors]="devlopmentOverview.colors" [labels]="devlopmentOverview.labels" [stroke]="devlopmentOverview.stroke" [plotOptions]="devlopmentOverview.plotOptions">
+                        </apx-chart>
                     </div>
-                    <div class="col-xl-4">
-                        <div class="p-4">
-                            <div class="mt-0">
-                                <div class="d-flex align-items-center">
-                                    <div class="avatar-sm m-auto">
-                                        <span class="avatar-title rounded-circle bg-light-subtle text-body font-size-16">
-                                            1
-                                        </span>
-                                    </div>
-                                    <div class="flex-grow-1 ms-3">
-                                        <span class="font-size-16">Coinmarketcap</span>
-                                    </div>
-
-                                    <div class="flex-shrink-0">
-                                        <span class="badge rounded-pill  bg-success-subtle  text-success fw-medium">+2.5%</span>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="mt-3">
-                                <div class="d-flex align-items-center">
-                                    <div class="avatar-sm m-auto">
-                                        <span class="avatar-title rounded-circle bg-light-subtle text-body font-size-16">
-                                            2
-                                        </span>
-                                    </div>
-                                    <div class="flex-grow-1 ms-3">
-                                        <span class="font-size-16">Binance</span>
-                                    </div>
-
-                                    <div class="flex-shrink-0">
-                                        <span class="badge rounded-pill bg-success-subtle text-success font-size-12 fw-medium">+8.3%</span>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="mt-3">
-                                <div class="d-flex align-items-center">
-                                    <div class="avatar-sm m-auto">
-                                        <span class="avatar-title rounded-circle bg-light-subtle text-body font-size-16">
-                                            3
-                                        </span>
-                                    </div>
-                                    <div class="flex-grow-1 ms-3">
-                                        <span class="font-size-16">Coinbase</span>
-                                    </div>
-
-                                    <div class="flex-shrink-0">
-                                        <span class="badge rounded-pill bg-danger-subtle text-danger font-size-12 fw-medium">-3.6%</span>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="mt-3">
-                                <div class="d-flex align-items-center">
-                                    <div class="avatar-sm m-auto">
-                                        <span class="avatar-title rounded-circle bg-light-subtle text-body font-size-16">
-                                            4
-                                        </span>
-                                    </div>
-                                    <div class="flex-grow-1 ms-3">
-                                        <span class="font-size-16">Yobit</span>
-                                    </div>
-
-                                    <div class="flex-shrink-0">
-                                        <span class="badge rounded-pill bg-success-subtle text-success font-size-12 fw-medium">+7.1%</span>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="mt-3">
-                                <div class="d-flex align-items-center">
-                                    <div class="avatar-sm m-auto">
-                                        <span class="avatar-title rounded-circle bg-light-subtle text-body font-size-16">
-                                            5
-                                        </span>
-                                    </div>
-                                    <div class="flex-grow-1 ms-3">
-                                        <span class="font-size-16">Bitfinex</span>
-                                    </div>
-
-                                    <div class="flex-shrink-0">
-                                        <span class="badge rounded-pill bg-danger-subtle text-danger font-size-12 fw-medium">-0.9%</span>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="mt-4 pt-2">
-                                <a href="" class="btn btn-primary w-100">See All Balances <i class="mdi mdi-arrow-right ms-1"></i></a>
-                            </div>
-
+                    <div class="col-sm align-self-center">
+                        <div class="mt-4 mt-sm-0">
+                          <div *ngFor="let label of devlopmentOverview.labels; let i = index" class="mt-4 pb-2">
+                            <p class="mb-2">
+                              <i class="mdi mdi-circle align-middle font-size-10 me-2"
+                                 [ngStyle]="{'color': devlopmentOverview.colors[i]}"></i>
+                              {{ label }}
+                            </p>
+                            <h6>
+                              {{ devlopmentOverview.series[i] }}
+                              <span class="text-muted font-size-14 fw-normal"> ({{ label }})</span>
+                            </h6>
+                          </div>
                         </div>
                     </div>
                 </div>
             </div>
-            <!-- end card -->
-        </div>
-        <!-- end col -->
-    </div>
-    <!-- end row-->
-
-    <div class="col-xl-4">
-        <!-- card -->
-        <div class="card">
-            <!-- card body -->
-            <div class="card-body">
-                <div class="d-flex flex-wrap align-items-center mb-4">
-                    <h5 class="card-title me-2">Sales by Locations {{title}}</h5>
-                    <div class="ms-auto">
-                        <div class="dropdown" ngbDropdown>
-                            <a class="dropdown-toggle text-reset" href="javascript:void(0)" id="dropdownMenuButton1" ngbDropdownToggle data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                <span class="text-muted font-size-12">Sort By:</span> <span class="fw-medium">World<i class="mdi mdi-chevron-down ms-1"></i></span>
-                            </a>
-
-                            <div class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuButton1" ngbDropdownMenu>
-                                <a class="dropdown-item" href="javascript:void(0)">USA</a>
-                                <a class="dropdown-item" href="javascript:void(0)">Russia</a>
-                                <a class="dropdown-item" href="javascript:void(0)">Australia</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div id="world-map" style="height: 250px">
-                </div>
-                <div class="px-2 py-2">
-                    <p class="mb-1">USA <span class="float-end">75%</span></p>
-                    <div class="progress mt-2" style="height: 6px;">
-                        <div class="progress-bar progress-bar-striped bg-primary" role="progressbar" style="width: 75%" aria-valuenow="75" aria-valuemin="0" aria-valuemax="75">
-                        </div>
-                    </div>
-
-                    <p class="mt-3 mb-1">Russia <span class="float-end">55%</span></p>
-                    <div class="progress mt-2" style="height: 6px;">
-                        <div class="progress-bar progress-bar-striped bg-primary" role="progressbar" style="width: 55%" aria-valuenow="55" aria-valuemin="0" aria-valuemax="55">
-                        </div>
-                    </div>
-
-                    <p class="mt-3 mb-1">Australia <span class="float-end">85%</span></p>
-                    <div class="progress mt-2" style="height: 6px;">
-                        <div class="progress-bar progress-bar-striped bg-primary" role="progressbar" style="width: 85%" aria-valuenow="85" aria-valuemin="0" aria-valuemax="85">
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <!-- end card body -->
         </div>
         <!-- end card -->
     </div>
     <!-- end col -->
-</div>
-<!-- end row-->
-
-<div class="row">
-    <div class="col-xl-4">
-        <div class="card">
-            <div class="card-header bg-transparent border-bottom">
-                <div class="d-flex flex-wrap">
-                    <div class="me-2">
-                        <h5 class="card-title mt-1 mb-0">Trading</h5>
-                    </div>
-                    <ul ngbNav #nav="ngbNav" [activeId]="1" class="nav-tabs nav-tabs-custom card-header-tabs ms-auto">
-                        <li [ngbNavItem]="1" class="nav-item">
-                            <a ngbNavLink>Buy</a>
-                            <ng-template ngbNavContent>
-                                <div class="card-body">
-                                    <div class="tab-pane active" id="buy-tab" role="tabpanel">
-                                        <div class="float-end ms-2">
-                                            <h5 class="font-size-14"><i class="bx bx-wallet text-primary font-size-16 align-middle me-1"></i>
-                                                <a href="javascript:void(0);" class="text-reset text-decoration-underline">$4335.23</a>
-                                            </h5>
-                                        </div>
-                                        <h5 class="font-size-14 mb-4">Buy Coins</h5>
-                                        <div>
-                                            <div class="form-group mb-3">
-                                                <label>Payment method :</label>
-                                                <select class="form-select">
-                                                    <option>Direct Bank Payment</option>
-                                                    <option>Credit / Debit Card</option>
-                                                    <option>Paypal</option>
-                                                    <option>Payoneer</option>
-                                                    <option>Stripe</option>
-                                                </select>
-                                            </div>
-
-                                            <div>
-                                                <label>Add Amount :</label>
-                                                <div class="input-group mb-3">
-                                                    <label class="input-group-text">Amount</label>
-                                                    <select class="form-select" style="max-width: 90px;">
-                                                        <option value="BT" selected>BTC</option>
-                                                        <option value="ET">ETH</option>
-                                                        <option value="LT">LTC</option>
-                                                    </select>
-                                                    <input type="text" class="form-control" placeholder="0.00121255">
-                                                </div>
-
-                                                <div class="input-group mb-3">
-                                                    <label class="input-group-text">Price</label>
-                                                    <input type="text" class="form-control" placeholder="$58,245">
-                                                    <label class="input-group-text">$</label>
-                                                </div>
-
-                                                <div class="input-group mb-3">
-                                                    <label class="input-group-text">Total</label>
-                                                    <input type="text" class="form-control" placeholder="$36,854.25">
-                                                </div>
-                                            </div>
-
-                                            <div class="text-center">
-                                                <button type="button" class="btn btn-success w-md">Buy Coin</button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </ng-template>
-                        </li>
-                        <li [ngbNavItem]="2" class="nav-item">
-                            <a ngbNavLink>Sell</a>
-                            <ng-template ngbNavContent>
-                                <div class="card-body">
-                                    <div class="tab-pane" id="sell-tab" role="tabpanel">
-                                        <div class="float-end ms-2">
-                                            <h5 class="font-size-14"><i class="bx bx-wallet text-primary font-size-16 align-middle me-1"></i>
-                                                <a href="javascript:void(0);" class="text-reset text-decoration-underline">$4235.23</a>
-                                            </h5>
-                                        </div>
-                                        <h5 class="font-size-14 mb-4">Sell Coins</h5>
-
-                                        <div>
-
-                                            <div class="form-group mb-3">
-                                                <label>Wallet ID :</label>
-                                                <input type="email" class="form-control" placeholder="1cvb254ugxvfcd280ki">
-                                            </div>
-
-                                            <div>
-                                                <label>Add Amount :</label>
-                                                <div class="input-group mb-3">
-                                                    <label class="input-group-text">Amount</label>
-
-                                                    <select class="form-select" style="max-width: 90px;">
-                                                        <option value="BT" selected>BTC</option>
-                                                        <option value="ET">ETH</option>
-                                                        <option value="LT">LTC</option>
-                                                    </select>
-                                                    <input type="text" class="form-control" placeholder="0.00121255">
-                                                </div>
-
-                                                <div class="input-group mb-3">
-
-                                                    <label class="input-group-text">Price</label>
-
-                                                    <input type="text" class="form-control" placeholder="$23,754.25">
-
-                                                    <label class="input-group-text">$</label>
-                                                </div>
-
-                                                <div class="input-group mb-3">
-                                                    <label class="input-group-text">Total</label>
-                                                    <input type="text" class="form-control" placeholder="$6,852.41">
-                                                </div>
-                                            </div>
-
-                                            <div class="text-center">
-                                                <button type="button" class="btn btn-danger w-md">Sell Coin</button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </ng-template>
-                        </li>
-                    </ul>
-                </div>
-            </div><!-- end card header -->
-            <div [ngbNavOutlet]="nav" class="mt-2 w-100"></div>
-        </div>
-        <!-- end card -->
-    </div>
-    <!-- end col -->
-
-    <div class="col-xl-4">
-        <div class="card">
-            <div class="card-header align-items-center d-flex">
-                <div class="flex-grow-1 me-2">
-                    <h5 class="card-title mt-1 mb-0">Transactions</h5>
-                </div>
-                <div class="flex-shrink-0">
-                    <ul ngbNav #transactions="ngbNav" [activeId]="1" class="nav-tabs nav-tabs-custom card-header-tabs ms-auto">
-                        <li [ngbNavItem]="1" class="nav-item">
-                            <a ngbNavLink>All</a>
-                            <ng-template ngbNavContent>
-                                <div class="card-body px-0">
-                                    <div class="tab-content">
-                                        <div class="tab-pane active" id="transactions-all-tab" role="tabpanel">
-                                            <div data-simplebar style="max-height: 352px;">
-                                                <div class="table-responsive px-3">
-                                                    <table class="table align-middle table-nowrap table-borderless">
-                                                        @for (data of transactionsAll; track $index) {
-                                                        <tbody>
-                                                            <tr>
-                                                                <td style="width: 50px;">
-                                                                    <div class="font-size-22 text-success" [ngClass]=" { 'text-danger': data.icon === 'bx-up-arrow-circle' }">
-                                                                        <i class="bx {{data.icon}} d-block"></i>
-                                                                    </div>
-                                                                </td>
-
-                                                                <td>
-                                                                    <div>
-                                                                        <h5 class="font-size-14 mb-1">{{data.title}}
-                                                                        </h5>
-                                                                        <p class="text-muted mb-0 font-size-12">
-                                                                            {{data.date}}</p>
-                                                                    </div>
-                                                                </td>
-
-                                                                <td>
-                                                                    <div class="text-end">
-                                                                        <h5 class="font-size-14 mb-0">{{data.coin}}</h5>
-                                                                        <p class="text-muted mb-0 font-size-12">Coin
-                                                                            Value
-                                                                        </p>
-                                                                    </div>
-                                                                </td>
-
-                                                                <td>
-                                                                    <div class="text-end">
-                                                                        <h5 class="font-size-14 text-muted mb-0">
-                                                                            {{data.amount}}</h5>
-                                                                        <p class="text-muted mb-0 font-size-12">Amount
-                                                                        </p>
-                                                                    </div>
-                                                                </td>
-                                                            </tr>
-                                                        </tbody>}
-                                                    </table>
-                                                </div>
-                                            </div>
-
-                                        </div>
-                                    </div>
-                                </div>
-                            </ng-template>
-                        </li>
-                        <li [ngbNavItem]="2" class="nav-item">
-                            <a ngbNavLink>Buy</a>
-                            <ng-template ngbNavContent>
-                                <div class="card-body px-0">
-                                    <div class="tab-content"></div>
-                                    <div class="tab-pane" id="transactions-buy-tab" role="tabpanel">
-                                        <div class="table-responsive px-3">
-                                            <table class="table align-middle table-nowrap table-borderless">
-                                                <tbody>
-                                                    @for (data of transactionsBuy; track $index) {
-                                                    <tr>
-                                                        <td style="width: 50px;">
-                                                            <div class="font-size-22 text-success">
-                                                                <i class="bx {{data.icon}} d-block"></i>
-                                                            </div>
-                                                        </td>
-
-                                                        <td>
-                                                            <div>
-                                                                <h5 class="font-size-14 mb-1">{{data.title}}</h5>
-                                                                <p class="text-muted mb-0 font-size-12">{{data.date}}
-                                                                </p>
-                                                            </div>
-                                                        </td>
-
-                                                        <td>
-                                                            <div class="text-end">
-                                                                <h5 class="font-size-14 mb-0">{{data.coin}}</h5>
-                                                                <p class="text-muted mb-0 font-size-12">Coin Value</p>
-                                                            </div>
-                                                        </td>
-
-                                                        <td>
-                                                            <div class="text-end">
-                                                                <h5 class="font-size-14 text-muted mb-0">{{data.amount}}
-                                                                </h5>
-                                                                <p class="text-muted mb-0 font-size-12">Amount</p>
-                                                            </div>
-                                                        </td>
-                                                    </tr>}
-
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    </div>
-                                </div>
-                            </ng-template>
-                        </li>
-                        <li [ngbNavItem]="3" class="nav-item">
-                            <a ngbNavLink>Sell</a>
-                            <ng-template ngbNavContent>
-                                <div class="card-body px-0">
-                                    <div class="tab-pane" id="transactions-sell-tab" role="tabpanel">
-                                        <div class="table-responsive px-3">
-                                            <table class="table align-middle table-nowrap table-borderless">
-                                                @for (data of transactionsSell; track $index) {
-                                                <tbody>
-                                                    <tr>
-                                                        <td>
-                                                            <div class="font-size-22 text-danger">
-                                                                <i class="bx {{data.icon}} d-block"></i>
-                                                            </div>
-                                                        </td>
-
-                                                        <td>
-                                                            <div>
-                                                                <h5 class="font-size-14 mb-1">{{data.title}}</h5>
-                                                                <p class="text-muted mb-0 font-size-12">{{data.date}}
-                                                                </p>
-                                                            </div>
-                                                        </td>
-
-                                                        <td>
-                                                            <div class="text-end">
-                                                                <h5 class="font-size-14 mb-0">{{data.coin}}</h5>
-                                                                <p class="text-muted mb-0 font-size-12">Coin Value</p>
-                                                            </div>
-                                                        </td>
-
-                                                        <td>
-                                                            <div class="text-end">
-                                                                <h5 class="font-size-14 text-muted mb-0">{{data.amount}}
-                                                                </h5>
-                                                                <p class="text-muted mb-0 font-size-12">Amount</p>
-                                                            </div>
-                                                        </td>
-                                                    </tr>
-
-                                                </tbody>}
-                                            </table>
-                                        </div>
-                                    </div>
-                                </div>
-                            </ng-template>
-                        </li>
-                    </ul>
-                </div>
-            </div><!-- end card header -->
-            <ngx-simplebar style="max-height: 400px;">
-                <div [ngbNavOutlet]="transactions" class="w-100"></div>
-            </ngx-simplebar>
-        </div>
-        <!-- end card -->
-    </div>
-    <!-- end col -->
-
-    <div class="col-xl-4">
-        <div class="card">
-            <div class="card-header align-items-center d-flex">
-                <h4 class="card-title mb-0 flex-grow-1">Recent Activity</h4>
-                <div class="flex-shrink-0">
-                    <select class="form-select form-select-sm mb-0 my-n1">
-                        <option value="Today" selected="">Today</option>
-                        <option value="Yesterday">Yesterday</option>
-                        <option value="Week">Last Week</option>
-                        <option value="Month">Last Month</option>
-                    </select>
-                </div>
-            </div><!-- end card header -->
-
-            <div class="card-body px-0">
-
-                <ngx-simplebar style="max-height: 360px;">
-                    <div class="px-3">
-                        <app-recent-activity [recentActivity]="recentActivity"></app-recent-activity>
-                    </div>
-                </ngx-simplebar>
-            </div>
-            <!-- end card body -->
-        </div>
-        <!-- end card -->
-    </div>
-    <!-- end col -->
-</div><!-- end row -->
+</div> <!-- end row-->
