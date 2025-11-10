@@ -5,8 +5,8 @@ declare var $: any;
   providedIn: 'root'
 })
 export class ApiService {
-  // public static HOST_URL: string = "http://localhost:8300";
-  public static HOST_URL: string = "https://api.fosterx.co";
+  public static HOST_URL: string = "http://localhost:8300";
+  // public static HOST_URL: string = "https://api.fosterx.co";
 
 
   constructor() {
@@ -17,6 +17,10 @@ export class ApiService {
       'Content-Type': 'application/json'
     })
   }
+
+  // Authentication APIs
+  public static sendOTPForAdminLoginURL: string = ApiService.HOST_URL + '/keryar/SendOTPForAdminLogin';
+  public static verifyOTPAndLoginURL: string = ApiService.HOST_URL + '/keryar/VerifyOTPAndLogin';
 
   // Client Details APIs
   public static uploadClientLogoImagesURL: string = ApiService.HOST_URL + '/keryar/UploadClientLogoImages';

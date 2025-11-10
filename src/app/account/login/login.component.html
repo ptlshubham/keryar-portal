@@ -7,7 +7,8 @@
                         <div class="d-flex flex-column h-100">
                             <div class="mb-4 mb-md-5 text-center">
                                 <a routerLink="/" class="d-block auth-logo">
-                                    <img src="assets/images/logo-sm.svg" alt="" height="28"> <span class="logo-txt">Keryar</span>
+                                    <img src="assets/images/logo-sm.svg" alt="" height="28"> <span
+                                        class="logo-txt">Keryar</span>
                                 </a>
                             </div>
                             <div class="auth-content my-auto">
@@ -19,7 +20,9 @@
 
                                     <div class="mb-3">
                                         <label for="email">Email</label>
-                                        <input type="email" class="form-control" id="email" formControlName="email" [ngClass]="{ 'is-invalid': submitted && f.email.errors }" placeholder="Enter email">
+                                        <input type="email" class="form-control" id="email" formControlName="email"
+                                            [ngClass]="{ 'is-invalid': submitted && f.email.errors }"
+                                            placeholder="Enter email" [readonly]="otpSent">
                                         @if(submitted && f.email.errors){
                                         <div class="invalid-feedback">
                                             @if(f.email.errors.required){
@@ -30,22 +33,47 @@
                                         </div>}
                                     </div>
 
+                                    @if(!otpSent){
+                                    <div class="mb-3">
+                                        <button class="btn btn-primary w-100" type="button" (click)="sendOtp()"
+                                            [disabled]="!loginForm.get('email')?.valid || isLoading">
+                                            @if(isLoading){
+                                            <span class="spinner-border spinner-border-sm me-2" role="status"
+                                                aria-hidden="true"></span>
+                                            }
+                                            Send OTP
+                                        </button>
+                                        @if(otpError){
+                                        <div class="text-danger mt-2">
+                                            <small>{{otpError}}</small>
+                                        </div>}
+                                    </div>
+                                    }
+
+                                    @if(otpSent){
                                     <div class="mb-3">
                                         <div class="float-end">
-                                            <a routerLink="/account/recoverpw" class="text-muted">Forgot
-                                                password?</a>
+                                            <a href="javascript:void(0)" (click)="resendOtp()"
+                                                [class.disabled]="isLoading" class="text-muted">
+                                                @if(isLoading){
+                                                <span class="spinner-border spinner-border-sm me-1" role="status"
+                                                    aria-hidden="true"></span>
+                                                }
+                                                Resend OTP?
+                                            </a>
                                         </div>
-                                        <label for="userpassword">Password</label>
-                                        <div class="input-group auth-pass-inputgroup">
-                                            <input [type]="fieldTextType ? 'text' : 'password'" class="form-control" formControlName="password" [ngClass]="{ 'is-invalid': submitted && f.password.errors }" placeholder="Enter password" aria-label="Password" aria-describedby="password-addon">
-                                            <button class="btn btn-light " type="button" id="password-addon"><i class="mdi" [ngClass]="{'mdi-eye-off-outline': !fieldTextType, 'mdi-eye-outline': fieldTextType
-                                                      }" (click)="toggleFieldTextType()"></i></button>
-                                            @if(submitted && f.password.errors){
-                                            <div class="invalid-feedback">
-                                                @if(f.password.errors.required){
-                                                <span>Password is required</span>}
-                                            </div>}
-                                        </div>
+                                        <label for="otp">Enter OTP</label>
+                                        <ng-otp-input [config]="otpConfig" (onInputChange)="onOtpChange($event)">
+                                        </ng-otp-input>
+                                        @if(submitted && f.otp.errors){
+                                        <div class="invalid-feedback d-block">
+                                            @if(f.otp.errors.required){
+                                            <span>OTP is required</span>}
+                                        </div>}
+                                        @if(otpError){
+                                        <div class="invalid-feedback d-block">
+                                            <span>{{otpError}}</span>
+                                        </div>}
                                     </div>
 
                                     <div class="form-check">
@@ -56,8 +84,15 @@
                                     </div>
 
                                     <div class="mt-3 d-grid">
-                                        <button class="btn btn-primary btn-block" type="submit">Log In</button>
+                                        <button class="btn btn-primary btn-block" type="submit" [disabled]="isLoading">
+                                            @if(isLoading){
+                                            <span class="spinner-border spinner-border-sm me-2" role="status"
+                                                aria-hidden="true"></span>
+                                            }
+                                            Log In
+                                        </button>
                                     </div>
+                                    }
                                 </form>
                             </div>
                             <div class="mt-2 mt-md-2 text-center">

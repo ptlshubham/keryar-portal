@@ -2,16 +2,14 @@ import { Injectable } from '@angular/core';
 import { Router, ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
 
 import { AuthenticationService } from '../services/auth.service';
-import { AuthfakeauthenticationService } from '../services/authfake.service';
 
 import { environment } from '../../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
-export class AuthGuard  {
+export class AuthGuard {
     constructor(
         private router: Router,
-        private authenticationService: AuthenticationService,
-        private authFackservice: AuthfakeauthenticationService
+        private authenticationService: AuthenticationService
     ) { }
 
     canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot) {
@@ -22,8 +20,11 @@ export class AuthGuard  {
                 return true;
             }
         } else {
-            const currentUser = this.authFackservice.currentUserValue;
-            if (currentUser) {
+            // Check if user is logged in via localStorage
+            const currentUser = localStorage.getItem('currentUser');
+            const token = localStorage.getItem('token');
+
+            if (currentUser && token) {
                 // logged in so return true
                 return true;
             }
