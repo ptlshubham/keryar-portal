@@ -7,7 +7,7 @@ declare var $: any;
 export class ApiService {
   // public static HOST_URL: string = "http://localhost:8300";
   public static HOST_URL: string = "https://api.fosterx.co";
-
+  
 
   constructor() {
   }
@@ -168,5 +168,11 @@ export class ApiService {
   public static getStudentFormDetailsURL: string = ApiService.HOST_URL + '/keryar/GetAllStudentFormDetails';
   public static removeStudentFormDetailsByIdURL: string = ApiService.HOST_URL + '/keryar/RemoveStudentFormById/';
 
+  // testimonial
+  public static getAllTestimonialsURL:string = ApiService.HOST_URL + '/keryar/GetAllTestimonials';
+  public static getTestimonialByIdURL:string = ApiService.HOST_URL + '/keryar/GetTestimonialById/';
+  public static addTestimonialURL:string = ApiService.HOST_URL + '/keryar/AddTestimonial';
+  public static updateTestimonialURL:string = ApiService.HOST_URL + '/keryar/UpdateTestimonial';
+  public static deleteTestimonialURL:string = ApiService.HOST_URL + '/keryar/DeleteTestimonial/';
 
 }
