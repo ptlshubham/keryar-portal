@@ -24,4 +24,28 @@ export class CommonSevice {
         return this.httpClient.delete<any>(`${ApiService.removeStudentFormDetailsByIdURL}${id}`);
     }
 
+    // testimonials
+    //get all testimonial
+    getAllTestimonials() {
+        return this.httpClient.get<any>(ApiService.getAllTestimonialsURL);
+    }
+    //get all test Testimonials by id
+    getTestimonialById(id: any) {
+        return this.httpClient.get<any>(`${ApiService.getTestimonialByIdURL}${id}`);
+    }
+
+    // add testimonial
+    addTestimonial(data: any) {
+        return this.httpClient.post<any>(ApiService.addTestimonialURL, data);
+    }
+
+    // update testimonial by id
+    updateTestimonial(data: any) {
+        return this.httpClient.post<any>(ApiService.updateTestimonialURL, data);
+    }
+
+    // delete Testimonials
+    deleteTestimonial(id: any) {
+        return this.httpClient.delete(`${ApiService.deleteTestimonialURL}${id}`)
+    }
 }
