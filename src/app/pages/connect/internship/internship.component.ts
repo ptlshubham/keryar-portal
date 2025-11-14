@@ -10,6 +10,7 @@ import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import * as XLSX from 'xlsx';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
+import { forkJoin } from 'rxjs';
 
 @Component({
   selector: 'app-internship',
@@ -35,6 +36,12 @@ export class InternshipComponent implements OnInit {
   searchText: string = '';
   filteredInternshipData: any[] = [];
   filteredTestLinkData: any[] = [];
+  sendingCertificateIds: Set<string> = new Set<string>();
+  sendingOfferLetterIds: Set<string> = new Set<string>();
+  selectedIds: Set<string> = new Set<string>();
+  selectedDocumentType: 'certificate' | 'offerletter' = 'certificate';
+  isSendingBulk = false;
+  private bulkDocumentModalRef?: NgbModalRef;
 
   constructor(
     public connectService: ConnectService,
@@ -42,8 +49,7 @@ export class InternshipComponent implements OnInit {
     public toastr: ToastrService,
     private modalService: NgbModal,
     private fb: FormBuilder,
-    private sanitizer: DomSanitizer
-    ,
+    private sanitizer: DomSanitizer,
     private internshipService: InternshipService
   ) {
     this.sendLinkForm = this.fb.group({
@@ -499,5 +505,194 @@ export class InternshipComponent implements OnInit {
     doc.save(fileName);
 
     this.toastr.success('PDF file downloaded successfully!', 'Success', { timeOut: 3000 });
+  }
+
+  // Send Certificate to individual student
+  sendCertificate(internshipId: string) {
+    Swal.fire({
+      title: 'Send Certificate?',
+      text: 'Are you sure you want to generate and send the completion certificate?',
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Yes, send it!'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.sendingCertificateIds.add(internshipId);
+        this.internshipService.generateAndSendCertificate(internshipId).subscribe({
+          next: (response) => {
+            if (response.success) {
+              Swal.fire({
+                icon: 'success',
+                title: 'Certificate Sent!',
+                text: response.message || 'Certificate generated and sent successfully.',
+                timer: 3000,
+                showConfirmButton: false
+              });
+              this.getInternshipDetails();
+            } else {
+              this.toastr.error(response.message || 'Failed to send certificate.');
+            }
+          },
+          error: (err) => {
+            this.toastr.error('Error sending certificate: ' + (err.error?.message || err.message));
+          },
+          complete: () => {
+            this.sendingCertificateIds.delete(internshipId);
+          }
+        });
+      }
+    });
+  }
+
+  // Send Offer Letter to individual student
+  sendOfferLetter(internshipId: string) {
+    Swal.fire({
+      title: 'Send Offer Letter?',
+      text: 'Are you sure you want to generate and send the offer letter?',
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Yes, send it!'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.sendingOfferLetterIds.add(internshipId);
+        this.internshipService.generateAndSendOfferLetter(internshipId).subscribe({
+          next: (response) => {
+            if (response.success) {
+              Swal.fire({
+                icon: 'success',
+                title: 'Offer Letter Sent!',
+                text: response.message || 'Offer letter generated and sent successfully.',
+                timer: 3000,
+                showConfirmButton: false
+              });
+              this.getInternshipDetails();
+            } else {
+              this.toastr.error(response.message || 'Failed to send offer letter.');
+            }
+          },
+          error: (err) => {
+            this.toastr.error('Error sending offer letter: ' + (err.error?.message || err.message));
+          },
+          complete: () => {
+            this.sendingOfferLetterIds.delete(internshipId);
+          }
+        });
+      }
+    });
+  }
+
+  isSendingCertificate(internshipId: string): boolean {
+    return this.sendingCertificateIds.has(internshipId);
+  }
+
+  isSendingOfferLetter(internshipId: string): boolean {
+    return this.sendingOfferLetterIds.has(internshipId);
+  }
+
+  // Selection methods
+  toggleSelection(event: any, id: string) {
+    if (event.target.checked) {
+      this.selectedIds.add(id);
+    } else {
+      this.selectedIds.delete(id);
+    }
+  }
+
+  isSelected(id: string): boolean {
+    return this.selectedIds.has(id);
+  }
+
+  isAllSelected(): boolean {
+    const visibleIds = this.paginateData.map((i: any) => i.id);
+    return visibleIds.length > 0 && visibleIds.every((id: string) => this.selectedIds.has(id));
+  }
+
+  toggleSelectAll(event: any) {
+    const checked = event.target.checked;
+    const visibleIds = this.paginateData.map((i: any) => i.id);
+    if (checked) {
+      visibleIds.forEach((id: string) => this.selectedIds.add(id));
+    } else {
+      visibleIds.forEach((id: string) => this.selectedIds.delete(id));
+    }
+  }
+
+  hasSelection(): boolean {
+    return this.selectedIds.size > 0;
+  }
+
+  selectionArray(): string[] {
+    return Array.from(this.selectedIds);
+  }
+
+  getStudentNameById(id: string): string | null {
+    const found = this.internshipFormDetails.find((s: any) => s.id === id) ||
+      this.paginateData.find((s: any) => s.id === id);
+    return found ? `${found.firstname || ''} ${found.lastname || ''}`.trim() : null;
+  }
+
+  // Bulk document generation methods
+  openBulkDocumentModal(modal: any) {
+    if (!this.hasSelection()) {
+      this.toastr.error('No students selected');
+      return;
+    }
+    this.selectedDocumentType = 'certificate';
+    this.bulkDocumentModalRef = this.modalService.open(modal, {
+      size: 'md',
+      centered: true,
+      backdrop: 'static'
+    });
+  }
+
+  sendBulkDocuments(modalRef?: NgbModalRef) {
+    if (!this.hasSelection()) {
+      this.toastr.error('No students selected');
+      return;
+    }
+
+    const selectedInternshipIds = this.selectionArray();
+    const documentTypeLabel = this.selectedDocumentType === 'certificate' ? 'Certificates' : 'Offer Letters';
+
+    this.isSendingBulk = true;
+    const apiCalls = selectedInternshipIds.map(id =>
+      this.selectedDocumentType === 'certificate'
+        ? this.internshipService.generateAndSendCertificate(id)
+        : this.internshipService.generateAndSendOfferLetter(id)
+    );
+
+    forkJoin(apiCalls).subscribe({
+      next: (results: any[]) => {
+        const successCount = results.filter(r => r.success).length;
+        const failCount = results.length - successCount;
+
+        Swal.fire({
+          title: `${documentTypeLabel} Sent!`,
+          html: `<strong>${successCount}</strong> ${documentTypeLabel.toLowerCase()} sent successfully<br>` +
+            (failCount > 0 ? `<span class="text-danger">${failCount} failed</span>` : ''),
+          icon: successCount > 0 ? 'success' : 'error',
+          confirmButtonColor: '#3085d6'
+        });
+
+        this.selectedIds.clear();
+        this.getInternshipDetails();
+        if (modalRef) {
+          modalRef.close();
+        }
+      },
+      error: (err) => {
+        this.toastr.error('Error sending documents: ' + (err.error?.message || err.message));
+      }
+    }).add(() => {
+      this.isSendingBulk = false;
+    });
+  }
+
+  closeBulkDocumentModal() {
+    this.bulkDocumentModalRef?.close();
   }
 }

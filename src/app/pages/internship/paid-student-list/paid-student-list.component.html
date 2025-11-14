@@ -57,6 +57,11 @@
                                 [disabled]="!hasSelection()" title="Change Status for Selected">
                                 <i class="mdi mdi-check-bold"></i> Status Selected
                             </button>
+                            <!-- Bulk Send Documents button -->
+                            <button class="btn btn-info btn-sm ms-1" (click)="openBulkDocumentModal(bulkDocumentModal)"
+                                [disabled]="!hasSelection()" title="Send Documents to Selected Students">
+                                <i class="mdi mdi-file-send"></i> Send Documents
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -81,6 +86,8 @@
                                     <!-- Add Status column -->
                                     <th>Status</th>
                                     <th>Student Status</th>
+                                    <th>Offer Letter</th>
+                                    <th>Certificate</th>
                                     <th>Remarks</th>
                                     <th>Actions</th>
                                 </tr>
@@ -117,6 +124,26 @@
                                     <td>{{ ((student.studentstatus || student.internship?.studentstatus) ?
                                         (student.studentstatus || student.internship?.studentstatus) : 'N/A') |
                                         titlecase }}</td>
+                                    <!-- Offer Letter Badge -->
+                                    <td>
+                                        <span class="badge" [ngClass]="{
+                                                'bg-danger': student.internship.isofferletter === 0 || student.internship.isofferletter === '0',
+                                                'bg-success': student.internship.isofferletter === 1 || student.internship.isofferletter === '1'
+                                            }">
+                                            {{ (student.internship.isofferletter === 1 ||
+                                            student.internship.isofferletter === '1') ? 'Sent' : 'Unsent' }}
+                                        </span>
+                                    </td>
+                                    <!-- Certificate Badge -->
+                                    <td>
+                                        <span class="badge" [ngClass]="{
+                                                'bg-danger': student.internship.isCertificate === 0 || student.internship.isCertificate === '0',
+                                                'bg-success': student.internship.isCertificate === 1 || student.internship.isCertificate === '1'
+                                            }">
+                                            {{ (student.internship.isCertificate === 1 ||
+                                            student.internship.isCertificate === '1') ? 'Sent' : 'Unsent' }}
+                                        </span>
+                                    </td>
                                     <td>{{ (student.remarks || 'N/A') | slice:0:20 }}...</td>
                                     <td class="text-nowrap">
                                         <button class="btn btn-primary btn-sm me-1"
@@ -129,7 +156,6 @@
                                             (click)="openApproveModal(approveModal, student)" [disabled]="isApproving">
                                             <i class="mdi mdi-pencil"></i> Status
                                         </button>
-                                        <!-- Add Remove button -->
                                         <button class="btn btn-outline-danger btn-sm"
                                             (click)="removeAssessment(student.assessment_id)" [disabled]="isRemoving">
                                             <i class="mdi mdi-delete"></i>
@@ -137,8 +163,7 @@
                                     </td>
                                 </tr>
                                 <tr *ngIf="!paginateData?.length">
-                                    <!-- Update colspan to account for new columns -->
-                                    <td colspan="14" class="text-center">No paid internship students found</td>
+                                    <td colspan="16" class="text-center">No paid internship students found</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -403,6 +428,51 @@
             <button type="button" class="btn btn-success" (click)="approveSelected(modal)" [disabled]="isApproving">
                 <span *ngIf="!isApproving">Confirm</span>
                 <span *ngIf="isApproving">Processing...</span>
+            </button>
+        </div>
+    </ng-template>
+
+    <!-- Bulk Document Selection Modal -->
+    <ng-template #bulkDocumentModal let-modal>
+        <div class="modal-header">
+            <h5 class="modal-title">Send Documents to Selected Students</h5>
+            <button type="button" class="btn-close" (click)="closeBulkDocumentModal()"></button>
+        </div>
+        <div class="modal-body">
+            <p class="mb-3">Choose the type of document to send to <strong>{{ selectionArray().length }}</strong>
+                selected student(s)</p>
+            <div class="form-group">
+                <label for="bulkDocumentType" class="form-label">Document Type</label>
+                <select id="bulkDocumentType" class="form-select" [(ngModel)]="selectedDocumentType">
+                    <option value="certificate">Completion Certificate</option>
+                    <option value="offerletter">Offer Letter</option>
+                </select>
+            </div>
+            <div class="alert alert-info mt-3" *ngIf="selectedDocumentType === 'certificate'">
+                <i class="mdi mdi-information"></i> This will generate and send internship completion certificates to
+                all selected students.
+            </div>
+            <div class="alert alert-info mt-3" *ngIf="selectedDocumentType === 'offerletter'">
+                <i class="mdi mdi-information"></i> This will generate and send internship offer letters to all selected
+                students.
+            </div>
+            <div *ngIf="selectionArray().length" class="mt-3">
+                <p><strong>Selected Students:</strong></p>
+                <ul class="small" style="max-height: 200px; overflow-y: auto;">
+                    <li *ngFor="let id of selectionArray()">{{ getAssessmentNameById(id) || id }}</li>
+                </ul>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" (click)="closeBulkDocumentModal()">Cancel</button>
+            <button type="button" class="btn btn-success" (click)="sendBulkDocuments(modal)" [disabled]="isSendingBulk">
+                <span *ngIf="!isSendingBulk">
+                    <i class="mdi mdi-send me-1"></i> Send {{ selectedDocumentType === 'certificate' ? 'Certificates' :
+                    'Offer Letters' }}
+                </span>
+                <span *ngIf="isSendingBulk">
+                    <span class="spinner-border spinner-border-sm me-1"></span> Sending...
+                </span>
             </button>
         </div>
     </ng-template>

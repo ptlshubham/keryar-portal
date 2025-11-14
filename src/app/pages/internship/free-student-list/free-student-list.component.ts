@@ -54,7 +54,11 @@ export class FreeStudentListComponent {
   isRejecting = false;
   isRemoving = false;
   isSavingRemarks = false;
+  sendingCertificateIds: Set<string> = new Set<string>();
+  selectedDocumentType: 'certificate' | 'offerletter' = 'certificate';
+  isSendingBulk = false;
   private modalRef?: NgbModalRef;
+  private bulkDocumentModalRef?: NgbModalRef;
   assessmentStatus = AssessmentStatus;
   safeResumeUrl?: SafeResourceUrl;
 
@@ -591,6 +595,83 @@ export class FreeStudentListComponent {
   getStudentNameById(id: string): string | null {
     const found = this.students.find(s => s.assessment_id === id) || this.paginateData.find(s => s.assessment_id === id);
     return found ? (found.internship?.name || null) : null;
+  }
+
+  // Bulk document generation methods
+  openBulkDocumentModal(modal: any) {
+    if (!this.hasSelection()) {
+      this.toastr.error('No students selected');
+      return;
+    }
+    this.selectedDocumentType = 'certificate';
+    this.bulkDocumentModalRef = this.modalService.open(modal, {
+      size: 'md',
+      centered: true,
+      backdrop: 'static'
+    });
+  }
+
+  sendBulkDocuments(modalRef?: NgbModalRef) {
+    if (!this.hasSelection()) {
+      this.toastr.error('No students selected');
+      return;
+    }
+
+    const selectedStudentIds = this.selectionArray();
+    const documentTypeLabel = this.selectedDocumentType === 'certificate' ? 'Certificates' : 'Offer Letters';
+
+    // Get internship IDs from selected assessment IDs
+    const internshipIds = selectedStudentIds
+      .map(assessmentId => {
+        const student = this.students.find(s => s.assessment_id === assessmentId) ||
+          this.paginateData.find(s => s.assessment_id === assessmentId);
+        return student?.internship?.id || student?.internship_id;
+      })
+      .filter(id => id); // Remove undefined values
+
+    if (internshipIds.length === 0) {
+      this.toastr.error('No valid internship IDs found for selected students');
+      return;
+    }
+
+    this.isSendingBulk = true;
+    const apiCalls = internshipIds.map(id =>
+      this.selectedDocumentType === 'certificate'
+        ? this.internshipService.generateAndSendCertificate(id)
+        : this.internshipService.generateAndSendOfferLetter(id)
+    );
+
+    forkJoin(apiCalls).subscribe({
+      next: (results: any[]) => {
+        const successCount = results.filter(r => r.success).length;
+        const failCount = results.length - successCount;
+
+        Swal.fire({
+          title: `${documentTypeLabel} Sent!`,
+          html: `<strong>${successCount}</strong> ${documentTypeLabel.toLowerCase()} sent successfully<br>` +
+            (failCount > 0 ? `<span class="text-danger">${failCount} failed</span>` : ''),
+          icon: successCount > 0 ? 'success' : 'error',
+          confirmButtonColor: '#3085d6'
+        });
+
+        this.selectedIds.clear();
+        this.loadApprovedStudents();
+        if (modalRef) {
+          modalRef.close();
+        }
+      },
+      error: (err) => {
+        this.toastr.error('Error sending documents: ' + (err.error?.message || err.message));
+      }
+    }).add(() => {
+      this.isSendingBulk = false;
+    });
+  }
+
+  closeBulkDocumentModal() {
+    this.bulkDocumentModalRef?.close();
+  } isSendingCertificate(studentId: string): boolean {
+    return this.sendingCertificateIds.has(studentId);
   }
 }
 

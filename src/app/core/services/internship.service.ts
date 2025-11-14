@@ -77,4 +77,22 @@ export class InternshipService {
     updateInternshipRemarks(assessmentId: string, remarks: string): Observable<any> {
         return this.httpClient.post(ApiService.updateInternshipRemarksURL, { assessmentId, remarks });
     }
+
+    // Certificate Generation APIs
+    generateAndSendCertificate(studentId: string): Observable<any> {
+        return this.httpClient.post(ApiService.generateAndSendSingleCertificateURL, { studentId });
+    }
+
+    generateAndSendAllCertificates(): Observable<any> {
+        return this.httpClient.post(ApiService.generateAndSendInternshipCertificatesURL, {});
+    }
+
+    // Offer Letter Generation APIs
+    generateAndSendOfferLetter(studentId: string): Observable<any> {
+        return this.httpClient.post(ApiService.generateAndSendSingleOfferLetterURL, { studentId });
+    }
+
+    generateAndSendAllOfferLetters(): Observable<any> {
+        return this.httpClient.post(ApiService.generateAndSendInternshipOfferLettersURL, {});
+    }
 }

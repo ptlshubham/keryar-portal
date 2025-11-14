@@ -179,4 +179,12 @@ export class ApiService {
   public static updateTestimonialURL: string = ApiService.HOST_URL + '/keryar/UpdateTestimonial';
   public static deleteTestimonialURL: string = ApiService.HOST_URL + '/keryar/DeleteTestimonial/';
 
+  // Certificate Generation
+  public static generateAndSendSingleCertificateURL: string = ApiService.HOST_URL + '/keryar/GenerateAndSendSingleCertificate';
+  public static generateAndSendInternshipCertificatesURL: string = ApiService.HOST_URL + '/keryar/GenerateAndSendInternshipCertificates';
+
+  // Offer Letter Generation
+  public static generateAndSendSingleOfferLetterURL: string = ApiService.HOST_URL + '/keryar/GenerateAndSendSingleOfferLetter';
+  public static generateAndSendInternshipOfferLettersURL: string = ApiService.HOST_URL + '/keryar/GenerateAndSendInternshipOfferLetters';
+
 }
