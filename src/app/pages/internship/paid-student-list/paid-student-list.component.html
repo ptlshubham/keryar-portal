@@ -127,21 +127,21 @@
                                     <!-- Offer Letter Badge -->
                                     <td>
                                         <span class="badge" [ngClass]="{
-                                                'bg-danger': student.internship.isofferletter === 0 || student.internship.isofferletter === '0',
-                                                'bg-success': student.internship.isofferletter === 1 || student.internship.isofferletter === '1'
+                                                'bg-success': student.internship.isofferletter === 0 || student.internship.isofferletter === '0',
+                                                'bg-danger': student.internship.isofferletter === 1 || student.internship.isofferletter === '1'
                                             }">
                                             {{ (student.internship.isofferletter === 1 ||
-                                            student.internship.isofferletter === '1') ? 'Sent' : 'Unsent' }}
+                                            student.internship.isofferletter === 1) ? 'Unsent' : 'Sent' }}
                                         </span>
                                     </td>
                                     <!-- Certificate Badge -->
                                     <td>
                                         <span class="badge" [ngClass]="{
-                                                'bg-danger': student.internship.isCertificate === 0 || student.internship.isCertificate === '0',
-                                                'bg-success': student.internship.isCertificate === 1 || student.internship.isCertificate === '1'
+                                                'bg-success': student.internship.isCertificate === 0 || student.internship.isCertificate === 0,
+                                                'bg-danger': student.internship.isCertificate === 1 || student.internship.isCertificate === 1
                                             }">
                                             {{ (student.internship.isCertificate === 1 ||
-                                            student.internship.isCertificate === '1') ? 'Sent' : 'Unsent' }}
+                                            student.internship.isCertificate === 1) ? 'Unsent' : 'Sent' }}
                                         </span>
                                     </td>
                                     <td>{{ (student.remarks || 'N/A') | slice:0:20 }}...</td>

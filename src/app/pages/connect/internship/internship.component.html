@@ -94,19 +94,19 @@
                                     <!-- Offer Letter Badge -->
                                     <td class="text-center">
                                         <span class="badge" [ngClass]="{
-                                                'bg-danger': c.isofferletter === 0 || c.isofferletter === '0',
-                                                'bg-success': c.isofferletter === 1 || c.isofferletter === '1'
+                                                'bg-success': c.isofferletter === 0 || c.isofferletter === '0',
+                                                'bg-danger': c.isofferletter === 1 || c.isofferletter === '1'
                                             }">
-                                            {{ (c.isofferletter === 1 || c.isofferletter === '1') ? 'Sent' : 'Unsent' }}
+                                            {{ (c.isofferletter === 1 || c.isofferletter === '1') ? 'Unsent' : 'Sent' }}
                                         </span>
                                     </td>
                                     <!-- Certificate Badge -->
                                     <td class="text-center">
                                         <span class="badge" [ngClass]="{
-                                                'bg-danger': c.isCertificate === 0 || c.isCertificate === '0',
-                                                'bg-success': c.isCertificate === 1 || c.isCertificate === '1'
+                                                'bg-success': c.isCertificate === 0 || c.isCertificate === '0',
+                                                'bg-danger': c.isCertificate === 1 || c.isCertificate === '1'
                                             }">
-                                            {{ (c.isCertificate === 1 || c.isCertificate === '1') ? 'Sent' : 'Unsent' }}
+                                            {{ (c.isCertificate === 1 || c.isCertificate === '1') ? 'Unsent' : 'Sent' }}
                                         </span>
                                     </td>
                                     <td class="text-end">
