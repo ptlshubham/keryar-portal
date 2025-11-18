@@ -59,7 +59,7 @@ export class PaidStudentListComponent {
   isApproving = false;
   isRemoving = false;
   assessmentStatus = AssessmentStatus;
-  selectedDocumentType: 'certificate' | 'offerletter' = 'certificate';
+  selectedDocumentType: '' | 'certificate' | 'offerletter' = '';
   isSendingBulk = false;
   private bulkDocumentModalRef?: NgbModalRef;
 
@@ -535,7 +535,8 @@ export class PaidStudentListComponent {
       this.toastr.error('No students selected');
       return;
     }
-    this.selectedDocumentType = 'certificate';
+    // Clear selection so user must explicitly pick a document type
+    this.selectedDocumentType = '';
     this.bulkDocumentModalRef = this.modalService.open(modal, {
       size: 'md',
       centered: true,
@@ -550,6 +551,10 @@ export class PaidStudentListComponent {
     }
 
     const selectedStudentIds = this.selectionArray();
+    if (!this.selectedDocumentType) {
+      this.toastr.error('Please select the document type');
+      return;
+    }
     const documentTypeLabel = this.selectedDocumentType === 'certificate' ? 'Certificates' : 'Offer Letters';
 
     // Get internship IDs from selected assessment IDs

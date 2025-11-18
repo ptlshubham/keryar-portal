@@ -463,8 +463,9 @@
             <p class="mb-3">Choose the type of document to send to <strong>{{ selectionArray().length }}</strong>
                 selected student(s)</p>
             <div class="form-group">
-                <label for="bulkDocumentType" class="form-label">Document Type</label>
+                <label for="bulkDocumentType" class="form-label">Select the letter</label>
                 <select id="bulkDocumentType" class="form-select" [(ngModel)]="selectedDocumentType">
+                    <option value="">Choose document type...</option>
                     <option value="certificate">Completion Certificate</option>
                     <option value="offerletter">Offer Letter</option>
                 </select>
@@ -486,7 +487,8 @@
         </div>
         <div class="modal-footer">
             <button type="button" class="btn btn-secondary" (click)="closeBulkDocumentModal()">Cancel</button>
-            <button type="button" class="btn btn-success" (click)="sendBulkDocuments(modal)" [disabled]="isSendingBulk">
+            <button type="button" class="btn btn-success" (click)="sendBulkDocuments(modal)"
+                [disabled]="!selectedDocumentType || isSendingBulk">
                 <span *ngIf="!isSendingBulk">
                     <i class="mdi mdi-send me-1"></i> Send {{ selectedDocumentType === 'certificate' ? 'Certificates' :
                     'Offer Letters' }}

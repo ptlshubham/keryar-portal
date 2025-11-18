@@ -55,7 +55,7 @@ export class FreeStudentListComponent {
   isRemoving = false;
   isSavingRemarks = false;
   sendingCertificateIds: Set<string> = new Set<string>();
-  selectedDocumentType: 'certificate' | 'offerletter' = 'certificate';
+  selectedDocumentType: '' | 'certificate' | 'offerletter' = '';
   isSendingBulk = false;
   private modalRef?: NgbModalRef;
   private bulkDocumentModalRef?: NgbModalRef;
@@ -603,7 +603,8 @@ export class FreeStudentListComponent {
       this.toastr.error('No students selected');
       return;
     }
-    this.selectedDocumentType = 'certificate';
+    // Clear selection so user must choose which document to send
+    this.selectedDocumentType = '';
     this.bulkDocumentModalRef = this.modalService.open(modal, {
       size: 'md',
       centered: true,
@@ -618,6 +619,10 @@ export class FreeStudentListComponent {
     }
 
     const selectedStudentIds = this.selectionArray();
+    if (!this.selectedDocumentType) {
+      this.toastr.error('Please select the document type');
+      return;
+    }
     const documentTypeLabel = this.selectedDocumentType === 'certificate' ? 'Certificates' : 'Offer Letters';
 
     // Get internship IDs from selected assessment IDs

@@ -32,8 +32,10 @@ export class AutoApprovedStudentsComponent implements OnInit {
   selectAll: boolean = false;
   sendingCertificateIds: Set<string> = new Set<string>();
   sendingOfferLetterIds: Set<string> = new Set<string>();
-  selectedDocumentType: 'certificate' | 'offerletter' = 'certificate';
+  selectedDocumentType: '' | 'certificate' | 'offerletter' = '';
   isSendingBulk = false;
+  isSendingBulkCertificates = false;
+  isSendingBulkOfferLetters = false;
   isDeletingBulk = false;
   private bulkDocumentModalRef?: NgbModalRef;
 
@@ -293,7 +295,7 @@ export class AutoApprovedStudentsComponent implements OnInit {
       item.collagename || '-'
     ]);
     autoTable(doc, {
-      head: [['#', 'Name', 'Email', 'Mobile', 'College']],
+      head: [['#', 'Name', 'Created Date', 'Email', 'Mobile', 'College']],
       body: tableData,
       startY: 25
     });
@@ -379,11 +381,81 @@ export class AutoApprovedStudentsComponent implements OnInit {
       this.toastr.error('No students selected');
       return;
     }
-    this.selectedDocumentType = 'certificate';
+    this.selectedDocumentType = '';
     this.bulkDocumentModalRef = this.modalService.open(modal, {
       size: 'md',
       centered: true,
       backdrop: 'static'
+    });
+  }
+
+  sendBulkCertificatesDirect() {
+    if (this.selectedStudents.size === 0) {
+      this.toastr.warning('Please select at least one student.');
+      return;
+    }
+
+    const selectedStudentIds = Array.from(this.selectedStudents);
+
+    Swal.fire({
+      title: 'Send Certificates?',
+      text: `Send certificates to ${selectedStudentIds.length} student(s)?`,
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, send!'
+    }).then((result) => {
+      if (!result.isConfirmed) return;
+
+      this.isSendingBulkCertificates = true;
+      const apiCalls = selectedStudentIds.map(id => this.internshipService.generateAndSendCertificate(id.toString()));
+      forkJoin(apiCalls).subscribe({
+        next: (results: any[]) => {
+          const successCount = results.filter(r => r.success).length;
+          Swal.fire('Done!', `${successCount} certificate(s) sent.`, 'success');
+          this.selectedStudents.clear();
+          this.selectAll = false;
+          this.getAutoApprovedStudents();
+        },
+        error: (err) => {
+          console.error('Bulk Certificate Error:', err);
+          this.toastr.error('Error sending certificates.');
+        }
+      }).add(() => this.isSendingBulkCertificates = false);
+    });
+  }
+
+  sendBulkOfferLettersDirect() {
+    if (this.selectedStudents.size === 0) {
+      this.toastr.warning('Please select at least one student.');
+      return;
+    }
+
+    const selectedStudentIds = Array.from(this.selectedStudents);
+
+    Swal.fire({
+      title: 'Send Offer Letters?',
+      text: `Send offer letters to ${selectedStudentIds.length} student(s)?`,
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, send!'
+    }).then((result) => {
+      if (!result.isConfirmed) return;
+
+      this.isSendingBulkOfferLetters = true;
+      const apiCalls = selectedStudentIds.map(id => this.internshipService.generateAndSendOfferLetter(id.toString()));
+      forkJoin(apiCalls).subscribe({
+        next: (results: any[]) => {
+          const successCount = results.filter(r => r.success).length;
+          Swal.fire('Done!', `${successCount} offer letter(s) sent.`, 'success');
+          this.selectedStudents.clear();
+          this.selectAll = false;
+          this.getAutoApprovedStudents();
+        },
+        error: (err) => {
+          console.error('Bulk Offer Letter Error:', err);
+          this.toastr.error('Error sending offer letters.');
+        }
+      }).add(() => this.isSendingBulkOfferLetters = false);
     });
   }
 
@@ -394,6 +466,10 @@ export class AutoApprovedStudentsComponent implements OnInit {
     }
 
     const selectedStudentIds = Array.from(this.selectedStudents);
+    if (!this.selectedDocumentType) {
+      this.toastr.error('Please select the document type');
+      return;
+    }
     const documentTypeLabel = this.selectedDocumentType === 'certificate' ? 'Certificates' : 'Offer Letters';
 
     this.isSendingBulk = true;

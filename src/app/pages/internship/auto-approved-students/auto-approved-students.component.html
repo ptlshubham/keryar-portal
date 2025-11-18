@@ -15,6 +15,24 @@
                             title="Send Documents to Selected Students">
                             <i class="mdi mdi-file-send me-1"></i>Send Documents
                         </button>
+                        <button type="button" class="btn btn-outline-success btn-sm"
+                            (click)="sendBulkCertificatesDirect()"
+                            [disabled]="selectedStudents.size === 0 || isSendingBulkCertificates"
+                            title="Send Certificates to selected">
+                            <span *ngIf="!isSendingBulkCertificates"><i class="mdi mdi-certificate me-1"></i>Send
+                                Certificates</span>
+                            <span *ngIf="isSendingBulkCertificates"><span
+                                    class="spinner-border spinner-border-sm me-1"></span>Sending...</span>
+                        </button>
+                        <button type="button" class="btn btn-outline-primary btn-sm"
+                            (click)="sendBulkOfferLettersDirect()"
+                            [disabled]="selectedStudents.size === 0 || isSendingBulkOfferLetters"
+                            title="Send Offer Letters to selected">
+                            <span *ngIf="!isSendingBulkOfferLetters"><i class="mdi mdi-file-document me-1"></i>Send
+                                Offer Letters</span>
+                            <span *ngIf="isSendingBulkOfferLetters"><span
+                                    class="spinner-border spinner-border-sm me-1"></span>Sending...</span>
+                        </button>
                         <button type="button" class="btn btn-success" (click)="downloadExcel()">
                             <i class="bx bxs-file-export me-1"></i>Download Excel
                         </button>
@@ -73,14 +91,15 @@
                                 </th>
                                 <th class="text-left">#</th>
                                 <th class="text-center">Name</th>
-                                <th class="text-center">Created Date</th>
                                 <th class="text-center">Email</th>
                                 <th class="text-center">Mobile Number</th>
                                 <!-- Subject hidden -->
                                 <th class="text-center">College</th>
                                 <!-- Department hidden -->
                                 <th class="text-center">Offer Letter</th>
+
                                 <th class="text-center">Certificate</th>
+                                <th class="text-center">Created Date</th>
 
                                 <!-- Offer Letter and Certificate moved to action column -->
                                 <th class="text-end">Action</th>
@@ -94,8 +113,7 @@
                                 </td>
                                 <td class="text-left">{{ s.index }}</td>
                                 <td class="text-center">{{ (s.firstname || '') + ' ' + (s.lastname || '') }}</td>
-                                <td class="text-center">{{ s.createddate ? (s.createddate | date:'dd/MM/yyyy') : '-' }}
-                                </td>
+
                                 <td class="text-center">{{ s.email }}</td>
                                 <td class="text-center">{{ s.mobilenumber }}</td>
                                 <!-- Subject hidden -->
@@ -118,6 +136,8 @@
                                     }">{{ (s.internship?.isCertificate === 1 || s.isCertificate === 1 ||
                                         s.internship?.isCertificate === '1' || s.isCertificate === '1') ? 'Unsent' :
                                         'Sent' }}</span>
+                                </td>
+                                <td class="text-center">{{ s.createddate ? (s.createddate | date:'dd/MM/yyyy') : '-' }}
                                 </td>
                                 <td class="text-end">
                                     <div class="d-flex justify-content-end gap-1">
@@ -262,7 +282,7 @@
     </div>
     <div class="modal-body">
         <div class="mb-3">
-            <label class="form-label">Select Document Type</label>
+            <label class="form-label">Select the letter</label>
             <select class="form-select" [(ngModel)]="selectedDocumentType">
                 <option value="">Choose document type...</option>
                 <option value="offerletter">Offer Letter</option>
