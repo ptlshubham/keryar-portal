@@ -63,6 +63,12 @@
                                 (click)="selectedStudents.clear(); selectAll = false">
                                 <i class="bx bx-reset me-1"></i>Clear Selection
                             </button>
+                            <button type="button" class="btn btn-danger btn-sm" (click)="bulkDeleteStudents()"
+                                [disabled]="isDeletingBulk">
+                                <span *ngIf="!isDeletingBulk"><i class="bx bx-trash-alt me-1"></i>Delete Selected</span>
+                                <span *ngIf="isDeletingBulk"><span
+                                        class="spinner-border spinner-border-sm me-1"></span>Deleting...</span>
+                            </button>
                         </div>
                         <div class="table-responsive">
                             <table class="table mb-0">
@@ -73,14 +79,14 @@
                                                 (change)="toggleSelectAll($event)" style="cursor: pointer;">
                                         </th>
                                         <th class="text-left">#</th>
-                                        <th class="text-center">First Name</th>
-                                        <th class="text-center">Last Name</th>
-                                        <th class="text-center">Internship Type</th>
+                                        <th class="text-center">Name</th>
+                                        <!-- Internship Type hidden -->
                                         <th class="text-center">Email</th>
                                         <th class="text-center">Mobile Number</th>
-                                        <th class="text-center">Subject</th>
+                                        <!-- Subject hidden -->
                                         <th class="text-center">College</th>
-                                        <th class="text-center">Department</th>
+                                        <th class="text-center">Created Date</th>
+                                        <!-- Department hidden -->
                                         <th class="text-end">Action</th>
                                     </tr>
                                 </thead>
@@ -91,18 +97,18 @@
                                                 (change)="toggleSelectStudent(c.id, $event)" style="cursor: pointer;">
                                         </td>
                                         <td class="text-left">{{ c.index }}</td>
-                                        <td class="text-center">{{ c.firstname }}</td>
-                                        <td class="text-center">{{ c.lastname }}</td>
-                                        <td class="text-center"><span class="badge bg-primary">{{ c.internshiptype
-                                                }}</span>
+                                        <td class="text-center">{{ (c.firstname || '') + ' ' + (c.lastname || '') }}
                                         </td>
+                                        <!-- Internship Type hidden -->
                                         <td class="text-center">{{ c.email }}</td>
                                         <td class="text-center">{{ c.mobilenumber }}</td>
-                                        <td class="text-center">{{ c.subject }}</td>
+                                        <!-- Subject hidden -->
                                         <td class="text-center">{{ c.collagename || c.college_name || c.institute || '-'
                                             }}
                                         </td>
-                                        <td class="text-center">{{ c.department || c.dept || '-' }}</td>
+                                        <td class="text-center">{{ c.createddate ? (c.createddate | date:'dd/MM/yyyy') :
+                                            '-' }}</td>
+                                        <!-- Department hidden -->
                                         <td class="text-end">
                                             <div class="d-flex justify-content-end gap-1">
                                                 <button type="button"
@@ -150,36 +156,35 @@
                                     <thead class="table-light">
                                         <tr>
                                             <th class="text-left">#</th>
-                                            <th class="text-center">First Name</th>
-                                            <th class="text-center">Last Name</th>
-                                            <th class="text-center">Internship Type</th>
+                                            <th class="text-center">Name</th>
+                                            <!-- Internship Type hidden -->
                                             <th class="text-center">Email</th>
                                             <th class="text-center">Mobile Number</th>
-                                            <th class="text-center">Subject</th>
+                                            <!-- Subject hidden -->
                                             <th class="text-center">College</th>
-                                            <th class="text-center">Department</th>
+
+                                            <!-- Department hidden -->
                                             <th class="text-end">Action</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         <tr *ngFor="let t of filteredTestLinkData; let i = index">
                                             <td class="text-left">{{ t.index || (i + 1) }}</td>
-                                            <td class="text-center">{{ t.firstname || t.first_name || t.link_owner ||
-                                                '-' }}
-                                            </td>
-                                            <td class="text-center">{{ t.lastname || t.last_name || '-' }}</td>
-                                            <td class="text-center"><span class="badge bg-primary">{{ t.internshiptype
-                                                    ||
-                                                    t.type || '-' }}</span></td>
+                                            <td class="text-center">{{ (t.firstname || t.first_name || t.link_owner ||
+                                                '') + ' ' + (t.lastname || t.last_name || '') }}</td>
+                                            <!-- Internship Type hidden -->
                                             <td class="text-center">{{ t.email || t.contact_email || '-' }}</td>
+
                                             <td class="text-center">{{ t.mobilenumber || t.phone || t.contact_number ||
                                                 '-'
                                                 }}</td>
-                                            <td class="text-center">{{ t.subject || t.link_name || '-' }}</td>
+                                            <!-- Subject hidden -->
                                             <td class="text-center">{{ t.collagename || t.college_name || t.college ||
                                                 '-'
                                                 }}</td>
-                                            <td class="text-center">{{ t.department || t.dept || '-' }}</td>
+                                            <td class="text-center">{{ t.createddate ? (t.createddate |
+                                                date:'dd/MM/yyyy') : '-' }}</td>
+                                            <!-- Department hidden -->
                                             <td class="text-end">
                                                 <div class="d-flex justify-content-end gap-1">
                                                     <button type="button"
@@ -220,6 +225,12 @@
                                 (click)="selectedStudents.clear(); selectAll = false">
                                 <i class="bx bx-reset me-1"></i>Clear Selection
                             </button>
+                            <button type="button" class="btn btn-danger btn-sm" (click)="bulkDeleteStudents()"
+                                [disabled]="isDeletingBulk">
+                                <span *ngIf="!isDeletingBulk"><i class="bx bx-trash-alt me-1"></i>Delete Selected</span>
+                                <span *ngIf="isDeletingBulk"><span
+                                        class="spinner-border spinner-border-sm me-1"></span>Deleting...</span>
+                            </button>
                         </div>
 
                         <div class="table-responsive">
@@ -231,15 +242,17 @@
                                                 (change)="toggleSelectAll($event)" style="cursor: pointer;">
                                         </th>
                                         <th class="text-left">#</th>
-                                        <th class="text-center">First Name</th>
-                                        <th class="text-center">Last Name</th>
-                                        <th class="text-center">Internship Type</th>
+                                        <th class="text-center">Name</th>
+                                        <!-- Internship Type hidden -->
                                         <th class="text-center">Email</th>
                                         <th class="text-center">Mobile Number</th>
-                                        <th class="text-center">Subject</th>
+                                        <!-- Subject hidden -->
                                         <th class="text-center">College</th>
-                                        <th class="text-center">Department</th>
+
+                                        <!-- Department hidden -->
                                         <th class="text-center">Amount</th>
+                                        <th class="text-center">Created Date</th>
+
                                         <th class="text-end">Action</th>
                                     </tr>
                                 </thead>
@@ -250,19 +263,21 @@
                                                 (change)="toggleSelectStudent(h.id, $event)" style="cursor: pointer;">
                                         </td>
                                         <td class="text-left">{{ h.index }}</td>
-                                        <td class="text-center">{{ h.firstname }}</td>
-                                        <td class="text-center">{{ h.lastname }}</td>
-                                        <td class="text-center"><span class="badge bg-warning">{{ h.internshiptype
-                                                }}</span></td>
+                                        <td class="text-center">{{ (h.firstname || '') + ' ' + (h.lastname || '') }}
+                                        </td>
+                                        <!-- Internship Type hidden -->
                                         <td class="text-center">{{ h.email }}</td>
                                         <td class="text-center">{{ h.mobilenumber }}</td>
-                                        <td class="text-center">{{ h.subject }}</td>
+
+                                        <!-- Subject hidden -->
                                         <td class="text-center">{{ h.collagename || h.college_name || h.institute || '-'
                                             }}</td>
-                                        <td class="text-center">{{ h.department || h.dept || '-' }}</td>
+                                        <!-- Department hidden -->
                                         <td class="text-center">
                                             <span class="badge bg-info">₹{{ h.amount || 0 }}</span>
                                         </td>
+                                        <td class="text-center">{{ h.createddate ? (h.createddate | date:'dd/MM/yyyy') :
+                                            '-' }}</td>
                                         <td class="text-end">
                                             <div class="d-flex justify-content-end gap-1">
                                                 <button type="button"
@@ -310,19 +325,10 @@
     </div>
     <div class="modal-body">
         <div class="row gy-3">
+            <!-- Internship Type hidden as per UI preference -->
             <div class="col-md-12">
-                <strong>Internship Type</strong>
-                <div>
-                    <span class="badge bg-primary">{{ selectedClient?.internshiptype || '-' }}</span>
-                </div>
-            </div>
-            <div class="col-md-6">
-                <strong>First Name</strong>
-                <div>{{ selectedClient?.firstname || '-' }}</div>
-            </div>
-            <div class="col-md-6">
-                <strong>Last Name</strong>
-                <div>{{ selectedClient?.lastname || '-' }}</div>
+                <strong>Name</strong>
+                <div>{{ (selectedClient?.firstname || '') + ' ' + (selectedClient?.lastname || '') }}</div>
             </div>
             <div class="col-md-6">
                 <strong>Email</strong>
@@ -337,10 +343,7 @@
                 <div>{{ selectedClient?.collagename || selectedClient?.college_name || selectedClient?.institute || '-'
                     }}</div>
             </div>
-            <div class="col-md-6">
-                <strong>Department</strong>
-                <div>{{ selectedClient?.department || selectedClient?.dept || '-' }}</div>
-            </div>
+            <!-- Department hidden as per UI preference -->
             <div class="col-md-6">
                 <strong>Start Date</strong>
                 <div>{{ selectedClient?.startdate ? (selectedClient.startdate | date:'mediumDate') : '-' }}</div>
@@ -361,10 +364,7 @@
                 <strong>Amount</strong>
                 <div>{{ selectedClient?.amount ? ('₹' + selectedClient.amount) : '-' }}</div>
             </div>
-            <div class="col-12">
-                <strong>Subject</strong>
-                <div class="text-wrap">{{ selectedClient?.subject || '-' }}</div>
-            </div>
+            <!-- Subject hidden as per UI preference -->
             <div class="col-12" *ngIf="selectedClient?.resume_url || selectedClient?.resume">
                 <strong>Resume</strong>
                 <div class="d-flex gap-2 mt-2">

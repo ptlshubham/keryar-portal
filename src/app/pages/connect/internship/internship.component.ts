@@ -40,6 +40,7 @@ export class InternshipComponent implements OnInit {
   filteredHoldStudentData: any[] = [];
   selectedStudents: Set<number> = new Set();
   selectAll: boolean = false;
+  isDeletingBulk = false;
 
   constructor(
     public connectService: ConnectService,
@@ -315,7 +316,13 @@ export class InternshipComponent implements OnInit {
                 this.toastr.success(res.message || 'Email sent successfully!', 'Success', { timeOut: 3000 });
               }, 300);
               // Refresh data and update pagination, preserving current page
-              this.getInternshipDetails();
+              if (this.activeTab === 1) {
+                this.getInternshipDetails();
+              } else if (this.activeTab === 2) {
+                this.loadTestLinkDetails();
+              } else if (this.activeTab === 3) {
+                this.loadHoldStudentDetails();
+              }
               // getInternshipDetails already calls getPagintaion, so no need to call it again
             } else {
               this.toastr.error(res.message || 'Failed to send email.', 'Error', { timeOut: 3000 });
@@ -366,7 +373,13 @@ export class InternshipComponent implements OnInit {
               timer: 3000,
               showConfirmButton: false
             });
-            this.getInternshipDetails();
+            if (this.activeTab === 1) {
+              this.getInternshipDetails();
+            } else if (this.activeTab === 2) {
+              this.loadTestLinkDetails();
+            } else if (this.activeTab === 3) {
+              this.loadHoldStudentDetails();
+            }
           },
           error: (err) => {
             console.error('Delete API Error:', err);
@@ -521,14 +534,11 @@ export class InternshipComponent implements OnInit {
 
     const exportData = dataToExport.map((item: any, index: any) => ({
       '#': index + 1,
-      'First Name': item.firstname || item.first_name || item.link_owner || '-',
-      'Last Name': item.lastname || item.last_name || '-',
-      'Internship Type': item.internshiptype || item.type || '-',
+      'Name': `${item.firstname || item.first_name || item.link_owner || ''}${item.lastname ? ' ' + (item.lastname || item.last_name || '') : ''}`.trim() || '-',
       'Email': item.email || item.contact_email || '-',
+      'Created Date': item.createddate ? new Date(item.createddate).toLocaleDateString('en-GB') : '-',
       'Mobile Number': item.mobilenumber || item.phone || item.contact_number || '-',
-      'Subject': item.subject || item.link_name || '-',
       'College': item.collagename || item.college_name || item.college || item.institute || '-',
-      'Department': item.department || item.dept || '-',
       'Start Date': item.startdate || '-',
       'End Date': item.enddate || '-',
       'Semester': item.semester || '-',
@@ -562,18 +572,15 @@ export class InternshipComponent implements OnInit {
 
     const tableData = dataToExport.map((item: any, index: any) => [
       index + 1,
-      item.firstname || item.first_name || item.link_owner || '-',
-      item.lastname || item.last_name || '-',
-      item.internshiptype || item.type || '-',
+      `${item.firstname || item.first_name || item.link_owner || ''}${item.lastname ? ' ' + (item.lastname || item.last_name || '') : ''}`.trim() || '-',
       item.email || item.contact_email || '-',
+      item.createddate ? new Date(item.createddate).toLocaleDateString('en-GB') : '-',
       item.mobilenumber || item.phone || item.contact_number || '-',
-      item.subject || item.link_name || '-',
-      item.collagename || item.college_name || item.college || item.institute || '-',
-      item.department || item.dept || '-'
+      item.collagename || item.college_name || item.college || item.institute || '-'
     ]);
 
     autoTable(doc, {
-      head: [['#', 'First Name', 'Last Name', 'Type', 'Email', 'Mobile', 'Subject', 'College', 'Department']],
+      head: [['#', 'Name', 'Created Date', 'Email', 'Mobile', 'College']],
       body: tableData,
       startY: 25,
       theme: 'grid',
@@ -668,12 +675,18 @@ export class InternshipComponent implements OnInit {
         const selectedIds = Array.from(this.selectedStudents);
 
         selectedIds.forEach(id => {
-          const updateData = {
+          const updateData: any = {
             id: id,
             autoapproved: status ? 1 : 0,
             amount: amount,
             ishold: 0  // Always set ishold to 0 when setting auto-approved
           };
+          // If setting to Auto-Approved and the internship type is 'free', convert to 'paid'
+          const student = this.internshipFormDetails.find((st: any) => st.id === id);
+          if (status && student && student.internshiptype && String(student.internshiptype).toLowerCase() === 'free') {
+            updateData['internshiptype'] = 'paid';
+          }
+          // If setting to Manual (status false) and internship type is not provided, keep as-is
           updatePromises.push(
             this.connectService.updateInternshipAutoApproved(updateData).toPromise()
           );
@@ -684,14 +697,16 @@ export class InternshipComponent implements OnInit {
             const successCount = responses.filter(res => res.success).length;
             const failCount = responses.length - successCount;
 
-            // Update local data
-            this.internshipFormDetails.forEach((student: any) => {
-              if (this.selectedStudents.has(student.id)) {
-                student.autoapproved = status ? 1 : 0;
-              }
-            });
-            this.filteredInternshipData = [...this.internshipFormDetails];
-            this.getPagintaion();
+            // Re-fetch data from server to ensure latest state
+            if (this.activeTab === 1) {
+              this.getInternshipDetails();
+            } else if (this.activeTab === 2) {
+              this.loadTestLinkDetails();
+            } else if (this.activeTab === 3) {
+              this.loadHoldStudentDetails();
+            }
+            // also refresh hold students list (if any moved between tabs)
+            this.loadHoldStudentDetails();
 
             // Clear selections
             this.selectedStudents.clear();
@@ -740,7 +755,7 @@ export class InternshipComponent implements OnInit {
       cancelButtonText: 'Cancel'
     }).then((result) => {
       if (result.isConfirmed) {
-        const updateData = {
+        const updateData: any = {
           id: studentId,
           ishold: 1  // Set ishold to 1 to mark as hold
         };
@@ -755,6 +770,63 @@ export class InternshipComponent implements OnInit {
             this.toastr.error('Failed to mark student as hold.', 'Error');
             console.error('Error marking student as hold:', err);
           }
+        });
+      }
+    });
+  }
+
+  bulkDeleteStudents() {
+    if (this.selectedStudents.size === 0) {
+      this.toastr.warning('Please select at least one student.', 'Warning', { timeOut: 3000 });
+      return;
+    }
+
+    Swal.fire({
+      title: 'Delete Selected Students?',
+      text: `Permanently delete ${this.selectedStudents.size} student(s)? This action cannot be undone.`,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Yes, delete them!',
+      cancelButtonText: 'Cancel'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.isDeletingBulk = true;
+        const ids = Array.from(this.selectedStudents).map(x => x.toString()).join(',');
+        this.connectService.removeInternshipDetails(ids).subscribe({
+          next: (res: any) => {
+            Swal.fire({
+              icon: 'success',
+              title: 'Deleted',
+              text: res?.message || `${this.selectedStudents.size} student(s) deleted.`,
+              timer: 3000,
+              showConfirmButton: false
+            });
+
+            // Refresh lists depending on active tab
+            if (this.activeTab === 1) {
+              this.getInternshipDetails();
+            }
+            if (this.activeTab === 3) {
+              this.loadHoldStudentDetails();
+            }
+            // Clear selections
+            this.selectedStudents.clear();
+            this.selectAll = false;
+          },
+          error: (err) => {
+            console.error('Bulk delete error:', err);
+            Swal.fire({
+              icon: 'error',
+              title: 'Error',
+              text: err.error?.message || 'Failed to delete selected students.',
+              timer: 3000,
+              showConfirmButton: false
+            });
+          }
+        }).add(() => {
+          this.isDeletingBulk = false;
         });
       }
     });

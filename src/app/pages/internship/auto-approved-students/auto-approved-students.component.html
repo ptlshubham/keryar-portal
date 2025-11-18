@@ -51,6 +51,12 @@
                     <button type="button" class="btn btn-warning btn-sm" (click)="bulkSetManualApproval()">
                         <i class="bx bx-x-circle me-1"></i>Set to Manual Approval
                     </button>
+                    <button type="button" class="btn btn-danger btn-sm" (click)="bulkDeleteStudents()"
+                        [disabled]="isDeletingBulk">
+                        <span *ngIf="!isDeletingBulk"><i class="bx bx-trash-alt me-1"></i>Delete Selected</span>
+                        <span *ngIf="isDeletingBulk"><span
+                                class="spinner-border spinner-border-sm me-1"></span>Deleting...</span>
+                    </button>
                     <button type="button" class="btn btn-secondary btn-sm"
                         (click)="selectedStudents.clear(); selectAll = false">
                         <i class="bx bx-reset me-1"></i>Clear Selection
@@ -66,14 +72,13 @@
                                         (change)="toggleSelectAll($event)" style="cursor: pointer;">
                                 </th>
                                 <th class="text-left">#</th>
-                                <th class="text-center">First Name</th>
-                                <th class="text-center">Last Name</th>
-                                <th class="text-center">Internship Type</th>
+                                <th class="text-center">Name</th>
+                                <th class="text-center">Created Date</th>
                                 <th class="text-center">Email</th>
                                 <th class="text-center">Mobile Number</th>
-                                <th class="text-center">Subject</th>
+                                <!-- Subject hidden -->
                                 <th class="text-center">College</th>
-                                <th class="text-center">Department</th>
+                                <!-- Department hidden -->
                                 <th class="text-center">Offer Letter</th>
                                 <th class="text-center">Certificate</th>
 
@@ -88,15 +93,14 @@
                                         (change)="toggleSelectStudent(s.id, $event)" style="cursor: pointer;">
                                 </td>
                                 <td class="text-left">{{ s.index }}</td>
-                                <td class="text-center">{{ s.firstname }}</td>
-                                <td class="text-center">{{ s.lastname }}</td>
-                                <td class="text-center"><span class="badge bg-success">{{ s.internshiptype }}</span>
+                                <td class="text-center">{{ (s.firstname || '') + ' ' + (s.lastname || '') }}</td>
+                                <td class="text-center">{{ s.createddate ? (s.createddate | date:'dd/MM/yyyy') : '-' }}
                                 </td>
                                 <td class="text-center">{{ s.email }}</td>
                                 <td class="text-center">{{ s.mobilenumber }}</td>
-                                <td class="text-center">{{ s.subject }}</td>
+                                <!-- Subject hidden -->
                                 <td class="text-center">{{ s.collagename || s.college_name || s.institute || '-' }}</td>
-                                <td class="text-center">{{ s.department || s.dept || '-' }}</td>
+                                <!-- Department hidden -->
                                 <!-- Offer Letter badge column -->
                                 <td class="text-center">
                                     <span class="badge" [ngClass]="{
@@ -183,18 +187,11 @@
     <div class="modal-body">
         <div class="row gy-3">
             <div class="col-md-12">
-                <strong>Internship Type</strong>
-                <div>
-                    <span class="badge bg-success">{{ selectedStudent?.internshiptype || '-' }}</span>
-                </div>
+                <!-- Internship Type hidden as per UI preference -->
             </div>
-            <div class="col-md-6">
-                <strong>First Name</strong>
-                <div>{{ selectedStudent?.firstname || '-' }}</div>
-            </div>
-            <div class="col-md-6">
-                <strong>Last Name</strong>
-                <div>{{ selectedStudent?.lastname || '-' }}</div>
+            <div class="col-md-12">
+                <strong>Name</strong>
+                <div>{{ (selectedStudent?.firstname || '') + ' ' + (selectedStudent?.lastname || '') }}</div>
             </div>
             <div class="col-md-6">
                 <strong>Email</strong>
@@ -211,7 +208,7 @@
             </div>
             <div class="col-md-6">
                 <strong>Department</strong>
-                <div>{{ selectedStudent?.department || selectedStudent?.dept || '-' }}</div>
+                <!-- Department hidden as per UI preference -->
             </div>
             <div class="col-md-6">
                 <strong>Start Date</strong>
@@ -237,7 +234,7 @@
 
             <div class="col-md-6">
                 <strong>Subject</strong>
-                <div class="text-wrap">{{ selectedStudent?.subject || '-' }}</div>
+                <!-- Subject hidden as per UI preference -->
             </div>
             <div class="col-12" *ngIf="selectedStudent?.resume_url || selectedStudent?.resume">
                 <strong>Resume</strong>

@@ -34,6 +34,7 @@ export class AutoApprovedStudentsComponent implements OnInit {
   sendingOfferLetterIds: Set<string> = new Set<string>();
   selectedDocumentType: 'certificate' | 'offerletter' = 'certificate';
   isSendingBulk = false;
+  isDeletingBulk = false;
   private bulkDocumentModalRef?: NgbModalRef;
 
   constructor(
@@ -188,9 +189,15 @@ export class AutoApprovedStudentsComponent implements OnInit {
       confirmButtonText: 'Yes, update!'
     }).then((result) => {
       if (result.isConfirmed) {
-        const promises = Array.from(this.selectedStudents).map(id =>
-          this.connectService.updateInternshipAutoApproved({ id, autoapproved: false, ishold: 0 }).toPromise()
-        );
+        const promises = Array.from(this.selectedStudents).map(id => {
+          const student = this.autoApprovedStudents.find((s: any) => s.id === id);
+          const internshiptype = (student && student.internshiptype && String(student.internshiptype).toLowerCase() === 'paid') ? 'free' : undefined;
+          const payload: any = { id, autoapproved: false, ishold: 0 };
+          if (internshiptype !== undefined) {
+            payload.internshiptype = internshiptype;
+          }
+          return this.connectService.updateInternshipAutoApproved(payload).toPromise();
+        });
 
         Promise.all(promises).then((responses: any[]) => {
           const successCount = responses.filter(res => res.success).length;
@@ -198,6 +205,44 @@ export class AutoApprovedStudentsComponent implements OnInit {
           this.selectedStudents.clear();
           this.selectAll = false;
           this.getAutoApprovedStudents();
+        });
+      }
+    });
+  }
+
+  bulkDeleteStudents() {
+    if (this.selectedStudents.size === 0) {
+      this.toastr.warning('Please select at least one student.');
+      return;
+    }
+
+    Swal.fire({
+      title: 'Delete Selected Students?',
+      text: `Permanently delete ${this.selectedStudents.size} student(s)? This action cannot be undone.`,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Yes, delete them!',
+      cancelButtonText: 'Cancel'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.isDeletingBulk = true;
+        const ids = Array.from(this.selectedStudents).map(x => x.toString()).join(',');
+        this.connectService.removeInternshipDetails(ids).subscribe({
+          next: (res: any) => {
+            const msg = res?.message || `${this.selectedStudents.size} student(s) deleted.`;
+            Swal.fire('Deleted!', msg, 'success');
+            this.selectedStudents.clear();
+            this.selectAll = false;
+            this.getAutoApprovedStudents();
+          },
+          error: (err) => {
+            console.error('Bulk delete error:', err);
+            this.toastr.error('Failed to delete selected students.', 'Error');
+          }
+        }).add(() => {
+          this.isDeletingBulk = false;
         });
       }
     });
@@ -223,13 +268,11 @@ export class AutoApprovedStudentsComponent implements OnInit {
     if (!this.filteredStudents.length) return;
     const data = this.filteredStudents.map((item: any, i: any) => ({
       '#': i + 1,
-      'First Name': item.firstname || '-',
-      'Last Name': item.lastname || '-',
-      'Type': item.internshiptype || '-',
+      'Name': `${item.firstname || ''}${item.lastname ? ' ' + item.lastname : ''}`.trim() || '-',
+      'Created Date': item.createddate ? new Date(item.createddate).toLocaleDateString('en-GB') : '-',
       'Email': item.email || '-',
       'Mobile': item.mobilenumber || '-',
-      'College': item.collagename || item.college_name || '-',
-      'Department': item.department || '-'
+      'College': item.collagename || item.college_name || '-'
     }));
     const ws = XLSX.utils.json_to_sheet(data);
     const wb = XLSX.utils.book_new();
@@ -242,11 +285,15 @@ export class AutoApprovedStudentsComponent implements OnInit {
     const doc = new jsPDF('l', 'mm', 'a4');
     doc.text('Auto-Approved Students', 14, 15);
     const tableData = this.filteredStudents.map((item: any, i: any) => [
-      i + 1, item.firstname || '-', item.lastname || '-', item.email || '-',
-      item.mobilenumber || '-', item.collagename || '-'
+      i + 1,
+      `${item.firstname || ''}${item.lastname ? ' ' + item.lastname : ''}`.trim() || '-',
+      item.createddate ? new Date(item.createddate).toLocaleDateString('en-GB') : '-',
+      item.email || '-',
+      item.mobilenumber || '-',
+      item.collagename || '-'
     ]);
     autoTable(doc, {
-      head: [['#', 'First Name', 'Last Name', 'Email', 'Mobile', 'College']],
+      head: [['#', 'Name', 'Email', 'Mobile', 'College']],
       body: tableData,
       startY: 25
     });
