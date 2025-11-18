@@ -16,6 +16,7 @@ import { ApprovedInternshipStudentsComponent } from './approved-internship-stude
 import { HoldStudentListComponent } from './hold-student-list/hold-student-list.component';
 import { FreeStudentListComponent } from './free-student-list/free-student-list.component';
 import { PaidStudentListComponent } from './paid-student-list/paid-student-list.component';
+import { AutoApprovedStudentsComponent } from './auto-approved-students/auto-approved-students.component';
 
 
 @NgModule({
@@ -25,7 +26,8 @@ import { PaidStudentListComponent } from './paid-student-list/paid-student-list.
     ApprovedInternshipStudentsComponent,
     HoldStudentListComponent,
     FreeStudentListComponent,
-    PaidStudentListComponent
+    PaidStudentListComponent,
+    AutoApprovedStudentsComponent
   ],
   imports: [
     CommonModule,

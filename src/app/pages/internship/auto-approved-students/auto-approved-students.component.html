@@ -1,0 +1,298 @@
+<app-pagetitle title="Auto-Approved Internship Students" [breadcrumbItems]="breadCrumbItems"></app-pagetitle>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h5 class="card-title mb-1">Auto-Approved Internship Students</h5>
+                        <p class="card-title-desc mb-0">Students who have been automatically approved</p>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <button type="button" class="btn btn-info btn-sm"
+                            (click)="openBulkDocumentModal(bulkDocumentModal)" [disabled]="selectedStudents.size === 0"
+                            title="Send Documents to Selected Students">
+                            <i class="mdi mdi-file-send me-1"></i>Send Documents
+                        </button>
+                        <button type="button" class="btn btn-success" (click)="downloadExcel()">
+                            <i class="bx bxs-file-export me-1"></i>Download Excel
+                        </button>
+                        <button type="button" class="btn btn-danger" (click)="downloadPDF()">
+                            <i class="bx bxs-file-pdf me-1"></i>Download PDF
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <!-- Search Filter -->
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <div class="input-group">
+                            <input type="text" class="form-control"
+                                placeholder="Search by name, email, college, department..." [(ngModel)]="searchText"
+                                (ngModelChange)="applySearch()">
+                            <button class="btn btn-outline-secondary" type="button" (click)="clearSearch()"
+                                *ngIf="searchText">
+                                <i class="bx bx-x"></i>
+                            </button>
+                            <button class="btn btn-primary" type="button">
+                                <i class="bx bx-search"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bulk Action Buttons -->
+                <div class="mb-3 d-flex gap-2 align-items-center" *ngIf="selectedStudents.size > 0">
+                    <span class="badge bg-info" style="font-size: 14px; padding: 8px 12px;">
+                        {{ selectedStudents.size }} student(s) selected
+                    </span>
+                    <button type="button" class="btn btn-warning btn-sm" (click)="bulkSetManualApproval()">
+                        <i class="bx bx-x-circle me-1"></i>Set to Manual Approval
+                    </button>
+                    <button type="button" class="btn btn-secondary btn-sm"
+                        (click)="selectedStudents.clear(); selectAll = false">
+                        <i class="bx bx-reset me-1"></i>Clear Selection
+                    </button>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th class="text-center" style="width: 40px;">
+                                    <input type="checkbox" class="form-check-input" [(ngModel)]="selectAll"
+                                        (change)="toggleSelectAll($event)" style="cursor: pointer;">
+                                </th>
+                                <th class="text-left">#</th>
+                                <th class="text-center">First Name</th>
+                                <th class="text-center">Last Name</th>
+                                <th class="text-center">Internship Type</th>
+                                <th class="text-center">Email</th>
+                                <th class="text-center">Mobile Number</th>
+                                <th class="text-center">Subject</th>
+                                <th class="text-center">College</th>
+                                <th class="text-center">Department</th>
+                                <th class="text-center">Offer Letter</th>
+                                <th class="text-center">Certificate</th>
+
+                                <!-- Offer Letter and Certificate moved to action column -->
+                                <th class="text-end">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let s of paginateData; let i = index">
+                                <td class="text-center">
+                                    <input type="checkbox" class="form-check-input" [checked]="isSelected(s.id)"
+                                        (change)="toggleSelectStudent(s.id, $event)" style="cursor: pointer;">
+                                </td>
+                                <td class="text-left">{{ s.index }}</td>
+                                <td class="text-center">{{ s.firstname }}</td>
+                                <td class="text-center">{{ s.lastname }}</td>
+                                <td class="text-center"><span class="badge bg-success">{{ s.internshiptype }}</span>
+                                </td>
+                                <td class="text-center">{{ s.email }}</td>
+                                <td class="text-center">{{ s.mobilenumber }}</td>
+                                <td class="text-center">{{ s.subject }}</td>
+                                <td class="text-center">{{ s.collagename || s.college_name || s.institute || '-' }}</td>
+                                <td class="text-center">{{ s.department || s.dept || '-' }}</td>
+                                <!-- Offer Letter badge column -->
+                                <td class="text-center">
+                                    <span class="badge" [ngClass]="{
+                                        'bg-success': (s.internship?.isofferletter === 0 || s.isofferletter === 0 || s.internship?.isofferletter === '0' || s.isofferletter === '0'),
+                                        'bg-danger': (s.internship?.isofferletter === 1 || s.isofferletter === 1 || s.internship?.isofferletter === '1' || s.isofferletter === '1')
+                                    }">{{ (s.internship?.isofferletter === 1 || s.isofferletter === 1 ||
+                                        s.internship?.isofferletter === '1' || s.isofferletter === '1') ? 'Unsent' :
+                                        'Sent' }}</span>
+                                </td>
+                                <!-- Certificate badge column -->
+                                <td class="text-center">
+                                    <span class="badge" [ngClass]="{
+                                        'bg-success': (s.internship?.isCertificate === 0 || s.isCertificate === 0 || s.internship?.isCertificate === '0' || s.isCertificate === '0'),
+                                        'bg-danger': (s.internship?.isCertificate === 1 || s.isCertificate === 1 || s.internship?.isCertificate === '1' || s.isCertificate === '1')
+                                    }">{{ (s.internship?.isCertificate === 1 || s.isCertificate === 1 ||
+                                        s.internship?.isCertificate === '1' || s.isCertificate === '1') ? 'Unsent' :
+                                        'Sent' }}</span>
+                                </td>
+                                <td class="text-end">
+                                    <div class="d-flex justify-content-end gap-1">
+                                        <button type="button" class="btn btn-soft-primary waves-effect waves-light"
+                                            data-bs-toggle="tooltip" data-bs-placement="top" title="Preview"
+                                            (click)="openPreview(s, previewModal)">
+                                            <i class="bx bx-show font-size-16 align-middle"></i>
+                                        </button>
+                                        <!-- Offer Letter send button -->
+                                        <div class="d-flex align-items-center gap-1 me-2">
+                                            <button class="btn btn-sm btn-outline-info"
+                                                (click)="sendOfferLetter(s.id.toString())"
+                                                [disabled]="isSendingOfferLetter(s.id.toString())"
+                                                title="Send Offer Letter">
+                                                <span *ngIf="!isSendingOfferLetter(s.id.toString())">
+                                                    <i class="mdi mdi-file-document"></i>
+                                                </span>
+                                                <span *ngIf="isSendingOfferLetter(s.id.toString())">
+                                                    <span class="spinner-border spinner-border-sm"></span>
+                                                </span>
+                                            </button>
+                                        </div>
+
+                                        <!-- Certificate send button -->
+                                        <div class="d-flex align-items-center gap-1 me-2">
+                                            <button class="btn btn-sm btn-outline-success"
+                                                (click)="sendCertificate(s.id.toString())"
+                                                [disabled]="isSendingCertificate(s.id.toString())"
+                                                title="Send Certificate">
+                                                <span *ngIf="!isSendingCertificate(s.id.toString())">
+                                                    <i class="mdi mdi-certificate"></i>
+                                                </span>
+                                                <span *ngIf="isSendingCertificate(s.id.toString())">
+                                                    <span class="spinner-border spinner-border-sm"></span>
+                                                </span>
+                                            </button>
+                                        </div>
+
+                                        <button type="button" class="btn btn-soft-danger waves-effect waves-light"
+                                            data-bs-toggle="tooltip" data-bs-placement="top" title="Delete"
+                                            (click)="removeStudentData(s.id)">
+                                            <i class="bx bx-trash-alt font-size-16 align-middle"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="row mt-4">
+                    <ngb-pagination [collectionSize]="collectionSize" [pageSize]="pageSize" [(page)]="page"
+                        [maxSize]="5" [rotate]="true" [ellipses]="false" [boundaryLinks]="true"
+                        (pageChange)="getPagintaion()" aria-label="Default pagination"
+                        class="d-flex justify-content-end pagination-rounded-flat pagination-success"></ngb-pagination>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<ng-template #previewModal let-modal>
+    <div class="modal-header">
+        <h5 class="modal-title">Student Preview</h5>
+        <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss('Cross click')"></button>
+    </div>
+    <div class="modal-body">
+        <div class="row gy-3">
+            <div class="col-md-12">
+                <strong>Internship Type</strong>
+                <div>
+                    <span class="badge bg-success">{{ selectedStudent?.internshiptype || '-' }}</span>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <strong>First Name</strong>
+                <div>{{ selectedStudent?.firstname || '-' }}</div>
+            </div>
+            <div class="col-md-6">
+                <strong>Last Name</strong>
+                <div>{{ selectedStudent?.lastname || '-' }}</div>
+            </div>
+            <div class="col-md-6">
+                <strong>Email</strong>
+                <div>{{ selectedStudent?.email || '-' }}</div>
+            </div>
+            <div class="col-md-6">
+                <strong>Mobile Number</strong>
+                <div>{{ selectedStudent?.mobilenumber || '-' }}</div>
+            </div>
+            <div class="col-md-6">
+                <strong>College</strong>
+                <div>{{ selectedStudent?.collagename || selectedStudent?.college_name || selectedStudent?.institute ||
+                    '-' }}</div>
+            </div>
+            <div class="col-md-6">
+                <strong>Department</strong>
+                <div>{{ selectedStudent?.department || selectedStudent?.dept || '-' }}</div>
+            </div>
+            <div class="col-md-6">
+                <strong>Start Date</strong>
+                <div>{{ selectedStudent?.startdate ? (selectedStudent.startdate | date:'mediumDate') : '-' }}</div>
+            </div>
+            <div class="col-md-6">
+                <strong>End Date</strong>
+                <div>{{ selectedStudent?.enddate ? (selectedStudent.enddate | date:'mediumDate') : '-' }}</div>
+            </div>
+
+            <div class="col-md-6">
+                <strong>Semester</strong>
+                <div>{{ selectedStudent?.semester || '-' }}</div>
+            </div>
+            <div class="col-md-6">
+                <strong>Status</strong>
+                <div><span class="badge bg-success">Auto-Approved</span></div>
+            </div>
+            <div class="col-md-6">
+                <strong>Amount</strong>
+                <div><span class="badge bg-success">{{ selectedStudent?.amount }}</span></div>
+            </div>
+
+            <div class="col-md-6">
+                <strong>Subject</strong>
+                <div class="text-wrap">{{ selectedStudent?.subject || '-' }}</div>
+            </div>
+            <div class="col-12" *ngIf="selectedStudent?.resume_url || selectedStudent?.resume">
+                <strong>Resume</strong>
+                <div class="d-flex gap-2 mt-2">
+                    <button type="button" class="btn btn-sm btn-info"
+                        (click)="openResumeInNewTab(selectedStudent.resume_url || (serverBaseUrl + selectedStudent.resume))">
+                        <i class="bx bx-show me-1"></i>View Resume
+                    </button>
+                    <button type="button" class="btn btn-sm btn-success" (click)="downloadResume(selectedStudent)">
+                        <i class="bx bx-download me-1"></i>Download Resume
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-light" (click)="modal.close('Close click')">Close</button>
+    </div>
+</ng-template>
+
+<ng-template #bulkDocumentModal let-modal>
+    <div class="modal-header">
+        <h5 class="modal-title">Send Bulk Documents</h5>
+        <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss('Cross click')"></button>
+    </div>
+    <div class="modal-body">
+        <div class="mb-3">
+            <label class="form-label">Select Document Type</label>
+            <select class="form-select" [(ngModel)]="selectedDocumentType">
+                <option value="">Choose document type...</option>
+                <option value="offerletter">Offer Letter</option>
+                <option value="certificate">Certificate</option>
+            </select>
+        </div>
+        <div class="alert alert-info">
+            <strong>{{ selectedStudents.size }}</strong> student(s) selected
+        </div>
+        <div class="list-group max-height-300 overflow-auto">
+            <div class="list-group-item" *ngFor="let id of selectedStudents">
+                <i class="mdi mdi-account-circle me-2"></i>{{ getStudentNameById(id) }}
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-light" (click)="closeBulkDocumentModal()" [disabled]="isSendingBulk">
+            Cancel
+        </button>
+        <button type="button" class="btn btn-primary" (click)="sendBulkDocuments(modal)"
+            [disabled]="!selectedDocumentType || isSendingBulk">
+            <span *ngIf="!isSendingBulk">
+                <i class="mdi mdi-send me-1"></i>Send Documents
+            </span>
+            <span *ngIf="isSendingBulk">
+                <span class="spinner-border spinner-border-sm me-1"></span>Sending...
+            </span>
+        </button>
+    </div>
+</ng-template>

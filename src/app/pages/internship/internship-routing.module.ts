@@ -6,6 +6,7 @@ import { ApprovedInternshipStudentsComponent } from './approved-internship-stude
 import { HoldStudentListComponent } from './hold-student-list/hold-student-list.component';
 import { FreeStudentListComponent } from './free-student-list/free-student-list.component';
 import { PaidStudentListComponent } from './paid-student-list/paid-student-list.component';
+import { AutoApprovedStudentsComponent } from './auto-approved-students/auto-approved-students.component';
 
 const routes: Routes = [
   {
@@ -16,13 +17,17 @@ const routes: Routes = [
     path: 'free-student-internship',
     component: FreeStudentListComponent
   },
+  // {
+  //   path: 'paid-student-internship',
+  //   component: PaidStudentListComponent
+  // },
+  // {
+  //   path: 'hold-students',
+  //   component: HoldStudentListComponent
+  // },
   {
     path: 'paid-student-internship',
-    component: PaidStudentListComponent
-  },
-  {
-    path: 'hold-students',
-    component: HoldStudentListComponent
+    component: AutoApprovedStudentsComponent
   },
 ];
 

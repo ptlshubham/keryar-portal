@@ -10,7 +10,6 @@ import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import * as XLSX from 'xlsx';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
-import { forkJoin } from 'rxjs';
 
 @Component({
   selector: 'app-internship',
@@ -26,22 +25,21 @@ export class InternshipComponent implements OnInit {
   selectedClient: any = null;
   collegeJobMappings: any[] = [];
   sendLinkForm: FormGroup;
+  amountForm: FormGroup;
   selectedResumeUrl: string = '';
   safeResumeUrl: SafeResourceUrl = '';
   serverBaseUrl = 'https://api.fosterx.co';
   // Test link details fetched from API
   testLinkDetails: any[] = [];
+  holdStudentDetails: any[] = [];
   activeTab = 1;
   sendLinkModalRef: NgbModalRef | null = null; // Reference for the send link modal
   searchText: string = '';
   filteredInternshipData: any[] = [];
   filteredTestLinkData: any[] = [];
-  sendingCertificateIds: Set<string> = new Set<string>();
-  sendingOfferLetterIds: Set<string> = new Set<string>();
-  selectedIds: Set<string> = new Set<string>();
-  selectedDocumentType: 'certificate' | 'offerletter' = 'certificate';
-  isSendingBulk = false;
-  private bulkDocumentModalRef?: NgbModalRef;
+  filteredHoldStudentData: any[] = [];
+  selectedStudents: Set<number> = new Set();
+  selectAll: boolean = false;
 
   constructor(
     public connectService: ConnectService,
@@ -55,12 +53,16 @@ export class InternshipComponent implements OnInit {
     this.sendLinkForm = this.fb.group({
       link_name: ['', Validators.required]
     });
+    this.amountForm = this.fb.group({
+      amount: ['', [Validators.min(0)]]  // Amount is now optional (no required validator)
+    });
   }
 
   ngOnInit(): void {
     this.getInternshipDetails();
     this.getCollegeJobMappings();
     this.loadTestLinkDetails();
+    this.loadHoldStudentDetails();
   }
 
   loadTestLinkDetails() {
@@ -86,6 +88,7 @@ export class InternshipComponent implements OnInit {
       }
     });
   }
+
 
   applySearch() {
     const search = this.searchText.toLowerCase().trim();
@@ -141,7 +144,70 @@ export class InternshipComponent implements OnInit {
           );
         });
       }
+    } else if (this.activeTab === 3) {
+      // clear selections when switching to Hold tab
+      this.selectedStudents.clear();
+      this.selectAll = false;
+      if (!search) {
+        this.filteredHoldStudentData = [...this.holdStudentDetails];
+      } else {
+        this.filteredHoldStudentData = this.holdStudentDetails.filter((item: any) => {
+          return (
+            (item.firstname && item.firstname.toLowerCase().includes(search)) ||
+            (item.lastname && item.lastname.toLowerCase().includes(search)) ||
+            (item.email && item.email.toLowerCase().includes(search)) ||
+            (item.mobilenumber && item.mobilenumber.toString().includes(search)) ||
+            (item.internshiptype && item.internshiptype.toLowerCase().includes(search)) ||
+            (item.subject && item.subject.toLowerCase().includes(search)) ||
+            (item.collagename && item.collagename.toLowerCase().includes(search)) ||
+            (item.college_name && item.college_name.toLowerCase().includes(search)) ||
+            (item.institute && item.institute.toLowerCase().includes(search)) ||
+            (item.department && item.department.toLowerCase().includes(search)) ||
+            (item.dept && item.dept.toLowerCase().includes(search))
+          );
+        });
+      }
+      this.collectionSize = this.filteredHoldStudentData.length;
+      this.page = 1;
+      this.getPagintaion();
     }
+  }
+
+  loadHoldStudentDetails() {
+    this.internshipService.getHoldInternship().subscribe({
+      next: (res: any) => {
+        let data: any[] = [];
+        if (!res) {
+          data = [];
+        } else if (Array.isArray(res)) {
+          data = res;
+        } else if (res.success && Array.isArray(res.data)) {
+          data = res.data;
+        } else if (res.data && Array.isArray(res.data)) {
+          data = res.data;
+        } else if (typeof res === 'object') {
+          data = [res];
+        }
+
+        this.holdStudentDetails = data || [];
+        for (let i = 0; i < this.holdStudentDetails.length; i++) {
+          this.holdStudentDetails[i].index = i + 1;
+          if (this.holdStudentDetails[i].resume) {
+            this.holdStudentDetails[i].resume_url = this.serverBaseUrl + this.holdStudentDetails[i].resume;
+          }
+        }
+
+        this.filteredHoldStudentData = [...this.holdStudentDetails];
+        if (this.activeTab === 3) {
+          this.collectionSize = this.filteredHoldStudentData.length;
+          this.page = 1;
+          this.getPagintaion();
+        }
+      },
+      error: (err) => {
+        this.toastr.error('Failed to load hold students.', 'Error');
+      }
+    });
   }
 
   clearSearch() {
@@ -150,7 +216,16 @@ export class InternshipComponent implements OnInit {
   }
 
   getPagintaion() {
-    const dataSource = this.activeTab === 1 ? this.filteredInternshipData : this.internshipFormDetails;
+    let dataSource: any[] = [];
+    if (this.activeTab === 1) {
+      dataSource = this.filteredInternshipData;
+    } else if (this.activeTab === 2) {
+      dataSource = this.filteredTestLinkData;
+    } else if (this.activeTab === 3) {
+      dataSource = this.filteredHoldStudentData;
+    } else {
+      dataSource = this.filteredInternshipData;
+    }
     this.paginateData = dataSource
       .slice((this.page - 1) * this.pageSize, (this.page - 1) * this.pageSize + this.pageSize);
   }
@@ -325,6 +400,11 @@ export class InternshipComponent implements OnInit {
       }
 
       this.internshipFormDetails = data || [];
+
+      // Filter only students with autoapproved = 0 (manual approval) AND ishold = 0 or null (not on hold)
+      this.internshipFormDetails = this.internshipFormDetails.filter(
+        (student: any) => (student.autoapproved === 0 || !student.autoapproved) && (student.ishold === 0 || !student.ishold)
+      );
 
       // Ensure indexes and resume URLs
       for (let i = 0; i < this.internshipFormDetails.length; i++) {
@@ -507,192 +587,176 @@ export class InternshipComponent implements OnInit {
     this.toastr.success('PDF file downloaded successfully!', 'Success', { timeOut: 3000 });
   }
 
-  // Send Certificate to individual student
-  sendCertificate(internshipId: string) {
-    Swal.fire({
-      title: 'Send Certificate?',
-      text: 'Are you sure you want to generate and send the completion certificate?',
-      icon: 'question',
-      showCancelButton: true,
-      confirmButtonColor: '#3085d6',
-      cancelButtonColor: '#d33',
-      confirmButtonText: 'Yes, send it!'
-    }).then((result) => {
-      if (result.isConfirmed) {
-        this.sendingCertificateIds.add(internshipId);
-        this.internshipService.generateAndSendCertificate(internshipId).subscribe({
-          next: (response) => {
-            if (response.success) {
-              Swal.fire({
-                icon: 'success',
-                title: 'Certificate Sent!',
-                text: response.message || 'Certificate generated and sent successfully.',
-                timer: 3000,
-                showConfirmButton: false
-              });
-              this.getInternshipDetails();
-            } else {
-              this.toastr.error(response.message || 'Failed to send certificate.');
-            }
-          },
-          error: (err) => {
-            this.toastr.error('Error sending certificate: ' + (err.error?.message || err.message));
-          },
-          complete: () => {
-            this.sendingCertificateIds.delete(internshipId);
-          }
-        });
-      }
-    });
-  }
-
-  // Send Offer Letter to individual student
-  sendOfferLetter(internshipId: string) {
-    Swal.fire({
-      title: 'Send Offer Letter?',
-      text: 'Are you sure you want to generate and send the offer letter?',
-      icon: 'question',
-      showCancelButton: true,
-      confirmButtonColor: '#3085d6',
-      cancelButtonColor: '#d33',
-      confirmButtonText: 'Yes, send it!'
-    }).then((result) => {
-      if (result.isConfirmed) {
-        this.sendingOfferLetterIds.add(internshipId);
-        this.internshipService.generateAndSendOfferLetter(internshipId).subscribe({
-          next: (response) => {
-            if (response.success) {
-              Swal.fire({
-                icon: 'success',
-                title: 'Offer Letter Sent!',
-                text: response.message || 'Offer letter generated and sent successfully.',
-                timer: 3000,
-                showConfirmButton: false
-              });
-              this.getInternshipDetails();
-            } else {
-              this.toastr.error(response.message || 'Failed to send offer letter.');
-            }
-          },
-          error: (err) => {
-            this.toastr.error('Error sending offer letter: ' + (err.error?.message || err.message));
-          },
-          complete: () => {
-            this.sendingOfferLetterIds.delete(internshipId);
-          }
-        });
-      }
-    });
-  }
-
-  isSendingCertificate(internshipId: string): boolean {
-    return this.sendingCertificateIds.has(internshipId);
-  }
-
-  isSendingOfferLetter(internshipId: string): boolean {
-    return this.sendingOfferLetterIds.has(internshipId);
-  }
-
-  // Selection methods
-  toggleSelection(event: any, id: string) {
+  toggleSelectStudent(studentId: number, event: any) {
     if (event.target.checked) {
-      this.selectedIds.add(id);
+      this.selectedStudents.add(studentId);
     } else {
-      this.selectedIds.delete(id);
+      this.selectedStudents.delete(studentId);
+      this.selectAll = false;
     }
-  }
-
-  isSelected(id: string): boolean {
-    return this.selectedIds.has(id);
-  }
-
-  isAllSelected(): boolean {
-    const visibleIds = this.paginateData.map((i: any) => i.id);
-    return visibleIds.length > 0 && visibleIds.every((id: string) => this.selectedIds.has(id));
   }
 
   toggleSelectAll(event: any) {
-    const checked = event.target.checked;
-    const visibleIds = this.paginateData.map((i: any) => i.id);
-    if (checked) {
-      visibleIds.forEach((id: string) => this.selectedIds.add(id));
+    this.selectAll = event.target.checked;
+    if (this.selectAll) {
+      this.paginateData.forEach((student: any) => {
+        this.selectedStudents.add(student.id);
+      });
     } else {
-      visibleIds.forEach((id: string) => this.selectedIds.delete(id));
+      this.selectedStudents.clear();
     }
   }
 
-  hasSelection(): boolean {
-    return this.selectedIds.size > 0;
+  isSelected(studentId: number): boolean {
+    return this.selectedStudents.has(studentId);
   }
 
-  selectionArray(): string[] {
-    return Array.from(this.selectedIds);
-  }
-
-  getStudentNameById(id: string): string | null {
-    const found = this.internshipFormDetails.find((s: any) => s.id === id) ||
-      this.paginateData.find((s: any) => s.id === id);
-    return found ? `${found.firstname || ''} ${found.lastname || ''}`.trim() : null;
-  }
-
-  // Bulk document generation methods
-  openBulkDocumentModal(modal: any) {
-    if (!this.hasSelection()) {
-      this.toastr.error('No students selected');
+  openAmountModal(modalTpl: any) {
+    if (this.selectedStudents.size === 0) {
+      this.toastr.warning('Please select at least one student.', 'Warning', { timeOut: 3000 });
       return;
     }
-    this.selectedDocumentType = 'certificate';
-    this.bulkDocumentModalRef = this.modalService.open(modal, {
+    // Reset amount form (amount is now optional)
+    this.amountForm.reset({ amount: '' });
+    this.modalService.open(modalTpl, {
       size: 'md',
-      centered: true,
-      backdrop: 'static'
+      backdrop: 'static',
+      keyboard: true,
+      centered: true
     });
   }
 
-  sendBulkDocuments(modalRef?: NgbModalRef) {
-    if (!this.hasSelection()) {
-      this.toastr.error('No students selected');
+  bulkUpdateAutoApproved(status: boolean, modal?: any) {
+    if (this.selectedStudents.size === 0) {
+      this.toastr.warning('Please select at least one student.', 'Warning', { timeOut: 3000 });
       return;
     }
 
-    const selectedInternshipIds = this.selectionArray();
-    const documentTypeLabel = this.selectedDocumentType === 'certificate' ? 'Certificates' : 'Offer Letters';
+    if (this.amountForm.invalid) {
+      this.toastr.error('Please enter a valid amount.', 'Validation Error', { timeOut: 3000 });
+      return;
+    }
 
-    this.isSendingBulk = true;
-    const apiCalls = selectedInternshipIds.map(id =>
-      this.selectedDocumentType === 'certificate'
-        ? this.internshipService.generateAndSendCertificate(id)
-        : this.internshipService.generateAndSendOfferLetter(id)
-    );
+    const amount = this.amountForm.value.amount;
+    const statusText = status ? 'Auto-Approved' : 'Manual Approval';
+    const selectedCount = this.selectedStudents.size;
 
-    forkJoin(apiCalls).subscribe({
-      next: (results: any[]) => {
-        const successCount = results.filter(r => r.success).length;
-        const failCount = results.length - successCount;
-
+    Swal.fire({
+      title: 'Update Multiple Students?',
+      text: `Are you sure you want to set ${selectedCount} student(s) to ${statusText} with amount ₹${amount}?`,
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Yes, update them!',
+      cancelButtonText: 'Cancel'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        if (modal) {
+          modal.close();
+        }
         Swal.fire({
-          title: `${documentTypeLabel} Sent!`,
-          html: `<strong>${successCount}</strong> ${documentTypeLabel.toLowerCase()} sent successfully<br>` +
-            (failCount > 0 ? `<span class="text-danger">${failCount} failed</span>` : ''),
-          icon: successCount > 0 ? 'success' : 'error',
-          confirmButtonColor: '#3085d6'
+          title: 'Updating...',
+          text: 'Please wait while we update the students.',
+          allowOutsideClick: false,
+          didOpen: () => {
+            Swal.showLoading();
+          }
         });
 
-        this.selectedIds.clear();
-        this.getInternshipDetails();
-        if (modalRef) {
-          modalRef.close();
-        }
-      },
-      error: (err) => {
-        this.toastr.error('Error sending documents: ' + (err.error?.message || err.message));
+        const updatePromises: any[] = [];
+        const selectedIds = Array.from(this.selectedStudents);
+
+        selectedIds.forEach(id => {
+          const updateData = {
+            id: id,
+            autoapproved: status ? 1 : 0,
+            amount: amount,
+            ishold: 0  // Always set ishold to 0 when setting auto-approved
+          };
+          updatePromises.push(
+            this.connectService.updateInternshipAutoApproved(updateData).toPromise()
+          );
+        });
+
+        Promise.all(updatePromises)
+          .then((responses: any[]) => {
+            const successCount = responses.filter(res => res.success).length;
+            const failCount = responses.length - successCount;
+
+            // Update local data
+            this.internshipFormDetails.forEach((student: any) => {
+              if (this.selectedStudents.has(student.id)) {
+                student.autoapproved = status ? 1 : 0;
+              }
+            });
+            this.filteredInternshipData = [...this.internshipFormDetails];
+            this.getPagintaion();
+
+            // Clear selections
+            this.selectedStudents.clear();
+            this.selectAll = false;
+
+            Swal.fire({
+              icon: successCount > 0 ? 'success' : 'error',
+              title: 'Bulk Update Complete',
+              html: `<p><strong>${successCount}</strong> student(s) updated successfully.</p>
+                     ${failCount > 0 ? `<p><strong>${failCount}</strong> student(s) failed to update.</p>` : ''}`,
+              timer: 3000,
+              showConfirmButton: false
+            });
+
+            if (successCount > 0) {
+              this.toastr.success(`${successCount} student(s) updated successfully!`, 'Success', { timeOut: 3000 });
+            }
+            if (failCount > 0) {
+              this.toastr.error(`${failCount} student(s) failed to update.`, 'Error', { timeOut: 3000 });
+            }
+          })
+          .catch((err) => {
+            console.error('Bulk Update Error:', err);
+            Swal.fire({
+              icon: 'error',
+              title: 'Error',
+              text: 'An error occurred while updating students.',
+              timer: 3000,
+              showConfirmButton: false
+            });
+            this.toastr.error('Network error while updating students.', 'Error', { timeOut: 3000 });
+          });
       }
-    }).add(() => {
-      this.isSendingBulk = false;
     });
   }
 
-  closeBulkDocumentModal() {
-    this.bulkDocumentModalRef?.close();
+  markStudentAsHold(studentId: number) {
+    Swal.fire({
+      title: 'Mark as Hold?',
+      text: 'This student will be moved to Hold Students tab.',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#f1b44c',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Yes, mark as hold!',
+      cancelButtonText: 'Cancel'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        const updateData = {
+          id: studentId,
+          ishold: 1  // Set ishold to 1 to mark as hold
+        };
+
+        this.connectService.updateInternshipAutoApproved(updateData).subscribe({
+          next: (res: any) => {
+            this.toastr.success('Student marked as hold successfully!', 'Success');
+            this.getInternshipDetails();  // Refresh the list
+            this.loadHoldStudentDetails();  // Refresh hold students
+          },
+          error: (err) => {
+            this.toastr.error('Failed to mark student as hold.', 'Error');
+            console.error('Error marking student as hold:', err);
+          }
+        });
+      }
+    });
   }
 }

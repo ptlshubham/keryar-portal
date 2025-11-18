@@ -99,8 +99,11 @@ export class ApiService {
   // connect
   public static getInternshipFormDetailsURL: string = ApiService.HOST_URL + '/keryar/GetinternshipFormDetails';
   public static getsendInternshipTestLinkDetailsURL: string = ApiService.HOST_URL + '/keryar/GetsendInternshipTestLinkDetails';
+  public static getHoldInternshipURL: string = ApiService.HOST_URL + '/keryar/GetHoldInternship';
 
   public static removeInternshipDetailsURL: string = ApiService.HOST_URL + '/keryar/RemoveInternshipdetails/';
+  public static updateInternshipAutoApprovedURL: string = ApiService.HOST_URL + '/keryar/UpdateInternshipAutoApproved';
+  public static getAutoApprovedInternshipsURL: string = ApiService.HOST_URL + '/keryar/GetAutoApprovedInternships';
 
   public static getContactusFormDetailsURL: string = ApiService.HOST_URL + '/keryar/GetContactusFormDetails/';
   public static removeContactusFormDetailsURL: string = ApiService.HOST_URL + '/keryar/RemoveContactusFormdetails/';

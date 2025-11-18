@@ -27,6 +27,14 @@ export class ConnectService {
         return this.httpClient.post(ApiService.sendInternshipLinkURL, data);
     }
 
+    updateInternshipAutoApproved(data: any): Observable<any> {
+        return this.httpClient.post(ApiService.updateInternshipAutoApprovedURL, data);
+    }
+
+    getAutoApprovedInternships() {
+        return this.httpClient.get(ApiService.getAutoApprovedInternshipsURL);
+    }
+
     getAllCallToActionData(page: any = 1, limit: any = 10) {
         return this.httpClient.get(`${ApiService.getAllCallToActionDataURL}?page=${page}&limit=${limit}`);
     }

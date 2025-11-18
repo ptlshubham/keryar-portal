@@ -199,6 +199,12 @@ export const MENU: MenuItem[] = [
                 link: '/internship/internship-result',
                 parentId: 12
             },
+            // {
+            //     id: 12,
+            //     label: 'Auto Approved Internship',
+            //     link: '/internship/auto-approved-internship',
+            //     parentId: 12
+            // },
             {
                 id: 12,
                 label: 'Free student Internship',
@@ -211,12 +217,12 @@ export const MENU: MenuItem[] = [
                 link: '/internship/paid-student-internship',
                 parentId: 12
             },
-            {
-                id: 12,
-                label: 'Hold Students',
-                link: '/internship/hold-students',
-                parentId: 12
-            },
+            // {
+            //     id: 12,
+            //     label: 'Hold Students',
+            //     link: '/internship/hold-students',
+            //     parentId: 12
+            // },
 
 
         ]

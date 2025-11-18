@@ -22,6 +22,11 @@ export class InternshipService {
     getsendInternshipTestLinkDetails() {
         return this.httpClient.get(ApiService.getsendInternshipTestLinkDetailsURL);
     }
+
+    getHoldInternship() {
+        return this.httpClient.get(ApiService.getHoldInternshipURL);
+    }
+
     // Internship Assessment APIs
     getAllInternshipAssessments(status?: string): Observable<any> {
         const params = status ? `?status=${status}` : '';

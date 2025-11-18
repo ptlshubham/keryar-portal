@@ -7,6 +7,7 @@
                         <h5 class="card-title mb-1">Internship Forms & Test Links</h5>
                         <p class="card-title-desc mb-0">Switch between Internship Forms and Test Link data</p>
                     </div>
+
                     <div class="d-flex gap-2">
                         <button type="button" class="btn btn-success" (click)="downloadExcel()">
                             <i class="bx bxs-file-export me-1"></i>Download Excel
@@ -14,150 +15,63 @@
                         <button type="button" class="btn btn-danger" (click)="downloadPDF()">
                             <i class="bx bxs-file-pdf me-1"></i>Download PDF
                         </button>
-                        <button type="button" class="btn btn-info" (click)="openBulkDocumentModal(bulkDocumentModal)"
-                            [disabled]="!hasSelection()" *ngIf="activeTab === 1">
-                            <i class="bx bx-send me-1"></i>Send Documents
-                        </button>
                     </div>
                 </div>
-            </div>
-            <div class="card-body">
-                <!-- Simple tabs (use activeTab to switch) -->
-                <div class="d-flex mb-3">
-                    <button type="button" class="me-2 btn btn-lg"
-                        [ngClass]="{'btn-primary': activeTab===1, 'btn-outline-primary': activeTab!==1}"
-                        (click)="activeTab = 1; getInternshipDetails()">Internship Forms</button>
-                    <button type="button" (click)="loadTestLinkDetails()" class="btn btn-lg"
-                        [ngClass]="{'btn-primary': activeTab===2, 'btn-outline-primary': activeTab!==2}"
-                        (click)="activeTab = 2">Test Links</button>
-                </div>
+                <div class="card-body">
+                    <!-- Simple tabs (use activeTab to switch) -->
+                    <div class="d-flex mb-3">
+                        <button type="button" class="me-2 btn btn-lg"
+                            [ngClass]="{'btn-primary': activeTab===1, 'btn-outline-primary': activeTab!==1}"
+                            (click)="activeTab = 1; getInternshipDetails(); applySearch()">Internship Forms</button>
+                        <button type="button" class="me-2 btn btn-lg"
+                            [ngClass]="{'btn-primary': activeTab===2, 'btn-outline-primary': activeTab!==2}"
+                            (click)="activeTab = 2; loadTestLinkDetails(); applySearch()">Test Links</button>
+                        <button type="button" class="btn btn-lg"
+                            [ngClass]="{'btn-primary': activeTab===3, 'btn-outline-primary': activeTab!==3}"
+                            (click)="activeTab = 3; loadHoldStudentDetails(); applySearch()">Hold Students</button>
+                    </div>
 
-                <!-- Search Filter -->
-                <div class="row mb-3">
-                    <div class="col-md-6">
-                        <div class="input-group">
-                            <input type="text" class="form-control"
-                                placeholder="Search by name, email, college, department..." [(ngModel)]="searchText"
-                                (ngModelChange)="applySearch()">
-                            <button class="btn btn-outline-secondary" type="button" (click)="clearSearch()"
-                                *ngIf="searchText">
-                                <i class="bx bx-x"></i>
-                            </button>
-                            <button class="btn btn-primary" type="button">
-                                <i class="bx bx-search"></i>
-                            </button>
+                    <!-- Search Filter -->
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <div class="input-group">
+                                <input type="text" class="form-control"
+                                    placeholder="Search by name, email, college, department..." [(ngModel)]="searchText"
+                                    (ngModelChange)="applySearch()">
+                                <button class="btn btn-outline-secondary" type="button" (click)="clearSearch()"
+                                    *ngIf="searchText">
+                                    <i class="bx bx-x"></i>
+                                </button>
+                                <button class="btn btn-primary" type="button">
+                                    <i class="bx bx-search"></i>
+                                </button>
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                <!-- Tab content -->
-                <div *ngIf="activeTab === 1">
-                    <div class="table-responsive">
-                        <table class="table mb-0">
-                            <thead class="table-light">
-                                <tr>
-                                    <th style="width:32px">
-                                        <input type="checkbox" [checked]="isAllSelected()"
-                                            (change)="toggleSelectAll($event)" />
-                                    </th>
-                                    <th class="text-left">#</th>
-                                    <th class="text-center">First Name</th>
-                                    <th class="text-center">Last Name</th>
-                                    <th class="text-center">Internship Type</th>
-                                    <th class="text-center">Email</th>
-                                    <th class="text-center">Mobile Number</th>
-                                    <th class="text-center">Subject</th>
-                                    <th class="text-center">College</th>
-                                    <th class="text-center">Department</th>
-                                    <th class="text-center">Offer Letter</th>
-                                    <th class="text-center">Certificate</th>
-                                    <th class="text-end">Action</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr *ngFor="let c of paginateData; let i = index">
-                                    <td>
-                                        <input type="checkbox" [checked]="isSelected(c.id)"
-                                            (change)="toggleSelection($event, c.id)" />
-                                    </td>
-                                    <td class="text-left">{{ c.index }}</td>
-                                    <td class="text-center">{{ c.firstname }}</td>
-                                    <td class="text-center">{{ c.lastname }}</td>
-                                    <td class="text-center"><span class="badge bg-primary">{{ c.internshiptype }}</span>
-                                    </td>
-                                    <td class="text-center">{{ c.email }}</td>
-                                    <td class="text-center">{{ c.mobilenumber }}</td>
-                                    <td class="text-center">{{ c.subject }}</td>
-                                    <td class="text-center">{{ c.collagename || c.college_name || c.institute || '-' }}
-                                    </td>
-                                    <td class="text-center">{{ c.department || c.dept || '-' }}</td>
-                                    <!-- Offer Letter Badge -->
-                                    <td class="text-center">
-                                        <span class="badge" [ngClass]="{
-                                                'bg-success': c.isofferletter === 0 || c.isofferletter === '0',
-                                                'bg-danger': c.isofferletter === 1 || c.isofferletter === '1'
-                                            }">
-                                            {{ (c.isofferletter === 1 || c.isofferletter === '1') ? 'Unsent' : 'Sent' }}
-                                        </span>
-                                    </td>
-                                    <!-- Certificate Badge -->
-                                    <td class="text-center">
-                                        <span class="badge" [ngClass]="{
-                                                'bg-success': c.isCertificate === 0 || c.isCertificate === '0',
-                                                'bg-danger': c.isCertificate === 1 || c.isCertificate === '1'
-                                            }">
-                                            {{ (c.isCertificate === 1 || c.isCertificate === '1') ? 'Unsent' : 'Sent' }}
-                                        </span>
-                                    </td>
-                                    <td class="text-end">
-                                        <div class="d-flex justify-content-end gap-1">
-                                            <button type="button" class="btn btn-soft-primary waves-effect waves-light"
-                                                data-bs-toggle="tooltip" data-bs-placement="top" title="Preview"
-                                                (click)="openPreview(c, previewModal)">
-                                                <i class="bx bx-show font-size-16 align-middle"></i>
-                                            </button>
-                                            <button type="button" class="btn btn-soft-success waves-effect waves-light"
-                                                data-bs-toggle="tooltip" data-bs-placement="top" title="Send Link"
-                                                (click)="openSendLinkModal(c, sendLinkModal)">
-                                                <i class="bx bx-link font-size-16 align-middle"></i>
-                                            </button>
-                                            <button type="button" class="btn btn-soft-info waves-effect waves-light"
-                                                data-bs-toggle="tooltip" data-bs-placement="top"
-                                                title="Send Certificate" (click)="sendCertificate(c.id)"
-                                                [disabled]="isSendingCertificate(c.id)">
-                                                <i class="bx bx-certification font-size-16 align-middle"></i>
-                                            </button>
-                                            <button type="button" class="btn btn-soft-warning waves-effect waves-light"
-                                                data-bs-toggle="tooltip" data-bs-placement="top"
-                                                title="Send Offer Letter" (click)="sendOfferLetter(c.id)"
-                                                [disabled]="isSendingOfferLetter(c.id)">
-                                                <i class="bx bx-envelope font-size-16 align-middle"></i>
-                                            </button>
-                                            <button type="button" class="btn btn-soft-danger waves-effect waves-light"
-                                                data-bs-toggle="tooltip" data-bs-placement="top" title="Delete"
-                                                (click)="removeClientsData(c.id)">
-                                                <i class="bx bx-trash-alt font-size-16 align-middle"></i>
-                                            </button>
-                                        </div>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                    <div class="row mt-4">
-                        <ngb-pagination [collectionSize]="collectionSize" [pageSize]="pageSize" [(page)]="page"
-                            [maxSize]="5" [rotate]="true" [ellipses]="false" [boundaryLinks]="true"
-                            (pageChange)="getPagintaion()" aria-label="Default pagination"
-                            class="d-flex justify-content-end pagination-rounded-flat pagination-success"></ngb-pagination>
-                    </div>
-                </div>
-
-                <div *ngIf="activeTab === 2">
-                    <div *ngIf="filteredTestLinkData && filteredTestLinkData.length; else noTestLinks">
+                    <!-- Tab content -->
+                    <div *ngIf="activeTab === 1">
+                        <!-- Bulk Action Buttons -->
+                        <div class="mb-3 d-flex gap-2 align-items-center" *ngIf="selectedStudents.size > 0">
+                            <span class="badge bg-info" style="font-size: 14px; padding: 8px 12px;">
+                                {{ selectedStudents.size }} student(s) selected
+                            </span>
+                            <button type="button" class="btn btn-success btn-sm" (click)="openAmountModal(amountModal)">
+                                <i class="bx bx-check-circle me-1"></i>Set Auto-Approved
+                            </button>
+                            <button type="button" class="btn btn-secondary btn-sm"
+                                (click)="selectedStudents.clear(); selectAll = false">
+                                <i class="bx bx-reset me-1"></i>Clear Selection
+                            </button>
+                        </div>
                         <div class="table-responsive">
                             <table class="table mb-0">
                                 <thead class="table-light">
                                     <tr>
+                                        <th class="text-center" style="width: 40px;">
+                                            <input type="checkbox" class="form-check-input" [(ngModel)]="selectAll"
+                                                (change)="toggleSelectAll($event)" style="cursor: pointer;">
+                                        </th>
                                         <th class="text-left">#</th>
                                         <th class="text-center">First Name</th>
                                         <th class="text-center">Last Name</th>
@@ -171,33 +85,49 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr *ngFor="let t of filteredTestLinkData; let i = index">
-                                        <td class="text-left">{{ t.index || (i + 1) }}</td>
-                                        <td class="text-center">{{ t.firstname || t.first_name || t.link_owner || '-' }}
+                                    <tr *ngFor="let c of paginateData; let i = index">
+                                        <td class="text-center">
+                                            <input type="checkbox" class="form-check-input" [checked]="isSelected(c.id)"
+                                                (change)="toggleSelectStudent(c.id, $event)" style="cursor: pointer;">
                                         </td>
-                                        <td class="text-center">{{ t.lastname || t.last_name || '-' }}</td>
-                                        <td class="text-center"><span class="badge bg-primary">{{ t.internshiptype ||
-                                                t.type || '-' }}</span></td>
-                                        <td class="text-center">{{ t.email || t.contact_email || '-' }}</td>
-                                        <td class="text-center">{{ t.mobilenumber || t.phone || t.contact_number || '-'
-                                            }}</td>
-                                        <td class="text-center">{{ t.subject || t.link_name || '-' }}</td>
-                                        <td class="text-center">{{ t.collagename || t.college_name || t.college || '-'
-                                            }}</td>
-                                        <td class="text-center">{{ t.department || t.dept || '-' }}</td>
+                                        <td class="text-left">{{ c.index }}</td>
+                                        <td class="text-center">{{ c.firstname }}</td>
+                                        <td class="text-center">{{ c.lastname }}</td>
+                                        <td class="text-center"><span class="badge bg-primary">{{ c.internshiptype
+                                                }}</span>
+                                        </td>
+                                        <td class="text-center">{{ c.email }}</td>
+                                        <td class="text-center">{{ c.mobilenumber }}</td>
+                                        <td class="text-center">{{ c.subject }}</td>
+                                        <td class="text-center">{{ c.collagename || c.college_name || c.institute || '-'
+                                            }}
+                                        </td>
+                                        <td class="text-center">{{ c.department || c.dept || '-' }}</td>
                                         <td class="text-end">
                                             <div class="d-flex justify-content-end gap-1">
                                                 <button type="button"
                                                     class="btn btn-soft-primary waves-effect waves-light"
                                                     data-bs-toggle="tooltip" data-bs-placement="top" title="Preview"
-                                                    (click)="openPreview(t, previewModal)">
+                                                    (click)="openPreview(c, previewModal)">
                                                     <i class="bx bx-show font-size-16 align-middle"></i>
+                                                </button>
+                                                <button type="button"
+                                                    class="btn btn-soft-warning waves-effect waves-light"
+                                                    data-bs-toggle="tooltip" data-bs-placement="top"
+                                                    title="Hold Student" (click)="markStudentAsHold(c.id)">
+                                                    <i class="bx bx-pause-circle font-size-16 align-middle"></i>
                                                 </button>
                                                 <button type="button"
                                                     class="btn btn-soft-success waves-effect waves-light"
                                                     data-bs-toggle="tooltip" data-bs-placement="top" title="Send Link"
-                                                    (click)="openSendLinkModal(t, sendLinkModal)">
+                                                    (click)="openSendLinkModal(c, sendLinkModal)">
                                                     <i class="bx bx-link font-size-16 align-middle"></i>
+                                                </button>
+                                                <button type="button"
+                                                    class="btn btn-soft-danger waves-effect waves-light"
+                                                    data-bs-toggle="tooltip" data-bs-placement="top" title="Delete"
+                                                    (click)="removeClientsData(c.id)">
+                                                    <i class="bx bx-trash-alt font-size-16 align-middle"></i>
                                                 </button>
                                             </div>
                                         </td>
@@ -205,10 +135,168 @@
                                 </tbody>
                             </table>
                         </div>
+                        <div class="row mt-4">
+                            <ngb-pagination [collectionSize]="collectionSize" [pageSize]="pageSize" [(page)]="page"
+                                [maxSize]="5" [rotate]="true" [ellipses]="false" [boundaryLinks]="true"
+                                (pageChange)="getPagintaion()" aria-label="Default pagination"
+                                class="d-flex justify-content-end pagination-rounded-flat pagination-success"></ngb-pagination>
+                        </div>
                     </div>
-                    <ng-template #noTestLinks>
-                        <div class="text-center text-muted py-4">No test link data available.</div>
-                    </ng-template>
+
+                    <div *ngIf="activeTab === 2">
+                        <div *ngIf="filteredTestLinkData && filteredTestLinkData.length; else noTestLinks">
+                            <div class="table-responsive">
+                                <table class="table mb-0">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th class="text-left">#</th>
+                                            <th class="text-center">First Name</th>
+                                            <th class="text-center">Last Name</th>
+                                            <th class="text-center">Internship Type</th>
+                                            <th class="text-center">Email</th>
+                                            <th class="text-center">Mobile Number</th>
+                                            <th class="text-center">Subject</th>
+                                            <th class="text-center">College</th>
+                                            <th class="text-center">Department</th>
+                                            <th class="text-end">Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr *ngFor="let t of filteredTestLinkData; let i = index">
+                                            <td class="text-left">{{ t.index || (i + 1) }}</td>
+                                            <td class="text-center">{{ t.firstname || t.first_name || t.link_owner ||
+                                                '-' }}
+                                            </td>
+                                            <td class="text-center">{{ t.lastname || t.last_name || '-' }}</td>
+                                            <td class="text-center"><span class="badge bg-primary">{{ t.internshiptype
+                                                    ||
+                                                    t.type || '-' }}</span></td>
+                                            <td class="text-center">{{ t.email || t.contact_email || '-' }}</td>
+                                            <td class="text-center">{{ t.mobilenumber || t.phone || t.contact_number ||
+                                                '-'
+                                                }}</td>
+                                            <td class="text-center">{{ t.subject || t.link_name || '-' }}</td>
+                                            <td class="text-center">{{ t.collagename || t.college_name || t.college ||
+                                                '-'
+                                                }}</td>
+                                            <td class="text-center">{{ t.department || t.dept || '-' }}</td>
+                                            <td class="text-end">
+                                                <div class="d-flex justify-content-end gap-1">
+                                                    <button type="button"
+                                                        class="btn btn-soft-primary waves-effect waves-light"
+                                                        data-bs-toggle="tooltip" data-bs-placement="top" title="Preview"
+                                                        (click)="openPreview(t, previewModal)">
+                                                        <i class="bx bx-show font-size-16 align-middle"></i>
+                                                    </button>
+                                                    <button type="button"
+                                                        class="btn btn-soft-success waves-effect waves-light"
+                                                        data-bs-toggle="tooltip" data-bs-placement="top"
+                                                        title="Send Link" (click)="openSendLinkModal(t, sendLinkModal)">
+                                                        <i class="bx bx-link font-size-16 align-middle"></i>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <ng-template #noTestLinks>
+                            <div class="text-center text-muted py-4">No test link data available.</div>
+                        </ng-template>
+                    </div>
+
+                    <!-- Hold Students Tab -->
+                    <div *ngIf="activeTab === 3">
+                        <!-- Bulk Action Buttons for Hold Students -->
+                        <div class="mb-3 d-flex gap-2 align-items-center" *ngIf="selectedStudents.size > 0">
+                            <span class="badge bg-info" style="font-size: 14px; padding: 8px 12px;">
+                                {{ selectedStudents.size }} student(s) selected
+                            </span>
+                            <button type="button" class="btn btn-success btn-sm" (click)="openAmountModal(amountModal)">
+                                <i class="bx bx-check-circle me-1"></i>Set Auto-Approved
+                            </button>
+                            <button type="button" class="btn btn-secondary btn-sm"
+                                (click)="selectedStudents.clear(); selectAll = false">
+                                <i class="bx bx-reset me-1"></i>Clear Selection
+                            </button>
+                        </div>
+
+                        <div class="table-responsive">
+                            <table class="table mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th class="text-center" style="width: 40px;">
+                                            <input type="checkbox" class="form-check-input" [(ngModel)]="selectAll"
+                                                (change)="toggleSelectAll($event)" style="cursor: pointer;">
+                                        </th>
+                                        <th class="text-left">#</th>
+                                        <th class="text-center">First Name</th>
+                                        <th class="text-center">Last Name</th>
+                                        <th class="text-center">Internship Type</th>
+                                        <th class="text-center">Email</th>
+                                        <th class="text-center">Mobile Number</th>
+                                        <th class="text-center">Subject</th>
+                                        <th class="text-center">College</th>
+                                        <th class="text-center">Department</th>
+                                        <th class="text-center">Amount</th>
+                                        <th class="text-end">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr *ngFor="let h of paginateData; let i = index">
+                                        <td class="text-center">
+                                            <input type="checkbox" class="form-check-input" [checked]="isSelected(h.id)"
+                                                (change)="toggleSelectStudent(h.id, $event)" style="cursor: pointer;">
+                                        </td>
+                                        <td class="text-left">{{ h.index }}</td>
+                                        <td class="text-center">{{ h.firstname }}</td>
+                                        <td class="text-center">{{ h.lastname }}</td>
+                                        <td class="text-center"><span class="badge bg-warning">{{ h.internshiptype
+                                                }}</span></td>
+                                        <td class="text-center">{{ h.email }}</td>
+                                        <td class="text-center">{{ h.mobilenumber }}</td>
+                                        <td class="text-center">{{ h.subject }}</td>
+                                        <td class="text-center">{{ h.collagename || h.college_name || h.institute || '-'
+                                            }}</td>
+                                        <td class="text-center">{{ h.department || h.dept || '-' }}</td>
+                                        <td class="text-center">
+                                            <span class="badge bg-info">₹{{ h.amount || 0 }}</span>
+                                        </td>
+                                        <td class="text-end">
+                                            <div class="d-flex justify-content-end gap-1">
+                                                <button type="button"
+                                                    class="btn btn-soft-primary waves-effect waves-light"
+                                                    data-bs-toggle="tooltip" data-bs-placement="top" title="Preview"
+                                                    (click)="openPreview(h, previewModal)">
+                                                    <i class="bx bx-show font-size-16 align-middle"></i>
+                                                </button>
+                                                <button type="button"
+                                                    class="btn btn-soft-success waves-effect waves-light"
+                                                    data-bs-toggle="tooltip" data-bs-placement="top" title="Send Link"
+                                                    (click)="openSendLinkModal(h, sendLinkModal)">
+                                                    <i class="bx bx-link font-size-16 align-middle"></i>
+                                                </button>
+                                                <button type="button"
+                                                    class="btn btn-soft-danger waves-effect waves-light"
+                                                    data-bs-toggle="tooltip" data-bs-placement="top" title="Delete"
+                                                    (click)="removeClientsData(h.id)">
+                                                    <i class="bx bx-trash-alt font-size-16 align-middle"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="row mt-4">
+                            <ngb-pagination [collectionSize]="collectionSize" [pageSize]="pageSize" [(page)]="page"
+                                [maxSize]="5" [rotate]="true" [ellipses]="false" [boundaryLinks]="true"
+                                (pageChange)="getPagintaion()" aria-label="Default pagination"
+                                class="d-flex justify-content-end pagination-rounded-flat pagination-success"></ngb-pagination>
+                        </div>
+                    </div>
+
                 </div>
             </div>
         </div>
@@ -268,6 +356,10 @@
             <div class="col-md-6">
                 <strong>Status</strong>
                 <div>{{ selectedClient?.status || '-' }}</div>
+            </div>
+            <div class="col-md-6">
+                <strong>Amount</strong>
+                <div>{{ selectedClient?.amount ? ('₹' + selectedClient.amount) : '-' }}</div>
             </div>
             <div class="col-12">
                 <strong>Subject</strong>
@@ -347,47 +439,32 @@
     </div>
 </ng-template>
 
-<!-- Bulk Document Selection Modal -->
-<ng-template #bulkDocumentModal let-modal>
+<ng-template #amountModal let-modal>
     <div class="modal-header">
-        <h5 class="modal-title">Send Documents to Selected Students</h5>
-        <button type="button" class="btn-close" (click)="closeBulkDocumentModal()"></button>
+        <h5 class="modal-title">Enter Amount for Auto-Approval</h5>
+        <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss('Cross click')"></button>
     </div>
     <div class="modal-body">
-        <p class="mb-3">Choose the type of document to send to <strong>{{ selectionArray().length }}</strong>
-            selected student(s)</p>
-        <div class="form-group">
-            <label for="bulkDocumentType" class="form-label">Document Type</label>
-            <select id="bulkDocumentType" class="form-select" [(ngModel)]="selectedDocumentType">
-                <option value="certificate">Completion Certificate</option>
-                <option value="offerletter">Offer Letter</option>
-            </select>
-        </div>
-        <div class="alert alert-info mt-3" *ngIf="selectedDocumentType === 'certificate'">
-            <i class="bx bx-info-circle"></i> This will generate and send internship completion certificates to
-            all selected students.
-        </div>
-        <div class="alert alert-info mt-3" *ngIf="selectedDocumentType === 'offerletter'">
-            <i class="bx bx-info-circle"></i> This will generate and send internship offer letters to all selected
-            students.
-        </div>
-        <div *ngIf="selectionArray().length" class="mt-3">
-            <p><strong>Selected Students:</strong></p>
-            <ul class="small" style="max-height: 200px; overflow-y: auto;">
-                <li *ngFor="let id of selectionArray()">{{ getStudentNameById(id) || id }}</li>
-            </ul>
-        </div>
+        <form [formGroup]="amountForm">
+            <div class="mb-3">
+                <label for="amount" class="form-label">Amount (₹) <span class="text-muted">(Optional)</span></label>
+                <input type="number" class="form-control" id="amount" formControlName="amount"
+                    placeholder="Enter amount (optional)" min="0" step="0.01">
+                <div class="invalid-feedback"
+                    *ngIf="amountForm.get('amount')?.touched && amountForm.get('amount')?.invalid">
+                    <span *ngIf="amountForm.get('amount')?.errors?.['min']">Amount must be greater than or equal to
+                        0.</span>
+                </div>
+                <small class="text-muted">This amount will be set for {{ selectedStudents.size }} selected
+                    student(s).</small>
+            </div>
+        </form>
     </div>
     <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" (click)="closeBulkDocumentModal()">Cancel</button>
-        <button type="button" class="btn btn-success" (click)="sendBulkDocuments(modal)" [disabled]="isSendingBulk">
-            <span *ngIf="!isSendingBulk">
-                <i class="bx bx-send me-1"></i> Send {{ selectedDocumentType === 'certificate' ? 'Certificates' :
-                'Offer Letters' }}
-            </span>
-            <span *ngIf="isSendingBulk">
-                <span class="spinner-border spinner-border-sm me-1"></span> Sending...
-            </span>
+        <button type="button" class="btn btn-light" (click)="modal.dismiss('Cancel click')">Cancel</button>
+        <button type="button" class="btn btn-success" (click)="bulkUpdateAutoApproved(true, modal)"
+            [disabled]="amountForm.invalid">
+            <i class="bx bx-check-circle me-1"></i>Confirm Auto-Approval
         </button>
     </div>
 </ng-template>
