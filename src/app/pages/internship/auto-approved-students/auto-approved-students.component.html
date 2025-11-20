@@ -10,29 +10,6 @@
                         <p class="card-title-desc mb-0">Students who have been automatically approved</p>
                     </div>
                     <div class="d-flex gap-2">
-                        <button type="button" class="btn btn-info btn-sm"
-                            (click)="openBulkDocumentModal(bulkDocumentModal)" [disabled]="selectedStudents.size === 0"
-                            title="Send Documents to Selected Students">
-                            <i class="mdi mdi-file-send me-1"></i>Send Documents
-                        </button>
-                        <button type="button" class="btn btn-outline-success btn-sm"
-                            (click)="sendBulkCertificatesDirect()"
-                            [disabled]="selectedStudents.size === 0 || isSendingBulkCertificates"
-                            title="Send Certificates to selected">
-                            <span *ngIf="!isSendingBulkCertificates"><i class="mdi mdi-certificate me-1"></i>Send
-                                Certificates</span>
-                            <span *ngIf="isSendingBulkCertificates"><span
-                                    class="spinner-border spinner-border-sm me-1"></span>Sending...</span>
-                        </button>
-                        <button type="button" class="btn btn-outline-primary btn-sm"
-                            (click)="sendBulkOfferLettersDirect()"
-                            [disabled]="selectedStudents.size === 0 || isSendingBulkOfferLetters"
-                            title="Send Offer Letters to selected">
-                            <span *ngIf="!isSendingBulkOfferLetters"><i class="mdi mdi-file-document me-1"></i>Send
-                                Offer Letters</span>
-                            <span *ngIf="isSendingBulkOfferLetters"><span
-                                    class="spinner-border spinner-border-sm me-1"></span>Sending...</span>
-                        </button>
                         <button type="button" class="btn btn-success" (click)="downloadExcel()">
                             <i class="bx bxs-file-export me-1"></i>Download Excel
                         </button>
@@ -96,12 +73,7 @@
                                 <!-- Subject hidden -->
                                 <th class="text-center">College</th>
                                 <!-- Department hidden -->
-                                <th class="text-center">Offer Letter</th>
-
-                                <th class="text-center">Certificate</th>
                                 <th class="text-center">Created Date</th>
-
-                                <!-- Offer Letter and Certificate moved to action column -->
                                 <th class="text-end">Action</th>
                             </tr>
                         </thead>
@@ -119,24 +91,6 @@
                                 <!-- Subject hidden -->
                                 <td class="text-center">{{ s.collagename || s.college_name || s.institute || '-' }}</td>
                                 <!-- Department hidden -->
-                                <!-- Offer Letter badge column -->
-                                <td class="text-center">
-                                    <span class="badge" [ngClass]="{
-                                        'bg-success': (s.internship?.isofferletter === 0 || s.isofferletter === 0 || s.internship?.isofferletter === '0' || s.isofferletter === '0'),
-                                        'bg-danger': (s.internship?.isofferletter === 1 || s.isofferletter === 1 || s.internship?.isofferletter === '1' || s.isofferletter === '1')
-                                    }">{{ (s.internship?.isofferletter === 1 || s.isofferletter === 1 ||
-                                        s.internship?.isofferletter === '1' || s.isofferletter === '1') ? 'Unsent' :
-                                        'Sent' }}</span>
-                                </td>
-                                <!-- Certificate badge column -->
-                                <td class="text-center">
-                                    <span class="badge" [ngClass]="{
-                                        'bg-success': (s.internship?.isCertificate === 0 || s.isCertificate === 0 || s.internship?.isCertificate === '0' || s.isCertificate === '0'),
-                                        'bg-danger': (s.internship?.isCertificate === 1 || s.isCertificate === 1 || s.internship?.isCertificate === '1' || s.isCertificate === '1')
-                                    }">{{ (s.internship?.isCertificate === 1 || s.isCertificate === 1 ||
-                                        s.internship?.isCertificate === '1' || s.isCertificate === '1') ? 'Unsent' :
-                                        'Sent' }}</span>
-                                </td>
                                 <td class="text-center">{{ s.createddate ? (s.createddate | date:'dd/MM/yyyy') : '-' }}
                                 </td>
                                 <td class="text-end">
@@ -146,36 +100,6 @@
                                             (click)="openPreview(s, previewModal)">
                                             <i class="bx bx-show font-size-16 align-middle"></i>
                                         </button>
-                                        <!-- Offer Letter send button -->
-                                        <div class="d-flex align-items-center gap-1 me-2">
-                                            <button class="btn btn-sm btn-outline-info"
-                                                (click)="sendOfferLetter(s.id.toString())"
-                                                [disabled]="isSendingOfferLetter(s.id.toString())"
-                                                title="Send Offer Letter">
-                                                <span *ngIf="!isSendingOfferLetter(s.id.toString())">
-                                                    <i class="mdi mdi-file-document"></i>
-                                                </span>
-                                                <span *ngIf="isSendingOfferLetter(s.id.toString())">
-                                                    <span class="spinner-border spinner-border-sm"></span>
-                                                </span>
-                                            </button>
-                                        </div>
-
-                                        <!-- Certificate send button -->
-                                        <div class="d-flex align-items-center gap-1 me-2">
-                                            <button class="btn btn-sm btn-outline-success"
-                                                (click)="sendCertificate(s.id.toString())"
-                                                [disabled]="isSendingCertificate(s.id.toString())"
-                                                title="Send Certificate">
-                                                <span *ngIf="!isSendingCertificate(s.id.toString())">
-                                                    <i class="mdi mdi-certificate"></i>
-                                                </span>
-                                                <span *ngIf="isSendingCertificate(s.id.toString())">
-                                                    <span class="spinner-border spinner-border-sm"></span>
-                                                </span>
-                                            </button>
-                                        </div>
-
                                         <button type="button" class="btn btn-soft-danger waves-effect waves-light"
                                             data-bs-toggle="tooltip" data-bs-placement="top" title="Delete"
                                             (click)="removeStudentData(s.id)">
@@ -272,44 +196,5 @@
     </div>
     <div class="modal-footer">
         <button type="button" class="btn btn-light" (click)="modal.close('Close click')">Close</button>
-    </div>
-</ng-template>
-
-<ng-template #bulkDocumentModal let-modal>
-    <div class="modal-header">
-        <h5 class="modal-title">Send Bulk Documents</h5>
-        <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss('Cross click')"></button>
-    </div>
-    <div class="modal-body">
-        <div class="mb-3">
-            <label class="form-label">Select the letter</label>
-            <select class="form-select" [(ngModel)]="selectedDocumentType">
-                <option value="">Choose document type...</option>
-                <option value="offerletter">Offer Letter</option>
-                <option value="certificate">Certificate</option>
-            </select>
-        </div>
-        <div class="alert alert-info">
-            <strong>{{ selectedStudents.size }}</strong> student(s) selected
-        </div>
-        <div class="list-group max-height-300 overflow-auto">
-            <div class="list-group-item" *ngFor="let id of selectedStudents">
-                <i class="mdi mdi-account-circle me-2"></i>{{ getStudentNameById(id) }}
-            </div>
-        </div>
-    </div>
-    <div class="modal-footer">
-        <button type="button" class="btn btn-light" (click)="closeBulkDocumentModal()" [disabled]="isSendingBulk">
-            Cancel
-        </button>
-        <button type="button" class="btn btn-primary" (click)="sendBulkDocuments(modal)"
-            [disabled]="!selectedDocumentType || isSendingBulk">
-            <span *ngIf="!isSendingBulk">
-                <i class="mdi mdi-send me-1"></i>Send Documents
-            </span>
-            <span *ngIf="isSendingBulk">
-                <span class="spinner-border spinner-border-sm me-1"></span>Sending...
-            </span>
-        </button>
     </div>
 </ng-template>

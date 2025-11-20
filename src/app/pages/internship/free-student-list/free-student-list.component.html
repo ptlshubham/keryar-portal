@@ -69,11 +69,6 @@
                                 title="Change Status for Selected">
                                 <i class="mdi mdi-check-bold"></i> Change Status
                             </button>
-                            <!-- Bulk Send Documents button -->
-                            <button class="btn btn-info btn-sm ms-1" (click)="openBulkDocumentModal(bulkDocumentModal)"
-                                [disabled]="!hasSelection()" title="Send Documents to Selected Students">
-                                <i class="mdi mdi-file-send"></i> Send Documents
-                            </button>
                         </div>
                     </div>
                 </div>
@@ -453,50 +448,4 @@
         </div>
     </ng-template>
 
-    <!-- Bulk Document Selection Modal -->
-    <ng-template #bulkDocumentModal let-modal>
-        <div class="modal-header">
-            <h5 class="modal-title">Send Documents to Selected Students</h5>
-            <button type="button" class="btn-close" (click)="closeBulkDocumentModal()"></button>
-        </div>
-        <div class="modal-body">
-            <p class="mb-3">Choose the type of document to send to <strong>{{ selectionArray().length }}</strong>
-                selected student(s)</p>
-            <div class="form-group">
-                <label for="bulkDocumentType" class="form-label">Select the letter</label>
-                <select id="bulkDocumentType" class="form-select" [(ngModel)]="selectedDocumentType">
-                    <option value="">Choose document type...</option>
-                    <option value="certificate">Completion Certificate</option>
-                    <option value="offerletter">Offer Letter</option>
-                </select>
-            </div>
-            <div class="alert alert-info mt-3" *ngIf="selectedDocumentType === 'certificate'">
-                <i class="mdi mdi-information"></i> This will generate and send internship completion certificates to
-                all selected students.
-            </div>
-            <div class="alert alert-info mt-3" *ngIf="selectedDocumentType === 'offerletter'">
-                <i class="mdi mdi-information"></i> This will generate and send internship offer letters to all selected
-                students.
-            </div>
-            <div *ngIf="selectionArray().length" class="mt-3">
-                <p><strong>Selected Students:</strong></p>
-                <ul class="small" style="max-height: 200px; overflow-y: auto;">
-                    <li *ngFor="let id of selectionArray()">{{ getStudentNameById(id) || id }}</li>
-                </ul>
-            </div>
-        </div>
-        <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" (click)="closeBulkDocumentModal()">Cancel</button>
-            <button type="button" class="btn btn-success" (click)="sendBulkDocuments(modal)"
-                [disabled]="!selectedDocumentType || isSendingBulk">
-                <span *ngIf="!isSendingBulk">
-                    <i class="mdi mdi-send me-1"></i> Send {{ selectedDocumentType === 'certificate' ? 'Certificates' :
-                    'Offer Letters' }}
-                </span>
-                <span *ngIf="isSendingBulk">
-                    <span class="spinner-border spinner-border-sm me-1"></span> Sending...
-                </span>
-            </button>
-        </div>
-    </ng-template>
 </div>
