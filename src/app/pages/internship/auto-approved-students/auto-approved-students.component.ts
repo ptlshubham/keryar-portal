@@ -67,7 +67,6 @@ export class AutoApprovedStudentsComponent implements OnInit {
       }
 
       this.autoApprovedStudents = data || [];
-
       for (let i = 0; i < this.autoApprovedStudents.length; i++) {
         this.autoApprovedStudents[i].index = i + 1;
         if (this.autoApprovedStudents[i].resume) {
@@ -300,10 +299,10 @@ export class AutoApprovedStudentsComponent implements OnInit {
 
   generateOfferLetter(val: any) {
     this.isGenerating = true;
-    this.generatingId = val.id;
+    this.generatingId = Array.isArray(val) ? null : val.id;
     this.progress = 5; // start
 
-    const data = [val];
+    const data = Array.isArray(val) ? val : [val];
 
     // Fake Progress Bar (smooth animation)
     let progressInterval = setInterval(() => {
@@ -319,9 +318,16 @@ export class AutoApprovedStudentsComponent implements OnInit {
 
         if (res.success) {
           this.filteredStudents = [];
-          this.toastr.success('Offer Letter Generated Successfully', 'Success', { timeOut: 3000 });
+          // this.toastr.success('Offer Letter Generated Successfully', 'Success', { timeOut: 3000 });
+          Swal.fire('Success!', 'Offer letters generated successfully.', 'success');
+          if (Array.isArray(val)) {
+            this.selectedStudents.clear();
+            this.selectAll = false;
+            this.getAutoApprovedStudents();
+          }
         } else {
-          this.toastr.error('Error generating letter', 'Error', { timeOut: 3000 });
+          // this.toastr.error('Error generating letter', 'Error', { timeOut: 3000 });
+          Swal.fire('Error!', 'Error generating offer letters.', 'error');
         }
 
         setTimeout(() => {
@@ -337,7 +343,8 @@ export class AutoApprovedStudentsComponent implements OnInit {
         this.isGenerating = false;
         this.generatingId = null;
 
-        this.toastr.error('Something went wrong', 'Error', { timeOut: 3000 });
+        // this.toastr.error('Something went wrong', 'Error', { timeOut: 3000 });
+        Swal.fire('Error!', 'Something went wrong while generating offer letters.', 'error');
       }
     });
   }
@@ -347,7 +354,30 @@ export class AutoApprovedStudentsComponent implements OnInit {
       this.toastr.warning('Please select at least one student.');
       return;
     }
-    const selectedData = this.filteredStudents.filter((student: any) => this.selectedStudents.has(student.id));
-    this.generateOfferLetter(selectedData);
+
+    Swal.fire({
+      title: 'Generate Offer Letters?',
+      text: `Generate offer letters for ${this.selectedStudents.size} student(s)?`,
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Yes, generate!',
+      cancelButtonText: 'Cancel'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        Swal.fire({
+          title: 'Generating...',
+          text: 'Please wait while generating offer letters.',
+          allowOutsideClick: false,
+          didOpen: () => {
+            Swal.showLoading();
+          }
+        });
+
+        const selectedData = this.filteredStudents.filter((student: any) => this.selectedStudents.has(student.id));
+        this.generateOfferLetter(selectedData);
+      }
+    });
   }
 }

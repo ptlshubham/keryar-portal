@@ -150,11 +150,37 @@
                     </div>
 
                     <div *ngIf="activeTab === 2">
+                        <!-- Bulk Action Buttons for Test Links -->
+                        <div class="mb-3 d-flex gap-2 align-items-center" *ngIf="selectedStudents.size > 0">
+                            <span class="badge bg-info" style="font-size: 14px; padding: 8px 12px;">
+                                {{ selectedStudents.size }} student(s) selected
+                            </span>
+                            <button type="button" class="btn btn-success btn-sm" (click)="openAmountModal(amountModal)">
+                                <i class="bx bx-check-circle me-1"></i>Set Auto-Approved
+                            </button>
+                            <button type="button" class="btn btn-warning btn-sm" (click)="bulkMarkAsHold()">
+                                <i class="bx bx-pause-circle me-1"></i>Mark as Hold
+                            </button>
+                            <button type="button" class="btn btn-secondary btn-sm"
+                                (click)="selectedStudents.clear(); selectAll = false">
+                                <i class="bx bx-reset me-1"></i>Clear Selection
+                            </button>
+                            <button type="button" class="btn btn-danger btn-sm" (click)="bulkDeleteStudents()"
+                                [disabled]="isDeletingBulk">
+                                <span *ngIf="!isDeletingBulk"><i class="bx bx-trash-alt me-1"></i>Delete Selected</span>
+                                <span *ngIf="isDeletingBulk"><span
+                                        class="spinner-border spinner-border-sm me-1"></span>Deleting...</span>
+                            </button>
+                        </div>
                         <div *ngIf="filteredTestLinkData && filteredTestLinkData.length; else noTestLinks">
                             <div class="table-responsive">
                                 <table class="table mb-0">
                                     <thead class="table-light">
                                         <tr>
+                                            <th class="text-center" style="width: 40px;">
+                                                <input type="checkbox" class="form-check-input" [(ngModel)]="selectAll"
+                                                    (change)="toggleSelectAll($event)" style="cursor: pointer;">
+                                            </th>
                                             <th class="text-left">#</th>
                                             <th class="text-center">Name</th>
                                             <!-- Internship Type hidden -->
@@ -162,6 +188,7 @@
                                             <th class="text-center">Mobile Number</th>
                                             <!-- Subject hidden -->
                                             <th class="text-center">College</th>
+                                            <th class="text-center">Created Date</th>
 
                                             <!-- Department hidden -->
                                             <th class="text-end">Action</th>
@@ -169,6 +196,12 @@
                                     </thead>
                                     <tbody>
                                         <tr *ngFor="let t of filteredTestLinkData; let i = index">
+                                            <td class="text-center">
+                                                <input type="checkbox" class="form-check-input"
+                                                    [checked]="isSelected(t.id)"
+                                                    (change)="toggleSelectStudent(t.id, $event)"
+                                                    style="cursor: pointer;">
+                                            </td>
                                             <td class="text-left">{{ t.index || (i + 1) }}</td>
                                             <td class="text-center">{{ (t.firstname || t.first_name || t.link_owner ||
                                                 '') + ' ' + (t.lastname || t.last_name || '') }}</td>
@@ -199,11 +232,30 @@
                                                         title="Send Link" (click)="openSendLinkModal(t, sendLinkModal)">
                                                         <i class="bx bx-link font-size-16 align-middle"></i>
                                                     </button>
+                                                    <button type="button"
+                                                        class="btn btn-soft-warning waves-effect waves-light"
+                                                        data-bs-toggle="tooltip" data-bs-placement="top"
+                                                        title="Hold Student" (click)="markStudentAsHold(t.id)">
+                                                        <i class="bx bx-pause-circle font-size-16 align-middle"></i>
+                                                    </button>
+                                                    <button type="button"
+                                                        class="btn btn-soft-danger waves-effect waves-light"
+                                                        data-bs-toggle="tooltip" data-bs-placement="top" title="Delete"
+                                                        (click)="removeTestLinkData(t.id)">
+                                                        <i class="bx bx-trash-alt font-size-16 align-middle"></i>
+                                                    </button>
                                                 </div>
                                             </td>
                                         </tr>
                                     </tbody>
                                 </table>
+                            </div>
+                            <div class="row mt-4">
+                                <ngb-pagination [collectionSize]="filteredTestLinkData.length" [pageSize]="pageSize"
+                                    [(page)]="page" [maxSize]="5" [rotate]="true" [ellipses]="false"
+                                    [boundaryLinks]="true" (pageChange)="getPagintaion()"
+                                    aria-label="Default pagination"
+                                    class="d-flex justify-content-end pagination-rounded-flat pagination-success"></ngb-pagination>
                             </div>
                         </div>
                         <ng-template #noTestLinks>

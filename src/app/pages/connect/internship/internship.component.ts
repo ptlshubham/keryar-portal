@@ -145,6 +145,9 @@ export class InternshipComponent implements OnInit {
           );
         });
       }
+      this.collectionSize = this.filteredTestLinkData.length;
+      this.page = 1;
+      this.getPagintaion();
     } else if (this.activeTab === 3) {
       // clear selections when switching to Hold tab
       this.selectedStudents.clear();
@@ -256,7 +259,6 @@ export class InternshipComponent implements OnInit {
     if (this.sendLinkForm.invalid) {
       this.toastr.error('Please select a link.', 'Validation Error', { timeOut: 3000 });
       if (modal) {
-        console.log('Closing modal: Validation Error');
         modal.close('Validation Error');
       }
       return;
@@ -275,7 +277,6 @@ export class InternshipComponent implements OnInit {
     if (!this.selectedClient.email || !selectedLink.college_id) {
       this.toastr.error('Invalid data: Missing email or college ID.', 'Error', { timeOut: 3000 });
       if (modal) {
-        console.log('Closing modal: Invalid data');
         modal.close('Invalid data');
       }
       return;
@@ -396,6 +397,54 @@ export class InternshipComponent implements OnInit {
     });
   }
 
+  removeTestLinkData(id: any) {
+    Swal.fire({
+      title: 'Are you sure?',
+      text: 'Do you want to delete this test link entry? This action cannot be undone.',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Yes, delete it!',
+      cancelButtonText: 'Cancel'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        Swal.fire({
+          title: 'Deleting...',
+          text: 'Please wait.',
+          allowOutsideClick: false,
+          didOpen: () => {
+            Swal.showLoading();
+          }
+        });
+        this.connectService.removeInternshipDetails(id).subscribe({
+          next: (res: any) => {
+            this.testLinkDetails = this.testLinkDetails.filter(item => item.id !== id);
+            this.filteredTestLinkData = [...this.testLinkDetails];
+            this.applySearch();
+            Swal.fire({
+              icon: 'success',
+              title: 'Deleted',
+              text: 'Test link entry deleted successfully.',
+              timer: 3000,
+              showConfirmButton: false
+            });
+          },
+          error: (err) => {
+            console.error('Delete API Error:', err);
+            Swal.fire({
+              icon: 'error',
+              title: 'Error',
+              text: err.error?.message || 'Failed to delete test link entry. Please try again.',
+              timer: 3000,
+              showConfirmButton: false
+            });
+          }
+        });
+      }
+    });
+  }
+
   getInternshipDetails() {
     this.connectService.getInternshipFormDetails().subscribe((res: any) => {
       let data: any[] = [];
@@ -413,7 +462,6 @@ export class InternshipComponent implements OnInit {
       }
 
       this.internshipFormDetails = data || [];
-
       // Filter only students with autoapproved = 0 (manual approval) AND ishold = 0 or null (not on hold)
       this.internshipFormDetails = this.internshipFormDetails.filter(
         (student: any) => (student.autoapproved === 0 || !student.autoapproved) && (student.ishold === 0 || !student.ishold)
@@ -743,6 +791,96 @@ export class InternshipComponent implements OnInit {
     });
   }
 
+  bulkMarkAsHold() {
+    if (this.selectedStudents.size === 0) {
+      this.toastr.warning('Please select at least one student.', 'Warning', { timeOut: 3000 });
+      return;
+    }
+
+    Swal.fire({
+      title: 'Mark Selected Students as Hold?',
+      text: `Mark ${this.selectedStudents.size} student(s) as hold? They will be moved to Hold Students tab.`,
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonColor: '#f1b44c',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Yes, mark as hold!',
+      cancelButtonText: 'Cancel'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        Swal.fire({
+          title: 'Updating...',
+          text: 'Please wait while marking students as hold.',
+          allowOutsideClick: false,
+          didOpen: () => {
+            Swal.showLoading();
+          }
+        });
+
+        const updatePromises: any[] = [];
+        const selectedIds = Array.from(this.selectedStudents);
+
+        selectedIds.forEach(id => {
+          const updateData: any = {
+            id: id,
+            ishold: 1
+          };
+          updatePromises.push(
+            this.connectService.updateInternshipAutoApproved(updateData).toPromise()
+          );
+        });
+
+        Promise.all(updatePromises)
+          .then((responses: any[]) => {
+            const successCount = responses.filter(res => res.success).length;
+            const failCount = responses.length - successCount;
+
+            // Re-fetch data from server to ensure latest state
+            if (this.activeTab === 1) {
+              this.getInternshipDetails();
+            } else if (this.activeTab === 2) {
+              this.loadTestLinkDetails();
+            } else if (this.activeTab === 3) {
+              this.loadHoldStudentDetails();
+            }
+            // also refresh hold students list
+            this.loadHoldStudentDetails();
+
+            // Clear selections
+            this.selectedStudents.clear();
+            this.selectAll = false;
+
+            Swal.fire({
+              icon: successCount > 0 ? 'success' : 'error',
+              title: 'Bulk Update Complete',
+              html: `<p><strong>${successCount}</strong> student(s) marked as hold.</p>
+                     ${failCount > 0 ? `<p><strong>${failCount}</strong> student(s) failed.</p>` : ''}`,
+              timer: 3000,
+              showConfirmButton: false
+            });
+
+            if (successCount > 0) {
+              this.toastr.success(`${successCount} student(s) marked as hold!`, 'Success', { timeOut: 3000 });
+            }
+            if (failCount > 0) {
+              this.toastr.error(`${failCount} student(s) failed.`, 'Error', { timeOut: 3000 });
+            }
+          })
+          .catch((err) => {
+            console.error('Bulk Mark as Hold Error:', err);
+            Swal.fire({
+              icon: 'error',
+              title: 'Error',
+              text: 'An error occurred while marking students as hold.',
+              timer: 3000,
+              showConfirmButton: false
+            });
+            this.toastr.error('Network error while marking students as hold.', 'Error', { timeOut: 3000 });
+          });
+      }
+    });
+  }
+
   markStudentAsHold(studentId: number) {
     Swal.fire({
       title: 'Mark as Hold?',
@@ -765,6 +903,7 @@ export class InternshipComponent implements OnInit {
             this.toastr.success('Student marked as hold successfully!', 'Success');
             this.getInternshipDetails();  // Refresh the list
             this.loadHoldStudentDetails();  // Refresh hold students
+            this.loadTestLinkDetails();  // Refresh test links
           },
           error: (err) => {
             this.toastr.error('Failed to mark student as hold.', 'Error');

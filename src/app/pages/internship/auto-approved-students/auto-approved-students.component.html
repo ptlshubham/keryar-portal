@@ -77,6 +77,8 @@
                                 <th class="text-center">College</th>
                                 <!-- Department hidden -->
                                 <th class="text-center">Created Date</th>
+                                <th class="text-center">Certificate</th>
+                                <th class="text-center">Offer Letter</th>
                                 <th class="text-end">Action</th>
                             </tr>
                         </thead>
@@ -95,6 +97,16 @@
                                 <td class="text-center">{{ s.collagename || s.college_name || s.institute || '-' }}</td>
                                 <!-- Department hidden -->
                                 <td class="text-center">{{ s.createddate ? (s.createddate | date:'dd/MM/yyyy') : '-' }}
+                                </td>
+                                <td class="text-center">
+                                    <span class="badge" [ngClass]="s.isCertificate == 1 ? 'bg-warning' : 'bg-success'">
+                                        {{ s.isCertificate == 1 ? 'Unsent' : 'Sent' }}
+                                    </span>
+                                </td>
+                                <td class="text-center">
+                                    <span class="badge" [ngClass]="s.isofferletter == 1 ? 'bg-warning' : 'bg-success'">
+                                        {{ s.isofferletter == 1 ? 'Unsent' : 'Sent' }}
+                                    </span>
                                 </td>
                                 <td class="text-end">
                                     <div class="d-flex justify-content-end gap-1">
@@ -171,6 +183,8 @@
             </div>
             <div class="col-md-6">
                 <strong>Department</strong>
+                <div>{{ selectedStudent?.department ||
+                    '-' }}</div>
                 <!-- Department hidden as per UI preference -->
             </div>
             <div class="col-md-6">
@@ -192,11 +206,12 @@
             </div>
             <div class="col-md-6">
                 <strong>Amount</strong>
-                <div><span class="badge bg-success">{{ selectedStudent?.amount }}</span></div>
+                <div><span class="badge bg-success">₹{{ selectedStudent?.amount || 0 }}</span></div>
             </div>
 
             <div class="col-md-6">
                 <strong>Subject</strong>
+                <div><span class="badge bg-success">{{ selectedStudent?.subject }}</span></div>
                 <!-- Subject hidden as per UI preference -->
             </div>
             <div class="col-12" *ngIf="selectedStudent?.resume_url || selectedStudent?.resume">
