@@ -43,6 +43,9 @@
                     <span class="badge bg-info" style="font-size: 14px; padding: 8px 12px;">
                         {{ selectedStudents.size }} student(s) selected
                     </span>
+                    <button type="button" class="btn btn-warning btn-sm" (click)="generateBulkOfferLetter()">
+                        <i class="bx bx-x-circle me-1"></i>Generate Offer Letters
+                    </button>
                     <button type="button" class="btn btn-warning btn-sm" (click)="bulkSetManualApproval()">
                         <i class="bx bx-x-circle me-1"></i>Set to Manual Approval
                     </button>
@@ -100,6 +103,15 @@
                                             (click)="openPreview(s, previewModal)">
                                             <i class="bx bx-show font-size-16 align-middle"></i>
                                         </button>
+                                        <button type="button" class="btn btn-soft-primary waves-effect waves-light"
+                                            data-bs-toggle="tooltip" data-bs-placement="top" title="Preview"
+                                            (click)="generateOfferLetter(s)" [disabled]="isGenerating">
+                                            <i class="bx bxs-file-pdf font-size-16 align-middle"></i>
+
+                                            <span *ngIf="isGenerating && generatingId === s.id"
+                                                class="spinner-border spinner-border-sm ms-1"></span>
+                                        </button>
+
                                         <button type="button" class="btn btn-soft-danger waves-effect waves-light"
                                             data-bs-toggle="tooltip" data-bs-placement="top" title="Delete"
                                             (click)="removeStudentData(s.id)">
@@ -107,8 +119,14 @@
                                         </button>
                                     </div>
                                 </td>
+
                             </tr>
                         </tbody>
+                        <div *ngIf="isGenerating" class="mt-2">
+                            <ngb-progressbar type="primary" [value]="progress" [striped]="true" [animated]="true">
+                                Generating Offer Letter... {{progress}}%
+                            </ngb-progressbar>
+                        </div>
                     </table>
                 </div>
 
@@ -122,6 +140,7 @@
         </div>
     </div>
 </div>
+
 
 <ng-template #previewModal let-modal>
     <div class="modal-header">

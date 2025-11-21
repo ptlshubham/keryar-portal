@@ -43,4 +43,8 @@ export class ConnectService {
         return this.httpClient.get(ApiService.removeCallToActionByIdURL + id);
     }
 
+    generateOfferLetter(data: any): Observable<any> {
+        return this.httpClient.post(ApiService.generateAndSendSingleOfferLetterURL, data);
+    }
+
 }

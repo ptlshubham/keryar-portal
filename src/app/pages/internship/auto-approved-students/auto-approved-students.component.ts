@@ -32,6 +32,9 @@ export class AutoApprovedStudentsComponent implements OnInit {
   selectAll: boolean = false;
   isDeletingBulk = false;
 
+  isGenerating: boolean = false;
+  progress: number = 0;
+  generatingId: any = null;
   constructor(
     public connectService: ConnectService,
     public toastr: ToastrService,
@@ -293,5 +296,58 @@ export class AutoApprovedStudentsComponent implements OnInit {
       startY: 25
     });
     doc.save(`Auto_Approved_${new Date().toISOString().split('T')[0]}.pdf`);
+  }
+
+  generateOfferLetter(val: any) {
+    this.isGenerating = true;
+    this.generatingId = val.id;
+    this.progress = 5; // start
+
+    const data = [val];
+
+    // Fake Progress Bar (smooth animation)
+    let progressInterval = setInterval(() => {
+      if (this.progress < 90) {
+        this.progress += 5;
+      }
+    }, 300);
+
+    this.connectService.generateOfferLetter(data).subscribe({
+      next: (res: any) => {
+        clearInterval(progressInterval);
+        this.progress = 100;
+
+        if (res.success) {
+          this.filteredStudents = [];
+          this.toastr.success('Offer Letter Generated Successfully', 'Success', { timeOut: 3000 });
+        } else {
+          this.toastr.error('Error generating letter', 'Error', { timeOut: 3000 });
+        }
+
+        setTimeout(() => {
+          this.isGenerating = false;
+          this.progress = 0;
+          this.generatingId = null;
+        }, 500);
+      },
+
+      error: (err) => {
+        clearInterval(progressInterval);
+        this.progress = 0;
+        this.isGenerating = false;
+        this.generatingId = null;
+
+        this.toastr.error('Something went wrong', 'Error', { timeOut: 3000 });
+      }
+    });
+  }
+
+  generateBulkOfferLetter() {
+    if (this.selectedStudents.size === 0) {
+      this.toastr.warning('Please select at least one student.');
+      return;
+    }
+    const selectedData = this.filteredStudents.filter((student: any) => this.selectedStudents.has(student.id));
+    this.generateOfferLetter(selectedData);
   }
 }

@@ -187,7 +187,7 @@ export class ApiService {
   public static generateAndSendInternshipCertificatesURL: string = ApiService.HOST_URL + '/keryar/GenerateAndSendInternshipCertificates';
 
   // Offer Letter Generation
-  public static generateAndSendSingleOfferLetterURL: string = ApiService.HOST_URL + '/keryar/GenerateAndSendSingleOfferLetter';
+  public static generateAndSendSingleOfferLetterURL: string = ApiService.HOST_URL + '/keryar/GenerateMultipleOfferLetter';
   public static generateAndSendInternshipOfferLettersURL: string = ApiService.HOST_URL + '/keryar/GenerateAndSendInternshipOfferLetters';
 
 }
