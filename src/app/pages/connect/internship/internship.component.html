@@ -106,7 +106,8 @@
                                         <td class="text-center">{{ c.collagename || c.college_name || c.institute || '-'
                                             }}
                                         </td>
-                                        <td class="text-center">{{ c.createddate ? (c.createddate | date:'dd/MM/yyyy') :
+                                        <td class="text-center">{{ c.createddate ? (c.createddate | date:'dd/MM/yyyy
+                                            HH:mm:ss') :
                                             '-' }}</td>
                                         <!-- Department hidden -->
                                         <td class="text-end">
@@ -216,7 +217,7 @@
                                                 '-'
                                                 }}</td>
                                             <td class="text-center">{{ t.createddate ? (t.createddate |
-                                                date:'dd/MM/yyyy') : '-' }}</td>
+                                                date:'dd/MM/yyyy HH:mm:ss') : '-' }}</td>
                                             <!-- Department hidden -->
                                             <td class="text-end">
                                                 <div class="d-flex justify-content-end gap-1">
@@ -328,8 +329,8 @@
                                         <td class="text-center">
                                             <span class="badge bg-info">₹{{ h.amount || 0 }}</span>
                                         </td>
-                                        <td class="text-center">{{ h.createddate ? (h.createddate | date:'dd/MM/yyyy') :
-                                            '-' }}</td>
+                                        <td class="text-center">{{ h.createddate ? (h.createddate |
+                                            date:'dd/MM/yyyy HH:mm:ss') :'-' }}</td>
                                         <td class="text-end">
                                             <div class="d-flex justify-content-end gap-1">
                                                 <button type="button"

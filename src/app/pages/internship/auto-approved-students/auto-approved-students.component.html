@@ -1,4 +1,4 @@
-<app-pagetitle title="Auto-Approved Internship Students" [breadcrumbItems]="breadCrumbItems"></app-pagetitle>
+<app-pagetitle title="Paid Internship Students" [breadcrumbItems]="breadCrumbItems"></app-pagetitle>
 
 <div class="row">
     <div class="col-12">
@@ -6,7 +6,7 @@
             <div class="card-header">
                 <div class="d-flex justify-content-between align-items-center">
                     <div>
-                        <h5 class="card-title mb-1">Auto-Approved Internship Students</h5>
+                        <h5 class="card-title mb-1">Paid Internship Students</h5>
                         <p class="card-title-desc mb-0">Students who have been automatically approved</p>
                     </div>
                     <div class="d-flex gap-2">
@@ -78,7 +78,9 @@
                                 <!-- Department hidden -->
                                 <th class="text-center">Created Date</th>
                                 <th class="text-center">Offer Letter</th>
+                                <th class="text-center">Download Offer Letter</th>
                                 <th class="text-center">Certificate</th>
+                                <th class="text-center">Download Certificate</th>
                                 <th class="text-end">Action</th>
                             </tr>
                         </thead>
@@ -96,7 +98,8 @@
                                 <!-- Subject hidden -->
                                 <td class="text-center">{{ s.collagename || s.college_name || s.institute || '-' }}</td>
                                 <!-- Department hidden -->
-                                <td class="text-center">{{ s.createddate ? (s.createddate | date:'dd/MM/yyyy') : '-' }}
+                                <td class="text-center">{{ s.createddate ? (s.createddate | date:'dd/MM/yyyy HH:mm:ss')
+                                    : '-' }}
                                 </td>
                                 <td class="text-center">
                                     <span class="badge" [ngClass]="s.isofferletter == 1 ? 'bg-warning' : 'bg-success'">
@@ -104,9 +107,25 @@
                                     </span>
                                 </td>
                                 <td class="text-center">
+                                    <button type="button" class="btn btn-soft-primary btn-sm waves-effect waves-light"
+                                        data-bs-toggle="tooltip" data-bs-placement="top" title="Open Offer Letter"
+                                        (click)="openOfferLetterInNewTab(s)" *ngIf="s.offerletter"
+                                        [disabled]="!s.offerletter">
+                                        <i class="bx bx-show font-size-16 align-middle"></i>
+                                    </button>
+                                </td>
+                                <td class="text-center">
                                     <span class="badge" [ngClass]="s.isCertificate == 1 ? 'bg-warning' : 'bg-success'">
                                         {{ s.isCertificate == 1 ? 'Unsent' : 'Sent' }}
                                     </span>
+                                </td>
+                                <td class="text-center">
+                                    <button type="button" class="btn btn-soft-success btn-sm waves-effect waves-light"
+                                        data-bs-toggle="tooltip" data-bs-placement="top" title="Open Certificate"
+                                        (click)="openCertificateInNewTab(s)" *ngIf="s.certificate"
+                                        [disabled]="!s.certificate">
+                                        <i class="bx bx-show font-size-16 align-middle"></i>
+                                    </button>
                                 </td>
 
                                 <td class="text-end">
@@ -117,8 +136,9 @@
                                             <i class="bx bx-show font-size-16 align-middle"></i>
                                         </button>
                                         <button type="button" class="btn btn-soft-primary waves-effect waves-light"
-                                            data-bs-toggle="tooltip" data-bs-placement="top" title="Preview"
-                                            (click)="generateOfferLetter(s)" [disabled]="isGenerating">
+                                            data-bs-toggle="tooltip" data-bs-placement="top"
+                                            title="Generate Offer Letter" (click)="generateOfferLetter(s)"
+                                            [disabled]="isGenerating">
                                             <i class="bx bxs-file-pdf font-size-16 align-middle"></i>
 
                                             <span *ngIf="isGenerating && generatingId === s.id"

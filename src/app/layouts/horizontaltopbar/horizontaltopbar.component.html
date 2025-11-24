@@ -22,7 +22,8 @@
                 </a>
             </div>
 
-            <button type="button" class="btn btn-sm px-3 font-size-16 header-item d-lg-none" id="vertical-menu-btn" (click)="toggleMobileMenu($event)">
+            <button type="button" class="btn btn-sm px-3 font-size-16 header-item d-lg-none" id="vertical-menu-btn"
+                (click)="toggleMobileMenu($event)">
                 <i class="fa fa-fw fa-bars"></i>
             </button>
 
@@ -38,15 +39,18 @@
         <div class="d-flex">
 
             <div class="dropdown d-inline-block d-lg-none ms-2" ngbDropdown>
-                <button type="button" class="btn header-item" id="page-header-search-dropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" ngbDropdownToggle>
+                <button type="button" class="btn header-item" id="page-header-search-dropdown" data-bs-toggle="dropdown"
+                    aria-haspopup="true" aria-expanded="false" ngbDropdownToggle>
                     <i-feather name="search" class="icon-lg"></i-feather>
                 </button>
-                <div class="dropdown-menu dropdown-menu-lg dropdown-menu-end p-0" aria-labelledby="page-header-search-dropdown" ngbDropdownMenu>
+                <div class="dropdown-menu dropdown-menu-lg dropdown-menu-end p-0"
+                    aria-labelledby="page-header-search-dropdown" ngbDropdownMenu>
 
                     <form class="p-3">
                         <div class="form-group m-0">
                             <div class="input-group">
-                                <input type="text" class="form-control" placeholder="Search ..." aria-label="Search Result">
+                                <input type="text" class="form-control" placeholder="Search ..."
+                                    aria-label="Search Result">
 
                                 <button class="btn btn-primary" type="submit"><i class="mdi mdi-magnify"></i></button>
                             </div>
@@ -56,7 +60,8 @@
             </div>
 
             <div class="dropdown d-none d-sm-inline-block" ngbDropdown>
-                <button type="button" class="btn header-item" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" ngbDropdownToggle>
+                <button type="button" class="btn header-item" data-bs-toggle="dropdown" aria-haspopup="true"
+                    aria-expanded="false" ngbDropdownToggle>
                     @if(flagvalue === undefined){
                     <img src="{{valueset}}" alt="Header Language" height="16">}
                     @else{
@@ -64,8 +69,11 @@
                 </button>
                 <div class="dropdown-menu dropdown-menu-end" ngbDropdownMenu>
                     @for (item of listLang; track $index) {
-                    <a href="javascript:void(0);" class="dropdown-item notify-item" (click)="setLanguage(item.text, item.lang, item.flag)" [ngClass]="{'active': cookieValue === item.lang}">
-                        <img src="{{item.flag}}" alt="user-image" class="me-1" height="12"> <span class="align-middle">{{item.text}}</span>
+                    <a href="javascript:void(0);" class="dropdown-item notify-item"
+                        (click)="setLanguage(item.text, item.lang, item.flag)"
+                        [ngClass]="{'active': cookieValue === item.lang}">
+                        <img src="{{item.flag}}" alt="user-image" class="me-1" height="12"> <span
+                            class="align-middle">{{item.text}}</span>
                     </a>
                     }
                 </div>
@@ -85,7 +93,8 @@
             </div>
 
             <div class="dropdown d-none d-lg-inline-block ms-1" ngbDropdown>
-                <button type="button" class="btn header-item" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" ngbDropdownToggle>
+                <button type="button" class="btn header-item" data-bs-toggle="dropdown" aria-haspopup="true"
+                    aria-expanded="false" ngbDropdownToggle>
                     <i-feather name="grid" class="icon-lg"></i-feather>
                 </button>
                 <div class="dropdown-menu dropdown-menu-lg dropdown-menu-end" ngbDropdownMenu>
@@ -136,18 +145,22 @@
             </div>
 
             <div class="dropdown d-inline-block" ngbDropdown>
-                <button type="button" class="btn header-item noti-icon position-relative" id="page-header-notifications-dropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" ngbDropdownToggle>
+                <button type="button" class="btn header-item noti-icon position-relative"
+                    id="page-header-notifications-dropdown" data-bs-toggle="dropdown" aria-haspopup="true"
+                    aria-expanded="false" ngbDropdownToggle>
                     <i-feather name="bell" class="icon-lg"></i-feather>
                     <span class="badge bg-danger rounded-pill">5</span>
                 </button>
-                <div class="dropdown-menu dropdown-menu-lg dropdown-menu-end p-0" aria-labelledby="page-header-notifications-dropdown" ngbDropdownMenu>
+                <div class="dropdown-menu dropdown-menu-lg dropdown-menu-end p-0"
+                    aria-labelledby="page-header-notifications-dropdown" ngbDropdownMenu>
                     <div class="p-3">
                         <div class="row align-items-center">
                             <div class="col">
                                 <h6 class="m-0"> {{ 'HEADER.NOTIFICATIONS.TITLE' | translate}} </h6>
                             </div>
                             <div class="col-auto">
-                                <a href="javascript:void(0);" class="small text-reset text-decoration-underline"> {{ 'HEADER.NOTIFICATIONS.VIEW_ALL' | translate}}</a>
+                                <a href="javascript:void(0);" class="small text-reset text-decoration-underline"> {{
+                                    'HEADER.NOTIFICATIONS.VIEW_ALL' | translate}}</a>
                             </div>
                         </div>
                     </div>
@@ -155,13 +168,15 @@
                         <a href="javascript:void(0);" class="text-reset notification-item">
                             <div class="d-flex">
                                 <div class="flex-shrink-0 me-3">
-                                    <img src="assets/images/users/avatar-3.jpg" class="rounded-circle avatar-sm" alt="user-pic">
+                                    <img src="assets/images/users/avatar-3.jpg" class="rounded-circle avatar-sm"
+                                        alt="user-pic">
                                 </div>
                                 <div class="flex-grow-1">
                                     <h6 class="mb-1">{{ 'HEADER.NOTIFICATIONS.FIRST.TITLE' | translate}}</h6>
                                     <div class="font-size-13 text-muted">
                                         <p class="mb-1">{{ 'HEADER.NOTIFICATIONS.FIRST.TEXT' | translate}}</p>
-                                        <p class="mb-0"><i class="mdi mdi-clock-outline"></i> <span>{{ 'HEADER.NOTIFICATIONS.FIRST.TIME' | translate}}</span>
+                                        <p class="mb-0"><i class="mdi mdi-clock-outline"></i> <span>{{
+                                                'HEADER.NOTIFICATIONS.FIRST.TIME' | translate}}</span>
                                         </p>
                                     </div>
                                 </div>
@@ -178,7 +193,8 @@
                                     <h6 class="mb-1">{{ 'HEADER.NOTIFICATIONS.SECOND.TITLE' | translate}}</h6>
                                     <div class="font-size-13 text-muted">
                                         <p class="mb-1">{{ 'HEADER.NOTIFICATIONS.SECOND.TEXT' | translate}}</p>
-                                        <p class="mb-0"><i class="mdi mdi-clock-outline"></i> <span>{{ 'HEADER.NOTIFICATIONS.SECOND.TIME' | translate}}</span></p>
+                                        <p class="mb-0"><i class="mdi mdi-clock-outline"></i> <span>{{
+                                                'HEADER.NOTIFICATIONS.SECOND.TIME' | translate}}</span></p>
                                     </div>
                                 </div>
                             </div>
@@ -194,7 +210,8 @@
                                     <h6 class="mb-1">{{ 'HEADER.NOTIFICATIONS.THIRD.TITLE' | translate}}</h6>
                                     <div class="font-size-13 text-muted">
                                         <p class="mb-1">{{ 'HEADER.NOTIFICATIONS.THIRD.TEXT' | translate}}</p>
-                                        <p class="mb-0"><i class="mdi mdi-clock-outline"></i> <span>{{ 'HEADER.NOTIFICATIONS.THIRD.TIME' |
+                                        <p class="mb-0"><i class="mdi mdi-clock-outline"></i> <span>{{
+                                                'HEADER.NOTIFICATIONS.THIRD.TIME' |
                                                 translate}}</span></p>
                                     </div>
                                 </div>
@@ -204,13 +221,15 @@
                         <a href="javascript:void(0);" class="text-reset notification-item">
                             <div class="d-flex">
                                 <div class="flex-shrink-0 me-3">
-                                    <img src="assets/images/users/avatar-6.jpg" class="rounded-circle avatar-sm" alt="user-pic">
+                                    <img src="assets/images/users/avatar-6.jpg" class="rounded-circle avatar-sm"
+                                        alt="user-pic">
                                 </div>
                                 <div class="flex-grow-1">
                                     <h6 class="mb-1">{{ 'HEADER.NOTIFICATIONS.FOUR.TITLE' | translate}}</h6>
                                     <div class="font-size-13 text-muted">
                                         <p class="mb-1">{{ 'HEADER.NOTIFICATIONS.FOUR.TEXT' | translate}}</p>
-                                        <p class="mb-0"><i class="mdi mdi-clock-outline"></i> <span>{{ 'HEADER.NOTIFICATIONS.FOUR.TIME' |
+                                        <p class="mb-0"><i class="mdi mdi-clock-outline"></i> <span>{{
+                                                'HEADER.NOTIFICATIONS.FOUR.TIME' |
                                                 translate}}</span>
                                         </p>
                                     </div>
@@ -234,17 +253,25 @@
             </div>
 
             <div class="dropdown d-inline-block" ngbDropdown>
-                <button type="button" class="btn header-item bg-light-subtle border-start border-end" id="page-header-user-dropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" ngbDropdownToggle>
-                    <img class="rounded-circle header-profile-user" src="assets/images/users/avatar-1.jpg" alt="Header Avatar">
-                    <span class="d-none d-xl-inline-block ms-1 fw-medium">Shawn L.</span>
+                <button type="button" class="btn header-item bg-light-subtle border-start border-end"
+                    id="page-header-user-dropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
+                    ngbDropdownToggle>
+                    <img class="rounded-circle header-profile-user" src="assets/images/users/avatar-1.jpg"
+                        alt="Header Avatar">
+                    <span class="d-none d-xl-inline-block ms-1 fw-medium">Admin</span>
                     <i class="mdi mdi-chevron-down d-none d-xl-inline-block"></i>
                 </button>
                 <div class="dropdown-menu dropdown-menu-end" ngbDropdownMenu>
                     <!-- item-->
-                    <a class="dropdown-item" routerLink="/apps/profile"><i class="mdi mdi-face-profile font-size-16 align-middle me-1"></i> Profile</a>
-                    <a class="dropdown-item" routerLink="/account/lock-screen"><i class="mdi mdi-lock font-size-16 align-middle me-1"></i> Lock screen</a>
+                    <a class="dropdown-item" routerLink="/apps/profile"><i
+                            class="mdi mdi-face-profile font-size-16 align-middle me-1"></i> Profile</a>
+                    <a class="dropdown-item" routerLink="/account/lock-screen"><i
+                            class="mdi mdi-lock font-size-16 align-middle me-1"></i> Lock screen</a>
                     <div class="dropdown-divider"></div>
-                    <a class="dropdown-item" href="javascript: void(0);" (click)="logout()"><i class="mdi mdi-logout text-muted font-size-16 align-middle me-1"></i> <span class="align-middle" key="t-logout">{{ 'MENUITEMS.AUTHENTICATION.LIST.LOGOUT' | translate}}</span></a>
+                    <a class="dropdown-item" href="javascript: void(0);" (click)="logout()"><i
+                            class="mdi mdi-logout text-muted font-size-16 align-middle me-1"></i> <span
+                            class="align-middle" key="t-logout">{{ 'MENUITEMS.AUTHENTICATION.LIST.LOGOUT' |
+                            translate}}</span></a>
                 </div>
             </div>
 
@@ -261,13 +288,16 @@
                         <li class="nav-item dropdown">
 
                             @if(item.subItems){
-                            <a class="nav-link dropdown-toggle arrow-none" (click)="onMenuClick($event)" href="javascript: void(0);" id="topnav-components" role="button">
+                            <a class="nav-link dropdown-toggle arrow-none" (click)="onMenuClick($event)"
+                                href="javascript: void(0);" id="topnav-components" role="button">
                                 <i-feather name="{{ item.icon }}"></i-feather>
                                 {{item.label | translate }}
                                 <div class="arrow-down"></div>
                             </a>
                             }@else {
-                            <a class="nav-link dropdown-toggle arrow-none" (click)="onMenuClick($event)" href="javascript: void(0);" id="topnav-components" [routerLink]="item.link" role="button">
+                            <a class="nav-link dropdown-toggle arrow-none" (click)="onMenuClick($event)"
+                                href="javascript: void(0);" id="topnav-components" [routerLink]="item.link"
+                                role="button">
 
                                 <i-feather name="{{ item.icon }}"></i-feather>{{ item.label | translate}}
                                 @if(hasItems(item)){<div class="arrow-down"></div>}
@@ -279,7 +309,8 @@
 
                                     @if(hasItems(subitem)){
                                     <div class="dropdown">
-                                        <a class="dropdown-item dropdown-toggle" href="javascript: void(0);" (click)="onMenuClick($event)">{{ subitem.label | translate }}
+                                        <a class="dropdown-item dropdown-toggle" href="javascript: void(0);"
+                                            (click)="onMenuClick($event)">{{ subitem.label | translate }}
                                             <div class="arrow-down"></div>
                                         </a>
                                         <div class="dropdown-menu">
@@ -288,21 +319,30 @@
                                                 @if(hasItems(subSubitem)){
                                                 <div class="dropdown">
 
-                                                    <a class="dropdown-item dropdown-toggle" href="javascript: void(0);" (click)="onMenuClick($event)">{{ subSubitem.label | translate }}
+                                                    <a class="dropdown-item dropdown-toggle" href="javascript: void(0);"
+                                                        (click)="onMenuClick($event)">{{ subSubitem.label | translate }}
                                                         <div class="arrow-down"></div>
                                                     </a>
                                                     <div class="dropdown-menu">
-                                                        <ng-template ngFor let-subSubSubitem [ngForOf]="subSubitem.subItems">
-                                                            <a class="dropdown-item side-nav-link-ref" href="javascript: void(0);" [routerLink]="subSubSubitem.link" routerLinkActive="active">{{ subSubSubitem.label | translate }}
+                                                        <ng-template ngFor let-subSubSubitem
+                                                            [ngForOf]="subSubitem.subItems">
+                                                            <a class="dropdown-item side-nav-link-ref"
+                                                                href="javascript: void(0);"
+                                                                [routerLink]="subSubSubitem.link"
+                                                                routerLinkActive="active">{{ subSubSubitem.label |
+                                                                translate }}
 
                                                             </a>
                                                         </ng-template>
                                                     </div>
                                                 </div>}
                                                 @else {
-                                                <a class="dropdown-item side-nav-link-ref" href="javascript: void(0);" [routerLink]="subSubitem.link" routerLinkActive="active">{{ subSubitem.label | translate }}
+                                                <a class="dropdown-item side-nav-link-ref" href="javascript: void(0);"
+                                                    [routerLink]="subSubitem.link" routerLinkActive="active">{{
+                                                    subSubitem.label | translate }}
                                                     @if(subSubitem.badge){
-                                                    <span class="badge rounded-pill badge-soft-{{subSubitem.badge.variant}} float-end">{{subSubitem.badge.text
+                                                    <span
+                                                        class="badge rounded-pill badge-soft-{{subSubitem.badge.variant}} float-end">{{subSubitem.badge.text
                                                         | translate}}</span>}
                                                 </a>
                                                 }
@@ -310,7 +350,9 @@
                                         </div>
                                     </div>
                                     }@else {
-                                    <a class="col dropdown-item side-nav-link-ref" href="javascript: void(0);" [routerLink]="subitem.link" routerLinkActive="active">{{subitem.label | translate }}</a>
+                                    <a class="col dropdown-item side-nav-link-ref" href="javascript: void(0);"
+                                        [routerLink]="subitem.link" routerLinkActive="active">{{subitem.label |
+                                        translate }}</a>
                                     }
                                 </ng-template>
                             </div>}

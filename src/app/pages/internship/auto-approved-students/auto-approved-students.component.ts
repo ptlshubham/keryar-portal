@@ -46,7 +46,7 @@ export class AutoApprovedStudentsComponent implements OnInit {
   ngOnInit(): void {
     this.breadCrumbItems = [
       { label: 'Home' },
-      { label: 'Auto-Approved Internships', active: true }
+      { label: 'Paid Internships', active: true }
     ];
     this.getAutoApprovedStudents();
   }
@@ -65,12 +65,18 @@ export class AutoApprovedStudentsComponent implements OnInit {
       } else if (typeof res === 'object') {
         data = [res];
       }
-
+      console.log('Auto-approved students data:', data);
       this.autoApprovedStudents = data || [];
       for (let i = 0; i < this.autoApprovedStudents.length; i++) {
         this.autoApprovedStudents[i].index = i + 1;
         if (this.autoApprovedStudents[i].resume) {
           this.autoApprovedStudents[i].resume_url = this.serverBaseUrl + this.autoApprovedStudents[i].resume;
+        }
+        if (this.autoApprovedStudents[i].offerletter) {
+          this.autoApprovedStudents[i].offerletter_url = this.serverBaseUrl + this.autoApprovedStudents[i].offerletter;
+        }
+        if (this.autoApprovedStudents[i].certificate) {
+          this.autoApprovedStudents[i].certificate_url = this.serverBaseUrl + this.autoApprovedStudents[i].certificate;
         }
       }
 
@@ -251,12 +257,46 @@ export class AutoApprovedStudentsComponent implements OnInit {
     }
   }
 
+  openCertificateInNewTab(student: any) {
+    const url = student.certificate_url || (student.certificate ? this.serverBaseUrl + student.certificate : null);
+    if (url) {
+      window.open(url, '_blank');
+    }
+  }
+
+  openOfferLetterInNewTab(student: any) {
+    const url = student.offerletter_url || (student.offerletter ? this.serverBaseUrl + student.offerletter : null);
+    if (url) {
+      window.open(url, '_blank');
+    }
+  }
+
   downloadResume(student: any) {
     const url = student.resume_url || (student.resume ? this.serverBaseUrl + student.resume : null);
     if (url) {
       const link = document.createElement('a');
       link.href = url;
       link.download = `${student.firstname}_${student.lastname}_resume.pdf`;
+      link.click();
+    }
+  }
+
+  downloadCertificate(student: any) {
+    const url = student.certificate_url || (student.certificate ? this.serverBaseUrl + student.certificate : null);
+    if (url) {
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `${student.firstname}_${student.lastname}_certificate.pdf`;
+      link.click();
+    }
+  }
+
+  downloadOfferLetter(student: any) {
+    const url = student.offerletter_url || (student.offerletter ? this.serverBaseUrl + student.offerletter : null);
+    if (url) {
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `${student.firstname}_${student.lastname}_offerletter.pdf`;
       link.click();
     }
   }
@@ -295,6 +335,22 @@ export class AutoApprovedStudentsComponent implements OnInit {
       startY: 25
     });
     doc.save(`Auto_Approved_${new Date().toISOString().split('T')[0]}.pdf`);
+  }
+
+  downloadBulkOfferLetters() {
+    this.filteredStudents.forEach(student => {
+      if (student.offerletter) {
+        this.downloadOfferLetter(student);
+      }
+    });
+  }
+
+  downloadBulkCertificates() {
+    this.filteredStudents.forEach(student => {
+      if (student.certificate) {
+        this.downloadCertificate(student);
+      }
+    });
   }
 
   generateOfferLetter(val: any) {
