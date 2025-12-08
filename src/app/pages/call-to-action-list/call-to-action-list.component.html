@@ -26,7 +26,7 @@
                                 <td class="text-center">{{c.email || 'N/A'}}</td>
                                 <td class="text-center">{{c.contactnumber || 'N/A'}}</td>
                                 <td class="text-center">{{c.pagename || 'N/A'}}</td>
-                                <td class="text-center">{{c.createddate | date:'shortDate'}}</td>
+                                <td class="text-center">{{ formatTime(c.createddate) }}</td>
                                 <td class="text-end">
                                     <div class="d-flex justify-content-end gap-1">
                                         <button type="button" class="btn btn-soft-danger waves-effect waves-light"
