@@ -183,7 +183,7 @@ export class ApiService {
   public static deleteTestimonialURL: string = ApiService.HOST_URL + '/keryar/DeleteTestimonial/';
 
   // Certificate Generation
-  public static generateAndSendSingleCertificateURL: string = ApiService.HOST_URL + '/keryar/GenerateAndSendSingleCertificate';
+  public static generateAndSendSingleCertificateURL: string = ApiService.HOST_URL + '/keryar/GenerateMultipleCertificate';
   public static generateAndSendInternshipCertificatesURL: string = ApiService.HOST_URL + '/keryar/GenerateAndSendInternshipCertificates';
 
   // Offer Letter Generation

@@ -14,6 +14,8 @@
                                 <th class="text-center"> Name</th>
                                 <th class="text-center">Email</th>
                                 <th class="text-center">Contact</th>
+                                <th class="text-center">Company Name</th>
+                                <th class="text-center">Service</th>
                                 <th class="text-center">Page</th>
                                 <th class="text-center">Created Date</th>
                                 <th class="text-end">Action</th>
@@ -25,6 +27,8 @@
                                 <td class="text-center">{{c.name || 'N/A'}}</td>
                                 <td class="text-center">{{c.email || 'N/A'}}</td>
                                 <td class="text-center">{{c.contactnumber || 'N/A'}}</td>
+                                <td class="text-center">{{c.companyname || 'N/A'}}</td>
+                                <td class="text-center">{{c.service || 'N/A'}}</td>
                                 <td class="text-center">{{c.pagename || 'N/A'}}</td>
                                 <td class="text-center">{{ formatTime(c.createddate) }}</td>
                                 <td class="text-end">

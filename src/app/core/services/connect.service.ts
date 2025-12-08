@@ -47,4 +47,7 @@ export class ConnectService {
         return this.httpClient.post(ApiService.generateAndSendSingleOfferLetterURL, data);
     }
 
+    generateCertificate(data: any): Observable<any> {
+        return this.httpClient.post(ApiService.generateAndSendSingleCertificateURL, data);
+    }
 }

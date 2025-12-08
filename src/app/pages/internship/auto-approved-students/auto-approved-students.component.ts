@@ -35,6 +35,9 @@ export class AutoApprovedStudentsComponent implements OnInit {
   isGenerating: boolean = false;
   progress: number = 0;
   generatingId: any = null;
+  isGeneratingCertificate: boolean = false;
+  progressCertificate: number = 0;
+  generatingCertificateId: any = null;
   constructor(
     public connectService: ConnectService,
     public toastr: ToastrService,
@@ -433,6 +436,87 @@ export class AutoApprovedStudentsComponent implements OnInit {
 
         const selectedData = this.filteredStudents.filter((student: any) => this.selectedStudents.has(student.id));
         this.generateOfferLetter(selectedData);
+      }
+    });
+  }
+
+  generateCertificate(val: any) {
+    this.isGeneratingCertificate = true;
+    this.generatingCertificateId = Array.isArray(val) ? null : val.id;
+    this.progressCertificate = 5; // start
+
+    const data = Array.isArray(val) ? val : [val];
+
+    // Fake Progress Bar (smooth animation)
+    let progressInterval = setInterval(() => {
+      if (this.progressCertificate < 90) {
+        this.progressCertificate += 5;
+      }
+    }, 300);
+
+    this.connectService.generateCertificate(data).subscribe({
+      next: (res: any) => {
+        clearInterval(progressInterval);
+        this.progressCertificate = 100;
+
+        if (res.success) {
+          this.filteredStudents = [];
+          Swal.fire('Success!', 'Certificates generated successfully.', 'success');
+          if (Array.isArray(val)) {
+            this.selectedStudents.clear();
+            this.selectAll = false;
+            this.getAutoApprovedStudents();
+          }
+        } else {
+          Swal.fire('Error!', 'Error generating certificates.', 'error');
+        }
+
+        setTimeout(() => {
+          this.isGeneratingCertificate = false;
+          this.progressCertificate = 0;
+          this.generatingCertificateId = null;
+        }, 500);
+      },
+
+      error: (err) => {
+        clearInterval(progressInterval);
+        this.progressCertificate = 0;
+        this.isGeneratingCertificate = false;
+        this.generatingCertificateId = null;
+
+        Swal.fire('Error!', 'Something went wrong while generating certificates.', 'error');
+      }
+    });
+  }
+
+  generateBulkCertificate() {
+    if (this.selectedStudents.size === 0) {
+      this.toastr.warning('Please select at least one student.');
+      return;
+    }
+
+    Swal.fire({
+      title: 'Generate Certificates?',
+      text: `Generate certificates for ${this.selectedStudents.size} student(s)?`,
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Yes, generate!',
+      cancelButtonText: 'Cancel'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        Swal.fire({
+          title: 'Generating...',
+          text: 'Please wait while generating certificates.',
+          allowOutsideClick: false,
+          didOpen: () => {
+            Swal.showLoading();
+          }
+        });
+
+        const selectedData = this.filteredStudents.filter((student: any) => this.selectedStudents.has(student.id));
+        this.generateCertificate(selectedData);
       }
     });
   }

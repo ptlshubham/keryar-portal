@@ -44,7 +44,10 @@
                         {{ selectedStudents.size }} student(s) selected
                     </span>
                     <button type="button" class="btn btn-warning btn-sm" (click)="generateBulkOfferLetter()">
-                        <i class="bx bx-x-circle me-1"></i>Generate Offer Letters
+                        <i class="bx bx-file-blank me-1"></i>Generate Offer Letters
+                    </button>
+                    <button type="button" class="btn btn-info btn-sm" (click)="generateBulkCertificate()">
+                        <i class="bx bx-certification me-1"></i>Generate Certificates
                     </button>
                     <button type="button" class="btn btn-warning btn-sm" (click)="bulkSetManualApproval()">
                         <i class="bx bx-x-circle me-1"></i>Set to Manual Approval
@@ -107,12 +110,24 @@
                                     </span>
                                 </td>
                                 <td class="text-center">
-                                    <button type="button" class="btn btn-soft-primary btn-sm waves-effect waves-light"
-                                        data-bs-toggle="tooltip" data-bs-placement="top" title="Open Offer Letter"
-                                        (click)="openOfferLetterInNewTab(s)" *ngIf="s.offerletter"
-                                        [disabled]="!s.offerletter">
-                                        <i class="bx bx-show font-size-16 align-middle"></i>
-                                    </button>
+                                    <div class="d-flex justify-content-center gap-1">
+                                        <button type="button"
+                                            class="btn btn-soft-primary btn-sm waves-effect waves-light"
+                                            data-bs-toggle="tooltip" data-bs-placement="top" title="Open Offer Letter"
+                                            (click)="openOfferLetterInNewTab(s)" *ngIf="s.offerletter"
+                                            [disabled]="!s.offerletter">
+                                            <i class="bx bx-show font-size-16 align-middle"></i>
+                                        </button>
+                                        <button type="button"
+                                            class="btn btn-soft-primary btn-sm waves-effect waves-light"
+                                            data-bs-toggle="tooltip" data-bs-placement="top"
+                                            title="Generate Offer Letter" (click)="generateOfferLetter(s)"
+                                            [disabled]="isGenerating">
+                                            <i class="bx bxs-file-pdf font-size-16 align-middle"></i>
+                                            <span *ngIf="isGenerating && generatingId === s.id"
+                                                class="spinner-border spinner-border-sm ms-1"></span>
+                                        </button>
+                                    </div>
                                 </td>
                                 <td class="text-center">
                                     <span class="badge" [ngClass]="s.isCertificate == 1 ? 'bg-warning' : 'bg-success'">
@@ -120,12 +135,23 @@
                                     </span>
                                 </td>
                                 <td class="text-center">
-                                    <button type="button" class="btn btn-soft-success btn-sm waves-effect waves-light"
-                                        data-bs-toggle="tooltip" data-bs-placement="top" title="Open Certificate"
-                                        (click)="openCertificateInNewTab(s)" *ngIf="s.certificate"
-                                        [disabled]="!s.certificate">
-                                        <i class="bx bx-show font-size-16 align-middle"></i>
-                                    </button>
+                                    <div class="d-flex justify-content-center gap-1">
+                                        <button type="button"
+                                            class="btn btn-soft-success btn-sm waves-effect waves-light"
+                                            data-bs-toggle="tooltip" data-bs-placement="top" title="Open Certificate"
+                                            (click)="openCertificateInNewTab(s)" *ngIf="s.certificate"
+                                            [disabled]="!s.certificate">
+                                            <i class="bx bx-show font-size-16 align-middle"></i>
+                                        </button>
+                                        <button type="button" class="btn btn-soft-info btn-sm waves-effect waves-light"
+                                            data-bs-toggle="tooltip" data-bs-placement="top"
+                                            title="Generate Certificate" (click)="generateCertificate(s)"
+                                            [disabled]="isGeneratingCertificate">
+                                            <i class="bx bxs-certification font-size-16 align-middle"></i>
+                                            <span *ngIf="isGeneratingCertificate && generatingCertificateId === s.id"
+                                                class="spinner-border spinner-border-sm ms-1"></span>
+                                        </button>
+                                    </div>
                                 </td>
 
                                 <td class="text-end">
@@ -135,16 +161,6 @@
                                             (click)="openPreview(s, previewModal)">
                                             <i class="bx bx-show font-size-16 align-middle"></i>
                                         </button>
-                                        <button type="button" class="btn btn-soft-primary waves-effect waves-light"
-                                            data-bs-toggle="tooltip" data-bs-placement="top"
-                                            title="Generate Offer Letter" (click)="generateOfferLetter(s)"
-                                            [disabled]="isGenerating">
-                                            <i class="bx bxs-file-pdf font-size-16 align-middle"></i>
-
-                                            <span *ngIf="isGenerating && generatingId === s.id"
-                                                class="spinner-border spinner-border-sm ms-1"></span>
-                                        </button>
-
                                         <button type="button" class="btn btn-soft-danger waves-effect waves-light"
                                             data-bs-toggle="tooltip" data-bs-placement="top" title="Delete"
                                             (click)="removeStudentData(s.id)">
